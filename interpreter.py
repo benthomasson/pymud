@@ -36,8 +36,7 @@ class InterpreterVisitor(object):
         if self.commands.has_key(command.value):
             for expression in node.expressions[1:]:
                 finish(self.visit(expression))
-            print "Calling %s with %s" % (self.commands[command.value],
-                map(lambda x: x.value,node.expressions[1:]))
+            apply(self.commands[command.value],map(lambda x: x.value,node.expressions[1:]))
         else:
             for expression in node.expressions[1:]:
                 finish(self.visit(expression))
@@ -66,7 +65,7 @@ def say(*args):
 class Test(unittest.TestCase):
 
     def testStrings(self):
-        finish(interpret("""hello there""",{},{}))
+        finish(interpret("""hello there\n""",{},{}))
         finish(interpret("""hello there
 line 2
 line 3
@@ -82,7 +81,7 @@ variable $var
             step(call)
 
     def testCommand(self):
-        finish(interpret("""say hello""",{'say':say},{}))
+        finish(interpret("""say hello\n""",{'say':say},{}))
 
 
 

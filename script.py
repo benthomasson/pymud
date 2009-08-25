@@ -56,6 +56,15 @@ class Block(object):
         return buf
 
 
+class SingleCommand(object):
+
+    def __init__(self,tokens):
+        self.statement = tokens[0]
+        self.value = None
+
+    def __repr__(self):
+        return "SingleCommand: %s" % self.statement
+
 ParserElement.setDefaultWhitespaceChars("")
 
 empty = ZeroOrMore(White(" ")).suppress()
@@ -64,13 +73,15 @@ word.setParseAction(Symbol)
 variable = Combine( Word("$") + Word(alphas)) + empty
 variable.setParseAction(Variable)
 expression = OneOrMore(word | variable)
-expressionStatement = expression + Optional(White("\n")).suppress()
+expressionStatement = expression + empty + White("\n").suppress()
 expressionStatement.setParseAction(ExpressionStatement)
 fourSpace = White(" ") + White(" ") + White(" ") + White(" ")
 assign = word + Word("=") + empty + expression
 assign.setParseAction(Assign)
 block = OneOrMore(assign|expressionStatement)
 block.setParseAction(Block)
+singleCommand = assign|expressionStatement + StringEnd()
+singleCommand.setParseAction(SingleCommand)
 
 class Test(unittest.TestCase):
 
@@ -83,11 +94,14 @@ class Test(unittest.TestCase):
         print word.parseString('hello $there')
 
     def testLine(self):
-        print expressionStatement.parseString('hello')
-        print expressionStatement.parseString('hello there')
+        print expressionStatement.parseString('hello\n')
+        print expressionStatement.parseString('hello there\n')
         print expressionStatement.parseString('hello there\nboo')
         print block.parseString('hello there\nboo')
-        print expressionStatement.parseString('hello $there everyone')
+        print expressionStatement.parseString('hello $there everyone\n')
+
+    def testLineComplete(self):
+        print expressionStatement.parseString('hello dfdf\n')
 
     def testBlock(self):
         print block.parseString("""hello there
@@ -99,6 +113,11 @@ x = $a
     def testAssign(self):
         print assign.parseString("""x = a""")
 
+    def testSingleCommand(self):
+        print singleCommand.parseString("""x = a\n""")
+        print singleCommand.parseString("""hello there $var\n""")
+        self.assertRaises(ParseException,singleCommand.parseString,"""hello there $var
+second command""")
 
 if __name__ == '__main__':
     unittest.main()

@@ -57,7 +57,7 @@ def say(*args):
 class Test(unittest.TestCase):
 
     def testStrings(self):
-        check("""hello there""",{},{})
+        check("""hello there\n""",{},{})
         check("""hello there
 line 2
 line 3
@@ -70,10 +70,10 @@ variable $var
 """,{},{'var':5})
 
     def testCommand(self):
-        check("""say hello""",{'say':say},{})
+        check("""say hello\n""",{'say':say},{})
 
     def testVariableFailure(self):
-        self.assertRaises(VariableNotSetException,check,"""say hello $var""",{'say':say},{})
+        self.assertRaises(VariableNotSetException,check,"""say hello $var\n""",{'say':say},{})
 
 
 if __name__ == '__main__':
