@@ -44,7 +44,7 @@ class CheckerVisitor(object):
         if self.variables.has_key(node.name):
             node.value = self.variables[node.name]
         else:
-            raise VariableNotSetException('Cannot find variable %s' % node.name)
+            raise VariableNotSetException('Cannot find variable: %s' % node.name)
 
 def check(scriptText,commands,variables):
     block = script.block.parseString(scriptText)
