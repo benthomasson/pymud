@@ -11,6 +11,22 @@ def coroutine(func):
         return cr
     return start
 
+
+def step(func,steps=1):
+    try:
+        if steps >= 0:
+            for i in xrange(steps):
+                func.next()
+        else:
+            while True:
+                func.next()
+        return True
+    except StopIteration:
+        return False
+
+def finish(func):
+    step(func,-1)
+
 # Example use
 if __name__ == '__main__':
     @coroutine

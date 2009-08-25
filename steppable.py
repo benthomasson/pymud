@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from coroutine import coroutine
+from coroutine import coroutine, step
 
 
 @coroutine
@@ -8,19 +8,6 @@ def steppable():
     for x in xrange(100):
         yield
         print x
-
-def step(x,steps=1):
-    try:
-        if steps >= 0:
-            for i in xrange(steps):
-                x.next()
-        else:
-            while True:
-                x.next()
-        return True
-    except StopIteration:
-        return False
-
 
 @coroutine
 def steppable2():
