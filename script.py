@@ -56,15 +56,6 @@ class Block(object):
         return buf
 
 
-class SingleCommand(object):
-
-    def __init__(self,tokens):
-        self.statement = tokens[0]
-        self.value = None
-
-    def __repr__(self):
-        return "SingleCommand: %s" % self.statement
-
 ParserElement.setDefaultWhitespaceChars("")
 
 empty = ZeroOrMore(White(" ")).suppress()
@@ -80,8 +71,6 @@ assign = word + Word("=") + empty + expression
 assign.setParseAction(Assign)
 block = OneOrMore(assign|expressionStatement)
 block.setParseAction(Block)
-singleCommand = assign|expressionStatement + StringEnd()
-singleCommand.setParseAction(SingleCommand)
 
 class Test(unittest.TestCase):
 
@@ -112,12 +101,6 @@ x = $a
 
     def testAssign(self):
         print assign.parseString("""x = a""")
-
-    def testSingleCommand(self):
-        print singleCommand.parseString("""x = a\n""")
-        print singleCommand.parseString("""hello there $var\n""")
-        self.assertRaises(ParseException,singleCommand.parseString,"""hello there $var
-second command""")
 
 if __name__ == '__main__':
     unittest.main()
