@@ -7,13 +7,13 @@ import SocketServer
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
+        socketFile = self.request.makefile('rw')
         try:
             while True:
-                self.request.send("Hello there>")
-                data = self.request.recv(1024)
-                cur_thread = threading.currentThread()
-                response = data.upper()
-                self.request.send(response)
+                data = socketFile.readline()
+                print data
+                socketFile.write(data.upper())
+                socketFile.flush()
         except BaseException, e:
             print str(e)
 
@@ -34,6 +34,9 @@ if __name__ == "__main__":
     server_thread.start()
     print "Server loop running in thread:", server_thread.getName()
 
-    server.serve_forever()
+    try:
+        server.serve_forever()
+    except BaseException, e:
+        pass
     server.shutdown()
 
