@@ -9,7 +9,8 @@ def classname(obj):
 
 class InterpreterVisitor(object):
 
-    def __init__(self,commands,variables):
+    def __init__(self,instance,commands,variables):
+        self.instance = instance
         self.commands = commands
         self.variables = variables
 
@@ -33,10 +34,15 @@ class InterpreterVisitor(object):
         yield
         command = node.expressions[0]
         finish(self.visit(command))
-        if self.commands.has_key(command.value):
+        if command.value in self.commands:
             for expression in node.expressions[1:]:
                 finish(self.visit(expression))
-            apply(self.commands[command.value],map(lambda x: x.value,node.expressions[1:]))
+            func = self.commands[command.value]
+            arguments = map(lambda x: x.value,node.expressions[1:])
+            if hasattr(func,'im_self') and func.im_self:
+                apply(func,arguments)
+            else:
+                apply(func,[self.instance] + arguments)
         else:
             for expression in node.expressions[1:]:
                 finish(self.visit(expression))
@@ -48,40 +54,40 @@ class InterpreterVisitor(object):
 
     def visitVariable(self,node,*args):
         yield
-        if self.variables.has_key(node.name):
+        if node.name in self.variables:
             node.value = self.variables[node.name]
         else:
             print None
 
-def interpret(scriptText,commands,variables):
+def interpret(scriptText,instance,commands,variables):
     block = script.block.parseString(scriptText)
-    visitor = InterpreterVisitor(commands,variables)
+    visitor = InterpreterVisitor(instance,commands,variables)
     call = visitor.walk(block[0])
     while step(call):yield
 
-def say(*args):
+def say(self,*args):
     print args
 
 class Test(unittest.TestCase):
 
     def testStrings(self):
-        finish(interpret("""hello there\n""",{},{}))
+        finish(interpret("""hello there\n""",None,{},{}))
         finish(interpret("""hello there
 line 2
 line 3
 variable $var
-""",{},{'var':5}))
+""",None,{},{'var':5}))
         call = interpret("""hello there
 line 2
 line 3
 variable $var
-""",{},{'var':5})
+""",None,{},{'var':5})
         for x in xrange(10):
             print "%s:" % x
             step(call)
 
     def testCommand(self):
-        finish(interpret("""say hello\n""",{'say':say},{}))
+        finish(interpret("""say hello\n""",None,{'say':say},{}))
 
 
 

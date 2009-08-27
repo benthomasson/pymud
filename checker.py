@@ -30,7 +30,7 @@ class CheckerVisitor(object):
         """Handles the command statement case and the print statement case"""
         command = node.expressions[0]
         self.visit(command)
-        if self.commands.has_key(command.value):
+        if command.value in self.commands:
             for expression in node.expressions[1:]:
                 self.visit(expression)
         else:
@@ -41,7 +41,7 @@ class CheckerVisitor(object):
         node.value = node.name
 
     def visitVariable(self,node,*args):
-        if self.variables.has_key(node.name):
+        if node.name in self.variables:
             node.value = self.variables[node.name]
         else:
             raise VariableNotSetException('Cannot find variable: %s' % node.name)
