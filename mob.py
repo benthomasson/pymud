@@ -11,6 +11,9 @@ class Mob():
         self.stdout = stdout
         self.variables = {}
 
+    def default(self,args):
+        apply(self.say,args)
+
     def say(self,*args):
         self.stdout.write(" ".join(args) + "\n")
 
