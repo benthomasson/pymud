@@ -4,17 +4,39 @@ import socket
 import threading
 import SocketServer
 
+import checker
+import interpreter
+from coroutine import finish
+from mob import Mob
+
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+
+    def prompt(self):
+        return ">>>"
 
     def handle(self):
         socketFile = self.request.makefile('rw')
+        self.mob = Mob(stdin=socketFile,stdout=socketFile)
         try:
             while True:
-                data = socketFile.readline()
-                print data
-                socketFile.write(data.upper())
+                socketFile.write(self.prompt())
+                socketFile.flush()
+                command = socketFile.readline()
+                if not command: break
+                self.onecmd(command.strip())
                 socketFile.flush()
         except BaseException, e:
+            print str(e)
+
+    def onecmd(self,line):
+        try:
+            print "Command<>%s<>" % line
+            checker.check(line + "\n",self.mob.commands,self.mob.variables)
+            finish(interpreter.interpret(line + "\n",
+                                            self.mob,
+                                            self.mob.commands,
+                                            self.mob.variables))
+        except Exception,e:
             print str(e)
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
