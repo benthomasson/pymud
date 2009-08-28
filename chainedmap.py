@@ -2,11 +2,18 @@
 
 from collections import MutableMapping
 import unittest
+import pickle
+import chainedmap
 
 class ChainedMap(MutableMapping):
 
     def __init__(self,parent=None,map=None):
-        self.parent = parent
+        if type(parent) == type(""):
+            self.parentName = parent
+            self.parent = eval(parent)
+        else:
+            self.parentName = None
+            self.parent = parent
         if map:
             self.map = map
         else:
@@ -47,6 +54,20 @@ class ChainedMap(MutableMapping):
             return True
         except KeyError:
             return False
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['parent']
+        return state
+
+    def __setstate__(self,state):
+        self.__dict__ = state.copy()
+        if self.parentName:
+            self.parent = eval(self.parentName)
+        else:
+            self.parent = None
+        return state
+        
 
 
 class Test(unittest.TestCase):
@@ -91,7 +112,46 @@ class Test(unittest.TestCase):
         del pcmap['a']
         self.assertRaises(KeyError,ccmap.__getitem__,'a')
         self.assertRaises(KeyError,pcmap.__getitem__,'a')
-   
+
+    def testPickle(self):
+        cmap1 = ChainedMap(map={"a":1})
+        out = pickle.dumps(cmap1,2)
+        cmap2 = pickle.loads(out)
+        self.assertFalse(cmap1 is cmap2)
+        self.assertEquals(cmap1['a'],1)
+        self.assertEquals(cmap2['a'],1)
+ 
+    def testParentNotPickle(self):
+        pcmap = ChainedMap(map={"a":1})
+        ccmap = ChainedMap(parent=pcmap,map={'z':10})
+        out = pickle.dumps(ccmap,2)
+        cmap2 = pickle.loads(out)
+        self.assertFalse(cmap2 is ccmap)
+        self.assert_(ccmap.parent)
+        self.assertFalse(cmap2.parent)
+    
+class TestNamedParent(unittest.TestCase):
+
+    chain = ChainedMap(map={"a":112323})
+
+    def testNamedParent(self):
+        cmap = ChainedMap(parent="TestNamedParent.chain")
+        self.assertEquals(cmap['a'],112323)
+
+    def testNamedParent2(self):
+        cmap = ChainedMap(parent="chainedmap.TestNamedParent.chain")
+        self.assertEquals(cmap['a'],112323)
+
+    def testParentPickleLookup(self):
+        cmap = ChainedMap(parent="chainedmap.TestNamedParent.chain")
+        self.assertEquals(cmap['a'],112323)
+        out = pickle.dumps(cmap,2)
+        #print out
+        cmap2 = pickle.loads(out)
+        self.assertEquals(cmap2['a'],112323)
+        self.assert_(cmap.parent)
+        self.assert_(cmap2.parent)
+        self.assert_(cmap.parent is cmap2.parent)
 
 if __name__ == "__main__":
     unittest.main()

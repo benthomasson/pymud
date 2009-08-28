@@ -3,16 +3,17 @@
 import script
 import unittest
 from coroutine import coroutine, step, finish
+from mob import Mob
 
 def classname(obj):
     return obj.__class__.__name__
 
 class InterpreterVisitor(object):
 
-    def __init__(self,instance,commands,variables):
+    def __init__(self,instance):
         self.instance = instance
-        self.commands = commands
-        self.variables = variables
+        self.commands = instance.commands
+        self.variables = instance.variables
 
     def walk(self,ast):
         call = self.visit(ast)
@@ -59,9 +60,9 @@ class InterpreterVisitor(object):
         else:
             print None
 
-def interpret(scriptText,instance,commands,variables):
+def interpret(scriptText,instance):
     block = script.block.parseString(scriptText)
-    visitor = InterpreterVisitor(instance,commands,variables)
+    visitor = InterpreterVisitor(instance)
     call = visitor.walk(block[0])
     while step(call):yield
 
@@ -71,23 +72,23 @@ def say(self,*args):
 class Test(unittest.TestCase):
 
     def testStrings(self):
-        finish(interpret("""hello there\n""",None,{},{}))
+        finish(interpret("""hello there\n""",Mob(commands={},variables={})))
         finish(interpret("""hello there
 line 2
 line 3
 variable $var
-""",None,{},{'var':5}))
+""",Mob(commands={},variables={'var':5})))
         call = interpret("""hello there
 line 2
 line 3
 variable $var
-""",None,{},{'var':5})
+""",Mob(commands={},variables={'var':5}))
         for x in xrange(10):
             print "%s:" % x
             step(call)
 
     def testCommand(self):
-        finish(interpret("""say hello\n""",None,{'say':say},{}))
+        finish(interpret("""say hello\n""",Mob(commands={'say':say},variables={})))
 
 
 
