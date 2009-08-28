@@ -44,6 +44,7 @@ class Mob():
 
     def __setstate__(self,state):
         self.__dict__ = state.copy()
+        self.commands.parent = self.__class__.commands
         self.stdout = None
         self.stdin = None
 
@@ -64,17 +65,17 @@ class Mob():
 class Test(unittest.TestCase):
 
     def testSayHi(self):
-        mob = Mob()
-        say(mob,"hi")
-        mob.applyCommand("say",["hi"])
+        amob = Mob()
+        say(amob,"hi")
+        amob.applyCommand("say",["hi"])
 
     def testSet(self):
-        mob = Mob()
-        setVariable(mob,'a','5')
-        self.assertEquals(mob.variables['a'],'5')
-        del mob.variables['a']
-        mob.applyCommand("set",["a","5"])
-        self.assertEquals(mob.variables['a'],'5')
+        amob = Mob()
+        setVariable(amob,'a','5')
+        self.assertEquals(amob.variables['a'],'5')
+        del amob.variables['a']
+        amob.applyCommand("set",["a","5"])
+        self.assertEquals(amob.variables['a'],'5')
 
     def testPickleEmpty(self):
         mob1 = Mob()
@@ -96,11 +97,13 @@ class Test(unittest.TestCase):
     def testPickleCommands(self):
         mob1 = Mob()
         mob1.commands['uber'] = uber
+        mob1.applyCommand('say',['hi'])
         mob1.applyCommand('uber')
         out = pickle.dumps(mob1,pickle.HIGHEST_PROTOCOL)
         #print out
         mob2 = pickle.loads(out)
         mob2.stdout = sys.stdout
+        mob2.applyCommand('say',['hi'])
         mob2.applyCommand('uber')
 
 if __name__ == "__main__":

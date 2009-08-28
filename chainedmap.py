@@ -3,17 +3,11 @@
 from collections import MutableMapping
 import unittest
 import pickle
-import chainedmap
 
 class ChainedMap(MutableMapping):
 
     def __init__(self,parent=None,map=None):
-        if type(parent) == type(""):
-            self.parentName = parent
-            self.parent = eval(parent)
-        else:
-            self.parentName = None
-            self.parent = parent
+        self.parent = parent
         if map:
             self.map = map
         else:
@@ -62,10 +56,7 @@ class ChainedMap(MutableMapping):
 
     def __setstate__(self,state):
         self.__dict__ = state.copy()
-        if self.parentName:
-            self.parent = eval(self.parentName)
-        else:
-            self.parent = None
+        self.parent = None
         return state
         
 
@@ -130,28 +121,5 @@ class Test(unittest.TestCase):
         self.assert_(ccmap.parent)
         self.assertFalse(cmap2.parent)
     
-class TestNamedParent(unittest.TestCase):
-
-    chain = ChainedMap(map={"a":112323})
-
-    def testNamedParent(self):
-        cmap = ChainedMap(parent="TestNamedParent.chain")
-        self.assertEquals(cmap['a'],112323)
-
-    def testNamedParent2(self):
-        cmap = ChainedMap(parent="chainedmap.TestNamedParent.chain")
-        self.assertEquals(cmap['a'],112323)
-
-    def testParentPickleLookup(self):
-        cmap = ChainedMap(parent="chainedmap.TestNamedParent.chain")
-        self.assertEquals(cmap['a'],112323)
-        out = pickle.dumps(cmap,2)
-        #print out
-        cmap2 = pickle.loads(out)
-        self.assertEquals(cmap2['a'],112323)
-        self.assert_(cmap.parent)
-        self.assert_(cmap2.parent)
-        self.assert_(cmap.parent is cmap2.parent)
-
 if __name__ == "__main__":
     unittest.main()
