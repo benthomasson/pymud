@@ -33,9 +33,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
             print "Command<>%s<>" % line
             checker.check(line + "\n",self.mob.commands,self.mob.variables)
             finish(interpreter.interpret(line + "\n",
-                                            self.mob,
-                                            self.mob.commands,
-                                            self.mob.variables))
+                                            self.mob,))
         except Exception,e:
             print str(e)
 
