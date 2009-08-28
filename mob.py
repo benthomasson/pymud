@@ -22,12 +22,15 @@ class Mob():
 
     commands = ChainedMap({'say':say,
                             'set':setVariable})
+    id = 0
 
     def __init__(   self,
                     stdin=sys.stdin,
                     stdout=sys.stdout,
                     variables=None,
                     commands=None):
+        self.id = str(Mob.id)
+        Mob.id += 1
         self.stdin = stdin
         self.stdout = stdout
         if variables:
@@ -105,6 +108,16 @@ class Test(unittest.TestCase):
         mob2.stdout = sys.stdout
         mob2.applyCommand('say',['hi'])
         mob2.applyCommand('uber')
+
+    def testId(self):
+        Mob.id = 0
+        m0 = Mob()
+        m1 = Mob()
+        m2 = Mob()
+        self.assertEquals(m0.id, '0')
+        self.assertEquals(m1.id, '1')
+        self.assertEquals(m2.id, '2')
+        self.assertEquals(Mob.id, 3)
 
 if __name__ == "__main__":
     unittest.main()
