@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import script
+import pymud.script as script
 import unittest
 
 class VariableNotSetException(Exception): pass

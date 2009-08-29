@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from coroutine import coroutine, step
+from pymud.coroutine import coroutine, step
 
 
 @coroutine

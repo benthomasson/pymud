@@ -4,10 +4,10 @@ import readline
 import cmd
 
 import sys
-import checker
-import interpreter
-from coroutine import finish
-from mob import Mob
+import pymud.checker as checker
+import pymud.interpreter as interpreter
+from pymud.coroutine import finish
+from pymud.mob import Mob
 
 class Cli(cmd.Cmd):
 

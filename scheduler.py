@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import unittest
-from coroutine import coroutine,step
+from pymud.coroutine import coroutine,step
+from pymud.persist import P
 
 class Scheduler(object):
 
@@ -10,7 +11,7 @@ class Scheduler(object):
         self.itemsIterator = None
 
     def schedule(self,o):
-        self.items[o.id] = o
+        self.items[o.id] = P(o)
 
     def run(self,n=1):
         if not self.items: return True
@@ -47,31 +48,28 @@ class Test(unittest.TestCase):
         self.assert_(s.run())
 
     def testMob(self):
-        import mob
-        import persist
+        from pymud.mob import Mob
         s = Scheduler()
-        m = mob.Mob()
+        m = Mob()
         m.id = '0'
-        s.schedule(persist.P(m))
+        s.schedule(m)
         self.assert_(s.run())
 
     def testMultipleMob(self):
-        import mob
-        import persist
+        from pymud.mob import Mob
         s = Scheduler()
         for x in xrange(100):
-            m = mob.Mob()
+            m = Mob()
             m.id = '%x' % x
-            s.schedule(persist.P(m))
+            s.schedule(m)
         self.assert_(s.run(100))
 
     def testDelete(self):
-        import mob
-        import persist
+        from pymud.mob import Mob
         s = Scheduler()
-        m = mob.Mob()
+        m = Mob()
         m.id = '0'
-        s.schedule(persist.P(m))
+        s.schedule(m)
         self.assert_(s.run())
         m.deleted = True
         self.assert_(s.run())

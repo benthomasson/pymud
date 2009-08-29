@@ -5,7 +5,7 @@ import unittest
 import shelve
 import sys
 import os
-from coroutine import coroutine,step
+from pymud.coroutine import coroutine,step
 
 persist = None
 

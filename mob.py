@@ -3,7 +3,7 @@
 import sys
 import unittest
 import pickle
-from chainedmap import ChainedMap
+from pymud.chainedmap import ChainedMap
 
 def setVariable(self,name,value):
     self.variables[name] = value

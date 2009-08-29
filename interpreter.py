@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import script
+import pymud.script as script
 import unittest
-from coroutine import coroutine, step, finish
-from mob import Mob
+from pymud.coroutine import coroutine, step, finish
+from pymud.mob import Mob
 
 def classname(obj):
     return obj.__class__.__name__
