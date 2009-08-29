@@ -3,7 +3,6 @@
 import pymud.script as script
 import unittest
 from pymud.coroutine import coroutine, step, finish
-from pymud.mob import Mob
 
 def classname(obj):
     return obj.__class__.__name__
@@ -60,6 +59,7 @@ class InterpreterVisitor(object):
         else:
             print None
 
+@coroutine
 def interpret(scriptText,instance):
     block = script.block.parseString(scriptText)
     visitor = InterpreterVisitor(instance)
@@ -72,6 +72,7 @@ def say(self,*args):
 class Test(unittest.TestCase):
 
     def testStrings(self):
+        from pymud.mob import Mob
         finish(interpret("""hello there\n""",Mob(commands={},variables={})))
         finish(interpret("""hello there
 line 2
@@ -88,6 +89,7 @@ variable $var
             step(call)
 
     def testCommand(self):
+        from pymud.mob import Mob
         finish(interpret("""say hello\n""",Mob(commands={'say':say},variables={})))
 
 
