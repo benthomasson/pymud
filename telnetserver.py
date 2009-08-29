@@ -8,6 +8,7 @@ import pymud.checker as checker
 import pymud.interpreter as interpreter
 from pymud.coroutine import finish
 from pymud.mob import Mob
+import time
 
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
@@ -31,7 +32,6 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
     def onecmd(self,line):
         try:
             print "Command<>%s<>" % line
-            checker.check(line + "\n",self.mob.commands,self.mob.variables)
             finish(interpreter.interpret(line + "\n",
                                             self.mob,))
         except Exception,e:
@@ -46,16 +46,14 @@ if __name__ == "__main__":
     server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler)
     ip, port = server.server_address
 
-    # Start a thread with the server -- that thread will then start one
-    # more thread for each request
     server_thread = threading.Thread(target=server.serve_forever)
-    # Exit the server thread when the main thread terminates
     server_thread.setDaemon(True)
     server_thread.start()
     print "Server loop running in thread:", server_thread.getName()
 
     try:
-        server.serve_forever()
+        while True:
+            time.sleep(1)
     except BaseException, e:
         pass
     server.shutdown()
