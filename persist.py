@@ -7,8 +7,6 @@ import sys
 import os
 from pymud.coroutine import coroutine,step
 
-persist = None
-
 class P(object):
     """P is a persistent reference to a persistent object.
     To create a new persistent reference use:
@@ -19,6 +17,8 @@ class P(object):
 
     >>> x()
     """
+
+    persist = None
 
     def __init__(self,o):
         self.id = o.id
@@ -31,17 +31,18 @@ class P(object):
             return None
         if not self.id: return None
         try:
-            return persist.get(self.id)
+            return P.persist.get(self.id)
         except KeyError,e:
             return None
 
     def delete(self):
-        persist.delete(self)
+        P.persist.delete(self)
         self.id = None
         self.ref = None
 
     def __setstate__(self,state):
         self.id = state['id']
+        self.ref = None
 
     def __getstate__(self):
         state = {}
@@ -72,6 +73,13 @@ class Persistence(object):
 
     def get(self,id):
         return self.db[id]
+
+    def exists(self,id):
+        try:
+            self.db[id]
+            return True
+        except KeyError, e:
+            return False
 
     def delete(self,o):
         if o.id in self.db:
@@ -135,70 +143,66 @@ class TestShelve(unittest.TestCase):
 class TestPersistence(unittest.TestCase):
 
     def setUp(self):
-        global persist
         if os.path.exists("test.db"): os.remove("test.db")
-        persist = None
+        P.persist = None
 
     def testMob(self):
-        global persist
         import mob 
-        persist = Persistence("test.db")
-        self.assertEquals(persist.id,0)
+        P.persist = Persistence("test.db")
+        self.assertEquals(P.persist.id,0)
         m = mob.Mob()
         m.applyCommand("say",["hi"])
-        persist.persist(m)
-        persist.close()
-        persist = Persistence("test.db")
-        self.assertEquals(persist.id,1)
-        m = persist.get('1')
+        P.persist.persist(m)
+        P.persist.close()
+        P.persist = Persistence("test.db")
+        self.assertEquals(P.persist.id,1)
+        m = P.persist.get('1')
         m.stdout = sys.stdout
         m.applyCommand("say",["hi"])
-        persist.close()
+        P.persist.close()
 
     def testSync(self):
         import mob 
-        persist = Persistence("test.db")
-        self.assertEquals(persist.id,0)
+        P.persist = Persistence("test.db")
+        self.assertEquals(P.persist.id,0)
         for x in xrange(100):
             m = mob.Mob()
             m.applyCommand("say",["hi"])
-            persist.persist(m)
+            P.persist.persist(m)
         for x in xrange(10):
-            print persist.sync()
-        persist.close()
-        persist = Persistence("test.db")
-        self.assertEquals(persist.id,100)
-        m = persist.get('1')
+            print P.persist.sync()
+        P.persist.close()
+        P.persist = Persistence("test.db")
+        self.assertEquals(P.persist.id,100)
+        m = P.persist.get('1')
         m.stdout = sys.stdout
         m.applyCommand("say",["hi"])
-        persist.sync()
-        persist.close()
+        P.persist.sync()
+        P.persist.close()
 
     def testSyncDelete(self):
         import mob 
-        persist = Persistence("test.db")
-        self.assertEquals(persist.id,0)
+        P.persist = Persistence("test.db")
+        self.assertEquals(P.persist.id,0)
         for x in xrange(100):
             m = mob.Mob()
             m.applyCommand("say",["hi"])
-            persist.persist(m)
-        persist.sync()
-        persist.delete(m)
+            P.persist.persist(m)
+        P.persist.sync()
+        P.persist.delete(m)
         for x in xrange(10):
-            print persist.sync()
-        persist.close()
+            print P.persist.sync()
+        P.persist.close()
 
 class TestP(unittest.TestCase):
 
     def setUp(self):
-        global persist
         if os.path.exists("test.db"): os.remove("test.db")
-        persist = None
+        P.persist = None
 
     def testTemporary(self):
         import mob
         import sys
-        global persist
         m = P(mob.Mob())
         self.assert_(m())
         self.assertFalse(m().id)
@@ -211,9 +215,8 @@ class TestP(unittest.TestCase):
     def testPersistent(self):
         import mob
         import sys
-        global persist
-        persist = Persistence("test.db")
-        m = P(persist.persist(mob.Mob()))
+        P.persist = Persistence("test.db")
+        m = P(P.persist.persist(mob.Mob()))
         self.assert_(m())
         self.assert_(m().id)
         m().stdout = sys.stdout
@@ -225,9 +228,9 @@ class TestP(unittest.TestCase):
         m().stdout = sys.stdout
         m().run()
         m().applyCommand("say",['testPersistent'])
-        persist.close()
+        P.persist.close()
         m.ref = None
-        persist = Persistence("test.db")
+        P.persist = Persistence("test.db")
         self.assert_(m())
         self.assert_(m().id)
         m().stdout = sys.stdout
@@ -237,31 +240,29 @@ class TestP(unittest.TestCase):
     def testDeletedPersistent(self):
         import mob
         import sys
-        global persist
-        persist = Persistence("test.db")
-        m = P(persist.persist(mob.Mob()))
+        P.persist = Persistence("test.db")
+        m = P(P.persist.persist(mob.Mob()))
         m().run()
-        persist.delete(m)
+        P.persist.delete(m)
         self.assertTrue(m.ref.deleted)
         self.assertFalse(m())
         m.ref = None
-        persist.close()
-        persist = Persistence("test.db")
+        P.persist.close()
+        P.persist = Persistence("test.db")
         self.assertFalse(m())
 
     def testDelete(self):
         import mob
         import sys
-        global persist
-        persist = Persistence("test.db")
-        m = P(persist.persist(mob.Mob()))
+        P.persist = Persistence("test.db")
+        m = P(P.persist.persist(mob.Mob()))
         m().run()
         m.delete()
         self.assertFalse(m())
         m.delete()
         self.assertFalse(m())
-        persist.close()
-        persist = Persistence("test.db")
+        P.persist.close()
+        P.persist = Persistence("test.db")
         self.assertFalse(m())
 
 if __name__ == "__main__":
