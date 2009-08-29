@@ -4,7 +4,6 @@ import sys
 import unittest
 import pickle
 from chainedmap import ChainedMap
-import persist
 
 def setVariable(self,name,value):
     self.variables[name] = value
@@ -62,6 +61,8 @@ class Mob():
         else:
             apply(func,[self] + arguments)
 
+    def run(self,n=1):
+        print 'run %s' % n
 
 class Test(unittest.TestCase):
 
