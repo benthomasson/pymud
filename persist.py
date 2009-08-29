@@ -10,6 +10,7 @@ from coroutine import coroutine,step
 persist = None
 
 class P(object):
+    """"""
 
     def __init__(self,o):
         self.id = o.id
