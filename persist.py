@@ -89,7 +89,7 @@ class Persistence(object):
     @coroutine
     def partialSync(self):
         db = self.db
-        for key, entry in db.cache.iteritems():
+        for key, entry in db.cache.copy().iteritems():
             yield
             db.writeback = False
             print "Persisting %s" % key
@@ -172,6 +172,20 @@ class TestPersistence(unittest.TestCase):
         m.stdout = sys.stdout
         m.applyCommand("say",["hi"])
         persist.sync()
+        persist.close()
+
+    def testSyncDelete(self):
+        import mob 
+        persist = Persistence("test.db")
+        self.assertEquals(persist.id,0)
+        for x in xrange(100):
+            m = mob.Mob()
+            m.applyCommand("say",["hi"])
+            persist.persist(m)
+        persist.sync()
+        persist.delete(m)
+        for x in xrange(10):
+            print persist.sync()
         persist.close()
 
 class TestP(unittest.TestCase):
