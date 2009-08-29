@@ -4,6 +4,8 @@ import sys
 import unittest
 import pickle
 from pymud.chainedmap import ChainedMap
+from pymud.coroutine import step
+from pymud.interpreter import interpret
 
 def setVariable(self,name,value):
     self.variables[name] = value
@@ -31,6 +33,8 @@ class Mob():
         self.deleted = False
         self.stdin = stdin
         self.stdout = stdout
+        self.currentScript = None
+        self.commandQueue = []
         if variables:
             self.variables = variables
         else:
@@ -48,11 +52,13 @@ class Mob():
         self.commands.parent = self.__class__.commands
         self.stdout = None
         self.stdin = None
+        self.currentScript = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
         del state['stdin']
         del state['stdout']
+        del state['currentScript']
         return state
 
     def applyCommand(self,command,arguments=[]):
@@ -63,7 +69,13 @@ class Mob():
             func(*[self] + arguments)
 
     def run(self,n=1):
-        print 'run %s' % n
+        print 'run %s' % self.id
+        if not self.currentScript and len(self.commandQueue):
+            self.currentScript = interpret(self.commandQueue.pop(-1),self)
+        if self.currentScript:
+            if not step(self.currentScript):
+                self.currentScript = None
+
 
 class Test(unittest.TestCase):
 
@@ -109,6 +121,30 @@ class Test(unittest.TestCase):
         mob2.applyCommand('say',['hi'])
         mob2.applyCommand('uber')
 
+    def testRunEmpty(self):
+        amob = Mob()
+        amob.run()
+
+    def testRun(self):
+        amob = Mob()
+        amob.stdout = sys.stdout
+        amob.commandQueue.append("say hi\n")
+        amob.commandQueue.append("say hi\n")
+        amob.commandQueue.append("say hi\n")
+        self.assertFalse(amob.currentScript)
+        self.assertEquals(len(amob.commandQueue),3)
+        amob.run()
+        self.assertEquals(len(amob.commandQueue),2)
+        self.assertFalse(amob.currentScript)
+        amob.run()
+        self.assertEquals(len(amob.commandQueue),1)
+        self.assertFalse(amob.currentScript)
+        amob.run()
+        self.assertEquals(len(amob.commandQueue),0)
+        self.assertFalse(amob.currentScript)
+        amob.run()
+        self.assertEquals(len(amob.commandQueue),0)
+        self.assertFalse(amob.currentScript)
 
 if __name__ == "__main__":
     unittest.main()
