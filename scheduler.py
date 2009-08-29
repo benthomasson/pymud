@@ -23,9 +23,12 @@ class Scheduler(object):
 
     @coroutine
     def runItems(self):
-        for key, entry in self.items.iteritems():
+        for key, entry in self.items.copy().iteritems():
             yield
-            entry.run()
+            if entry(): 
+                entry().run()
+            else:
+                del self.items[key]
 
     def __setstate__(self,state):
         self.__dict__ = state.copy()
@@ -45,25 +48,33 @@ class Test(unittest.TestCase):
 
     def testMob(self):
         import mob
+        import persist
         s = Scheduler()
         m = mob.Mob()
         m.id = '0'
-        s.schedule(m)
+        s.schedule(persist.P(m))
         self.assert_(s.run())
 
     def testMultipleMob(self):
         import mob
+        import persist
         s = Scheduler()
         for x in xrange(100):
             m = mob.Mob()
             m.id = '%x' % x
-            s.schedule(m)
+            s.schedule(persist.P(m))
         self.assert_(s.run(100))
 
-    def testPersist(self):
+    def testDelete(self):
         import mob
         import persist
-        pass
+        s = Scheduler()
+        m = mob.Mob()
+        m.id = '0'
+        s.schedule(persist.P(m))
+        self.assert_(s.run())
+        m.deleted = True
+        self.assert_(s.run())
 
 if __name__ == "__main__":
     unittest.main()
