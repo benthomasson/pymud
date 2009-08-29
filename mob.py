@@ -28,6 +28,7 @@ class Mob():
                     variables=None,
                     commands=None):
         self.id = None
+        self.deleted = False
         self.stdin = stdin
         self.stdout = stdout
         if variables:

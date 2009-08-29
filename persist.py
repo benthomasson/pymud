@@ -10,20 +10,35 @@ from coroutine import coroutine,step
 persist = None
 
 class P(object):
-    """"""
+    """P is a persistent reference to a persistent object.
+    To create a new persistent reference use:
+    
+    >>> x = persist.P(o).
+
+    To retrieve the object from the peristent reference above use:
+
+    >>> x()
+    """
 
     def __init__(self,o):
         self.id = o.id
         self.ref = o
 
     def __call__(self):
-        if self.ref:
+        if self.ref and not self.ref.deleted:
             return self.ref
+        if self.ref and self.ref.deleted:
+            return None
         if not self.id: return None
         try:
             return persist.get(self.id)
-        except KeyValue,e:
+        except KeyError,e:
             return None
+
+    def delete(self):
+        persist.delete(self)
+        self.id = None
+        self.ref = None
 
     def __setstate__(self,state):
         self.id = state['id']
@@ -57,6 +72,11 @@ class Persistence(object):
 
     def get(self,id):
         return self.db[id]
+
+    def delete(self,o):
+        if o.id in self.db:
+            self.db[o.id].deleted = True
+            del self.db[o.id]
 
     def sync(self,n=1):
         if not self.writeBackIterator:
@@ -199,6 +219,36 @@ class TestP(unittest.TestCase):
         m().stdout = sys.stdout
         m().run()
         m().applyCommand("say",['testPersistent'])
+
+    def testDeletedPersistent(self):
+        import mob
+        import sys
+        global persist
+        persist = Persistence("test.db")
+        m = P(persist.persist(mob.Mob()))
+        m().run()
+        persist.delete(m)
+        self.assertTrue(m.ref.deleted)
+        self.assertFalse(m())
+        m.ref = None
+        persist.close()
+        persist = Persistence("test.db")
+        self.assertFalse(m())
+
+    def testDelete(self):
+        import mob
+        import sys
+        global persist
+        persist = Persistence("test.db")
+        m = P(persist.persist(mob.Mob()))
+        m().run()
+        m.delete()
+        self.assertFalse(m())
+        m.delete()
+        self.assertFalse(m())
+        persist.close()
+        persist = Persistence("test.db")
+        self.assertFalse(m())
 
 if __name__ == "__main__":
     unittest.main()
