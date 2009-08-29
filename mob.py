@@ -41,7 +41,7 @@ class Mob():
             self.commands = ChainedMap(Mob.commands)
 
     def default(self,args):
-        apply(say,[self] + args)
+        say(*[self] + args)
 
     def __setstate__(self,state):
         self.__dict__ = state.copy()
@@ -58,9 +58,9 @@ class Mob():
     def applyCommand(self,command,arguments=[]):
         func = self.commands[command]
         if hasattr(func,'im_self') and func.im_self:
-            apply(func,arguments)
+            func(*arguments)
         else:
-            apply(func,[self] + arguments)
+            func(*[self] + arguments)
 
     def run(self,n=1):
         print 'run %s' % n
