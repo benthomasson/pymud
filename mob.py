@@ -6,21 +6,24 @@ import pickle
 from pymud.chainedmap import ChainedMap
 from pymud.coroutine import step
 from pymud.interpreter import interpret
+from pymud.message import Channel, Message
 
 def setVariable(self,name,value):
     self.variables[name] = value
 
 def say(self,*args):
     if self.stdout:
+        self.stdout.write("\n")
         self.stdout.write(" ".join(args) + "\n")
         self.stdout.flush()
+    self.sendMessage(Message("say",message=" ".join(args),name=self.id))
 
 def uber(self):
     if self.stdout:
         self.stdout.write("UBER!")
         self.stdout.flush()
 
-class Mob():
+class Mob(Channel):
 
     commands = ChainedMap({'say':say,
                             'set':setVariable})
@@ -29,6 +32,7 @@ class Mob():
                     stdout=sys.stdout,
                     variables=None,
                     commands=None):
+        Channel.__init__(self)
         self.id = None
         self.deleted = False
         self.stdin = stdin
@@ -69,7 +73,7 @@ class Mob():
             func(*[self] + arguments)
 
     def run(self,n=1):
-        print 'run %s' % self.id
+        #print 'run %s' % self.id
         if not self.currentScript and len(self.commandQueue):
             self.currentScript = interpret(self.commandQueue.pop(-1),self)
         if self.currentScript:
