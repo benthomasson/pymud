@@ -10,15 +10,18 @@ import pymud.interpreter as interpreter
 import threading
 from pymud.coroutine import finish
 from pymud.mob import Mob
+from pymud.formatter import ColorTextFormatter
 
-class Cli(cmd.Cmd):
+class Cli(cmd.Cmd, ColorTextFormatter):
 
     prompt = "pymud>"
 
     def __init__(self,mob):
+        self.id = "cli"
         cmd.Cmd.__init__(self)
         self.mob = mob
         self.prompt = "%s>" % mob.id
+        mob.addListener(self)
 
     def onecmd(self,line):
         try:
@@ -31,8 +34,15 @@ class Cli(cmd.Cmd):
     def completenames(self, *ignored):
         return self.mob.commands.keys()
 
+    def receiveMessage(self,message):
+        sys.stdout.write("\n")
+        sys.stdout.write(self.formatMessage(message))
+        sys.stdout.write("\n")
+        sys.stdout.write(self.prompt)
+        sys.stdout.flush()
+
 if __name__ == '__main__':
-    m = Mob()
+    m = Mob(stdout=None,stdin=None)
     cli = Cli(m)
     server_thread = threading.Thread(target=cli.cmdloop)
     server_thread.setDaemon(True)
