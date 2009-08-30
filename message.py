@@ -44,7 +44,6 @@ class TestChannel(unittest.TestCase):
 
     def test(self):
         self.id = '1'
-        self.deleted = False
         m = Message("say",message="hello",name="Ed",id="1")
         c = Channel()
         c.addListener(self)
@@ -56,7 +55,6 @@ class TestChannel(unittest.TestCase):
         c.sendMessage(m)
         self.deleted = True
         c.sendMessage(m)
-
 
 
 if __name__ == "__main__":
