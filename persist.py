@@ -21,8 +21,12 @@ class P(object):
     persist = None
 
     def __init__(self,o):
-        self.id = o.id
-        self.ref = o
+        if isinstance(o,P):
+            self.id = o.id
+            self.ref = o.ref
+        else:
+            self.id = o.id
+            self.ref = o
 
     def __call__(self):
         if self.ref and not self.ref.deleted:
@@ -264,6 +268,14 @@ class TestP(unittest.TestCase):
         P.persist.close()
         P.persist = Persistence("test.db")
         self.assertFalse(m())
+
+    def testPersistentChain(self):
+        import mob
+        import sys
+        P.persist = Persistence("test.db")
+        m = P(P.persist.persist(mob.Mob()))
+        m2 = P(m)
+        self.assert_(m.ref is m2.ref)
 
 if __name__ == "__main__":
     unittest.main()
