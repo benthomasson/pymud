@@ -8,7 +8,6 @@ import time
 import pymud.checker as checker
 import pymud.interpreter as interpreter
 import threading
-from pymud.coroutine import finish
 from pymud.mob import Mob
 from pymud.formatter import ColorTextFormatter
 
