@@ -23,12 +23,14 @@ class P(object):
     def __init__(self,o):
         if isinstance(o,P):
             self.id = o.id
-            self.ref = o.ref
+            self.ref = o()
         else:
             self.id = o.id
             self.ref = o
 
     def __call__(self):
+        if self.ref and not hasattr(self.ref,'deleted'):
+            return self.ref
         if self.ref and not self.ref.deleted:
             return self.ref
         if self.ref and self.ref.deleted:
