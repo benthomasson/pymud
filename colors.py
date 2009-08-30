@@ -18,10 +18,48 @@ CYAN =      "\x1B[36;22m"
 WHITE =     "\x1B[37;22m"
 CLEAR =     "\x1B[0m"
 
+colors = {
+    'LIGHTBLACK' : LIGHTBLACK,
+    'LIGHTRED' : LIGHTRED,
+    'LIGHTGREEN' : LIGHTGREEN,
+    'LIGHTYELLOW' : LIGHTYELLOW,
+    'LIGHTBLUE' : LIGHTBLUE,
+    'LIGHTMAGENTA' : LIGHTMAGENTA,
+    'LIGHTCYAN' : LIGHTCYAN,
+    'LIGHTWHITE' : LIGHTWHITE,
+    'BLACK' : BLACK,
+    'RED' : RED,
+    'GREEN' : GREEN,
+    'YELLOW' : YELLOW,
+    'BLUE' : BLUE,
+    'MAGENTA' : MAGENTA,
+    'CYAN' : CYAN,
+    'WHITE' : WHITE,
+    'CLEAR' : CLEAR,
+}
+
+nocolors = {
+    'LIGHTBLACK' : "",
+    'LIGHTRED' : "",
+    'LIGHTGREEN' : "",
+    'LIGHTYELLOW' : "",
+    'LIGHTBLUE' : "",
+    'LIGHTMAGENTA' : "",
+    'LIGHTCYAN' : "",
+    'LIGHTWHITE' : "",
+    'BLACK' : "",
+    'RED' : "",
+    'GREEN' : "",
+    'YELLOW' : "",
+    'BLUE' : "",
+    'MAGENTA' : "",
+    'CYAN' : "",
+    'WHITE' : "",
+    'CLEAR' : "",
+}
+
 
 if __name__ == "__main__":
-    for x in locals().copy():
-        value = eval(x)
-        if type("") == type(value):
-            print value, x, CLEAR
+    for name,color in colors.iteritems():
+        print color, name, CLEAR
     
