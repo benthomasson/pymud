@@ -5,44 +5,69 @@ import threading
 import SocketServer
 
 import pymud.checker as checker
-import pymud.interpreter as interpreter
+from pymud.scheduler import Scheduler
 from pymud.coroutine import finish
 from pymud.mob import Mob
 import time
+from pymud.formatter import ColorTextFormatter
 
-class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+
+class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler, ColorTextFormatter):
+
+    def __init__(self,*args,**kwargs):
+        self.id = "telnetui"
+        SocketServer.BaseRequestHandler.__init__(self,*args,**kwargs)
 
     def prompt(self):
         return ">>>"
 
     def handle(self):
-        socketFile = self.request.makefile('rw')
-        self.mob = Mob(stdin=socketFile,stdout=socketFile)
+        global scheduler
+        self.socketFile = self.request.makefile('rw')
+        self.mob = Mob(stdin=None,stdout=None)
+        scheduler.schedule(self.mob)
+        self.mob.addListener(self)
+        self.socketFile.write(self.prompt())
+        self.socketFile.flush()
         try:
             while True:
-                socketFile.write(self.prompt())
-                socketFile.flush()
-                command = socketFile.readline()
+                command = self.socketFile.readline()
                 if not command: break
                 self.onecmd(command.strip())
-                socketFile.flush()
+                self.socketFile.flush()
         except BaseException, e:
             print str(e)
 
     def onecmd(self,line):
         try:
-            print "Command<>%s<>" % line
-            finish(interpreter.interpret(line + "\n",
-                                            self.mob,))
+            if line:
+                print "Command<>%s<>" % line
+                self.mob.commandQueue.append(line + "\n")
+            self.socketFile.write("\n")
+            self.socketFile.write(self.prompt())
+            self.socketFile.flush()
         except Exception,e:
             print str(e)
 
+    def receiveMessage(self,message):
+        self.socketFile.write("\n")
+        self.socketFile.write(self.formatMessage(message))
+        self.socketFile.write("\n")
+        self.socketFile.write(self.prompt())
+        self.socketFile.flush()
+
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-    pass
+
+    def server_bind(self):
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket.bind(self.server_address)
+
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8000
 
+    global scheduler
+    scheduler = Scheduler()
     server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler)
     ip, port = server.server_address
 
@@ -53,8 +78,9 @@ if __name__ == "__main__":
 
     try:
         while True:
-            time.sleep(1)
-    except BaseException, e:
+            time.sleep(0.001)
+            scheduler.run()
+    except KeyboardInterrupt, e:
         pass
     server.shutdown()
 
