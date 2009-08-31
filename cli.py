@@ -10,6 +10,7 @@ import pymud.interpreter as interpreter
 import threading
 from pymud.mob import Mob
 from pymud.formatter import ColorTextFormatter
+from pymud.persist import P, Persistence
 
 class Cli(cmd.Cmd, ColorTextFormatter):
 
@@ -20,18 +21,18 @@ class Cli(cmd.Cmd, ColorTextFormatter):
         cmd.Cmd.__init__(self)
         self.mob = mob
         self.prompt = "%s>" % mob.id
-        mob.addListener(self)
+        mob().addListener(self)
 
     def onecmd(self,line):
         try:
             if line:
-                self.mob.commandQueue.append(line + "\n")
-            self.prompt = "%s>" % self.mob.id
+                self.mob().commandQueue.append(line + "\n")
+            self.prompt = "%s>" % self.mob().id
         except Exception,e:
             print str(e)
 
     def completenames(self, *ignored):
-        return self.mob.commands.keys()
+        return self.mob().commands.keys()
 
     def receiveMessage(self,message):
         sys.stdout.write("\n")
@@ -41,7 +42,11 @@ class Cli(cmd.Cmd, ColorTextFormatter):
         sys.stdout.flush()
 
 if __name__ == '__main__':
-    m = Mob(stdout=None,stdin=None)
+    P.persist = Persistence("cli_test.db")
+    if P.persist.exists("mob"):
+        m = P(P.persist.get("mob"))
+    else:
+        m = P(P.persist.persist(Mob(stdout=None,stdin=None,id="mob")))
     cli = Cli(m)
     server_thread = threading.Thread(target=cli.cmdloop)
     server_thread.setDaemon(True)
@@ -50,8 +55,12 @@ if __name__ == '__main__':
     try:
         while True:
             time.sleep(0.01)
-            m.run()
+            m().run()
     except BaseException, e:
         print e
+
+    P.persist.sync(1000)
+    P.persist.close()
+
 
 
