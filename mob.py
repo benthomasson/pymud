@@ -31,9 +31,10 @@ class Mob(Channel):
                     stdin=sys.stdin,
                     stdout=sys.stdout,
                     variables=None,
-                    commands=None):
+                    commands=None,
+                    id=None):
         Channel.__init__(self)
-        self.id = None
+        self.id = id
         self.deleted = False
         self.stdin = stdin
         self.stdout = stdout
