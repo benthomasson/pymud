@@ -65,7 +65,7 @@ class Mob(Channel):
         #print 'run %s' % self.id
         try:
             if not self.currentScript and len(self.commandQueue):
-                self.currentScript = interpret(self.commandQueue.pop(-1),self)
+                self.currentScript = interpret(self.commandQueue.pop(0),self)
             if self.currentScript:
                 if not step(self.currentScript):
                     self.currentScript = None
