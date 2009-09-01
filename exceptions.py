@@ -1,0 +1,2 @@
+
+class ShutdownSignal(BaseException): pass
