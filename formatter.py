@@ -17,6 +17,9 @@ class TextFormatter(object):
     def formaterror(self,message):
         return "%(RED)sERROR:%(error)s%(CLEAR)s" % message.dict
 
+    def formatcreated(self,message):
+        return "%(RED)s%(name)s created a %(klass)s %(id)s!%(CLEAR)s" % message.dict
+
 class ColorTextFormatter(TextFormatter):
 
     def formatMessage(self,message):
