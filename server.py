@@ -7,35 +7,50 @@ from pymud import telnetserver
 from pymud.persist import P, Persistence
 import time
 
+class Server(object):
+
+    def __init__(self):
+        pass
+
+    def start(self):
+        P.persist = Persistence("server.db")
+        if P.persist.exists('scheduler'):
+            self.scheduler = P.persist.get('scheduler')
+        else:
+            self.scheduler = Scheduler()
+            self.scheduler.id = 'scheduler'
+            print 'New Scheduler'
+            P.persist.persist(self.scheduler)
+
+        P.persist.syncAll()
+
+        if P.persist.exists('mob'):
+            mob = P.persist.get("mob")
+        else:
+            mob = Mob(stdout=None,stdin=None,id="mob")
+            P.persist.persist(mob)
+            self.scheduler.schedule(mob)
+
+        cli.startCli(P(mob))
+        self.server = telnetserver.startServer(self.scheduler)
+
+    def run(self):
+        try:
+            while True:
+                time.sleep(0.1)
+                self.scheduler.run()
+        except BaseException, e:
+            print e
+
+    def close(self):
+        self.server.shutdown()
+        P.persist.close()
 
 if __name__ == "__main__":
-    P.persist = Persistence("server.db")
-    if P.persist.exists('scheduler'):
-        scheduler = P.persist.get('scheduler')
-    else:
-        scheduler = Scheduler()
-        scheduler.id = 'scheduler'
-        print 'New Scheduler'
-        P.persist.persist(scheduler)
 
-    P.persist.syncAll()
+    server = Server()
 
-    if P.persist.exists('mob'):
-        mob = P.persist.get("mob")
-    else:
-        mob = Mob(stdout=None,stdin=None,id="mob")
-        P.persist.persist(mob)
-        scheduler.schedule(mob)
+    server.start()
+    server.run()
+    server.close()
 
-    cli.startCli(P(mob))
-    server = telnetserver.startServer(scheduler)
-
-    try:
-        while True:
-            time.sleep(0.1)
-            scheduler.run()
-    except BaseException, e:
-        print e
-
-    server.shutdown()
-    P.persist.close()
