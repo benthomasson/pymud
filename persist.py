@@ -5,7 +5,7 @@ import unittest
 import shelve
 import sys
 import os
-from pymud.coroutine import coroutine,step
+from pymud.coroutine import coroutine,step,finish
 
 class P(object):
     """P is a persistent reference to a persistent object.
@@ -100,13 +100,19 @@ class Persistence(object):
             return True
         return False
 
+    def syncAll(self):
+        if not self.writeBackIterator:
+            self.writeBackIterator = self.partialSync()
+        finish(self.writeBackIterator)
+        self.db.dict.sync()
+
     @coroutine
     def partialSync(self):
         db = self.db
         for key, entry in db.cache.copy().iteritems():
             yield
             db.writeback = False
-            print "Persisting %s" % key
+            #print "Persisting %s" % key
             db[key] = entry
             db.writeback = True
 

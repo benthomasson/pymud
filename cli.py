@@ -41,16 +41,20 @@ class Cli(cmd.Cmd, ColorTextFormatter):
         sys.stdout.write(self.prompt)
         sys.stdout.flush()
 
+def startCli(m):
+    cli = Cli(m)
+    server_thread = threading.Thread(target=cli.cmdloop)
+    server_thread.setDaemon(True)
+    server_thread.start()
+
 if __name__ == '__main__':
     P.persist = Persistence("cli_test.db")
     if P.persist.exists("mob"):
         m = P(P.persist.get("mob"))
     else:
         m = P(P.persist.persist(Mob(stdout=None,stdin=None,id="mob")))
-    cli = Cli(m)
-    server_thread = threading.Thread(target=cli.cmdloop)
-    server_thread.setDaemon(True)
-    server_thread.start()
+
+    startCli(m)
 
     try:
         while True:

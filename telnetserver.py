@@ -5,27 +5,32 @@ import threading
 import SocketServer
 
 import pymud.checker as checker
+from pymud.persist import P, Persistence
 from pymud.scheduler import Scheduler
 from pymud.coroutine import finish
 from pymud.mob import Mob
 import time
 from pymud.formatter import ColorTextFormatter
 
+class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
 
-class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler, ColorTextFormatter):
+    scheduler = None
 
     def __init__(self,*args,**kwargs):
         self.id = "telnetui"
         SocketServer.BaseRequestHandler.__init__(self,*args,**kwargs)
 
     def prompt(self):
-        return ">>>"
+        return "%s>" % self.mob.id 
 
     def handle(self):
-        global scheduler
         self.socketFile = self.request.makefile('rw')
-        self.mob = Mob(stdin=None,stdout=None)
-        scheduler.schedule(self.mob)
+        if P.persist.exists("mob"):
+            self.mob = P.persist.get("mob")
+        else:
+            self.mob = Mob(stdin=None,stdout=None,id="mob")
+            P.persist.persist(self.mob)
+        TelnetInterface.scheduler.schedule(self.mob)
         self.mob.addListener(self)
         self.socketFile.write(self.prompt())
         self.socketFile.flush()
@@ -63,24 +68,37 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
         self.socket.bind(self.server_address)
 
 
-if __name__ == "__main__":
+def startServer(scheduler):
+    TelnetInterface.scheduler = scheduler
     HOST, PORT = "localhost", 8000
-
-    global scheduler
-    scheduler = Scheduler()
-    server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler)
+    server = ThreadedTCPServer((HOST, PORT), TelnetInterface)
     ip, port = server.server_address
-
     server_thread = threading.Thread(target=server.serve_forever)
     server_thread.setDaemon(True)
     server_thread.start()
-    print "Server loop running in thread:", server_thread.getName()
+    print "Server loop running at %s:%d:" % (ip,port)
+    return server
+
+if __name__ == "__main__":
+    P.persist = Persistence("telnet_test.db")
+
+    if P.persist.exists('scheduler'):
+        scheduler = P.persist.get('scheduler')
+    else:
+        scheduler = Scheduler()
+        scheduler.id = 'scheduler'
+        print 'New Scheduler'
+        P.persist.persist(scheduler)
+
+    server = startServer(scheduler)
 
     try:
         while True:
             time.sleep(0.001)
             scheduler.run()
+            P.persist.sync(1)
     except KeyboardInterrupt, e:
         pass
     server.shutdown()
+    P.persist.close()
 
