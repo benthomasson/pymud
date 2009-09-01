@@ -21,7 +21,7 @@ def uber(self):
 
 class Mob(Channel):
 
-    commands = ChainedMap({'say':say,
+    commands = ChainedMap(map={'say':say,
                             'set':setVariable})
     def __init__(   self,
                     variables=None,
