@@ -6,6 +6,7 @@ from pymud.scheduler import Scheduler
 from pymud import cli
 from pymud import telnetserver
 from pymud.persist import P, Persistence
+from pymud.exceptions import *
 import time
 
 class Server(object):
@@ -40,6 +41,8 @@ class Server(object):
             while True:
                 time.sleep(0.1)
                 Scheduler.scheduler.run()
+        except ShutdownSignal, e:
+            print "Shutting down server"
         except BaseException, e:
             print e
 
