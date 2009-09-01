@@ -14,8 +14,6 @@ from pymud.formatter import ColorTextFormatter
 
 class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
 
-    scheduler = None
-
     def __init__(self,*args,**kwargs):
         self.id = "telnetui"
         SocketServer.BaseRequestHandler.__init__(self,*args,**kwargs)
@@ -28,9 +26,9 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         if P.persist.exists("mob"):
             self.mob = P.persist.get("mob")
         else:
-            self.mob = Mob(stdin=None,stdout=None,id="mob")
+            self.mob = Mob(id="mob")
             P.persist.persist(self.mob)
-        TelnetInterface.scheduler.schedule(self.mob)
+        Scheduler.scheduler.schedule(self.mob)
         self.mob.addListener(self)
         self.socketFile.write(self.prompt())
         self.socketFile.flush()
@@ -68,8 +66,7 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
         self.socket.bind(self.server_address)
 
 
-def startServer(scheduler):
-    TelnetInterface.scheduler = scheduler
+def startServer():
     HOST, PORT = "localhost", 8000
     server = ThreadedTCPServer((HOST, PORT), TelnetInterface)
     ip, port = server.server_address
@@ -83,19 +80,19 @@ if __name__ == "__main__":
     P.persist = Persistence("telnet_test.db")
 
     if P.persist.exists('scheduler'):
-        scheduler = P.persist.get('scheduler')
+        Scheduler.scheduler = P.persist.get('scheduler')
     else:
-        scheduler = Scheduler()
-        scheduler.id = 'scheduler'
+        Scheduler.scheduler = Scheduler()
+        Scheduler.scheduler.id = 'scheduler'
         print 'New Scheduler'
-        P.persist.persist(scheduler)
+        P.persist.persist(Scheduler.scheduler)
 
-    server = startServer(scheduler)
+    server = startServer()
 
     try:
         while True:
             time.sleep(0.001)
-            scheduler.run()
+            Scheduler.scheduler.run()
             P.persist.sync(1)
     except KeyboardInterrupt, e:
         pass

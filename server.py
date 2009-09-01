@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from pymud.mob import Mob
+from pymud.creator import Creator
 from pymud.scheduler import Scheduler
 from pymud import cli
 from pymud import telnetserver
@@ -15,30 +16,30 @@ class Server(object):
     def start(self):
         P.persist = Persistence("server.db")
         if P.persist.exists('scheduler'):
-            self.scheduler = P.persist.get('scheduler')
+            Scheduler.scheduler = P.persist.get('scheduler')
         else:
-            self.scheduler = Scheduler()
-            self.scheduler.id = 'scheduler'
+            Scheduler.scheduler = Scheduler()
+            Scheduler.scheduler.id = 'scheduler'
             print 'New Scheduler'
-            P.persist.persist(self.scheduler)
+            P.persist.persist(Scheduler.scheduler)
 
         P.persist.syncAll()
 
-        if P.persist.exists('mob'):
-            mob = P.persist.get("mob")
+        if P.persist.exists('creator'):
+            creator = P.persist.get("creator")
         else:
-            mob = Mob(stdout=None,stdin=None,id="mob")
-            P.persist.persist(mob)
-            self.scheduler.schedule(mob)
+            creator = Creator(id="creator")
+            P.persist.persist(creator)
+            Scheduler.scheduler.schedule(creator)
 
-        cli.startCli(P(mob))
-        self.server = telnetserver.startServer(self.scheduler)
+        cli.startCli(P(creator))
+        self.server = telnetserver.startServer()
 
     def run(self):
         try:
             while True:
                 time.sleep(0.1)
-                self.scheduler.run()
+                Scheduler.scheduler.run()
         except BaseException, e:
             print e
 
