@@ -6,6 +6,8 @@ from pymud.persist import P
 
 class Scheduler(object):
 
+    scheduler = None
+
     def __init__(self):
         self.items = {}
         self.itemsIterator = None
