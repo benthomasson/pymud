@@ -52,7 +52,7 @@ if __name__ == '__main__':
     if P.persist.exists("mob"):
         m = P(P.persist.get("mob"))
     else:
-        m = P(P.persist.persist(Mob(stdout=None,stdin=None,id="mob")))
+        m = P(P.persist.persist(Mob(id="mob")))
 
     startCli(m)
 

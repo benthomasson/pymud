@@ -7,37 +7,29 @@ from pymud.chainedmap import ChainedMap
 from pymud.coroutine import step
 from pymud.interpreter import interpret
 from pymud.message import Channel, Message
+from pymud.formatter import ColorTextFormatter
 
 def setVariable(self,name,value):
     self.variables[name] = value
 
 def say(self,*args):
-    if self.stdout:
-        self.stdout.write("\n")
-        self.stdout.write(" ".join(args) + "\n")
-        self.stdout.flush()
     self.sendMessage(Message("say",message=" ".join(args),name=self.id))
 
 def uber(self):
-    if self.stdout:
-        self.stdout.write("UBER!")
-        self.stdout.flush()
+    sys.stdout.write("UBER!")
+    sys.stdout.flush()
 
 class Mob(Channel):
 
     commands = ChainedMap({'say':say,
                             'set':setVariable})
     def __init__(   self,
-                    stdin=sys.stdin,
-                    stdout=sys.stdout,
                     variables=None,
                     commands=None,
                     id=None):
         Channel.__init__(self)
         self.id = id
         self.deleted = False
-        self.stdin = stdin
-        self.stdout = stdout
         self.currentScript = None
         self.commandQueue = []
         if variables:
@@ -55,14 +47,10 @@ class Mob(Channel):
     def __setstate__(self,state):
         self.__dict__ = state.copy()
         self.commands.parent = self.__class__.commands
-        self.stdout = None
-        self.stdin = None
         self.currentScript = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state['stdin']
-        del state['stdout']
         del state['currentScript']
         return state
 
@@ -75,17 +63,30 @@ class Mob(Channel):
 
     def run(self,n=1):
         #print 'run %s' % self.id
-        if not self.currentScript and len(self.commandQueue):
-            self.currentScript = interpret(self.commandQueue.pop(-1),self)
-        if self.currentScript:
-            if not step(self.currentScript):
-                self.currentScript = None
+        try:
+            if not self.currentScript and len(self.commandQueue):
+                self.currentScript = interpret(self.commandQueue.pop(-1),self)
+            if self.currentScript:
+                if not step(self.currentScript):
+                    self.currentScript = None
+        except Exception, e:
+            self.sendMessage(Message("error",error=str(e)))
 
+class Test(unittest.TestCase, ColorTextFormatter):
 
-class Test(unittest.TestCase):
+    def setUp(self):
+        self.id = None
+
+    def receiveMessage(self,message):
+        sys.stdout.write("\n")
+        sys.stdout.write(self.formatMessage(message))
+        sys.stdout.write("\n")
+        sys.stdout.flush()
 
     def testSayHi(self):
+        from pymud.persist import P
         amob = Mob()
+        amob.addListener(P(self))
         say(amob,"hi")
         amob.applyCommand("say",["hi"])
 
@@ -104,25 +105,29 @@ class Test(unittest.TestCase):
         self.assertNotEquals(mob1,mob2)
 
     def testPickleVariables(self):
+        from pymud.persist import P
         mob1 = Mob()
+        mob1.addListener(P(self))
         setVariable(mob1,'a','5')
         say(mob1,'hi1')
         self.assertEquals(mob1.variables['a'],'5')
         out = pickle.dumps(mob1,pickle.HIGHEST_PROTOCOL)
         mob2 = pickle.loads(out)
+        mob2.addListener(P(self))
         self.assertEquals(mob2.variables['a'],'5')
-        mob2.stdout = sys.stdout
         say(mob2,'hi2')
 
     def testPickleCommands(self):
+        from pymud.persist import P
         mob1 = Mob()
+        mob1.addListener(P(self))
         mob1.commands['uber'] = uber
         mob1.applyCommand('say',['hi'])
         mob1.applyCommand('uber')
         out = pickle.dumps(mob1,pickle.HIGHEST_PROTOCOL)
         #print out
         mob2 = pickle.loads(out)
-        mob2.stdout = sys.stdout
+        mob2.addListener(P(self))
         mob2.applyCommand('say',['hi'])
         mob2.applyCommand('uber')
 
@@ -131,8 +136,9 @@ class Test(unittest.TestCase):
         amob.run()
 
     def testRun(self):
+        from pymud.persist import P
         amob = Mob()
-        amob.stdout = sys.stdout
+        amob.addListener(P(self))
         amob.commandQueue.append("say hi\n")
         amob.commandQueue.append("say hi\n")
         amob.commandQueue.append("say hi\n")

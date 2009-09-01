@@ -6,6 +6,7 @@ import shelve
 import sys
 import os
 from pymud.coroutine import coroutine,step,finish
+from pymud.formatter import ColorTextFormatter
 
 class P(object):
     """P is a persistent reference to a persistent object.
@@ -122,8 +123,22 @@ class Persistence(object):
     def close(self):
         self.db.close()
 
+class StdoutReceiver(ColorTextFormatter):
+
+    def __init__(self):
+        self.id = None
+
+    def receiveMessage(self,message):
+        sys.stdout.write("\n")
+        sys.stdout.write(self.formatMessage(message))
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+
 
 class TestShelve(unittest.TestCase):
+
+    def setUp(self):
+        if os.path.exists("test.db"): os.remove("test.db")
 
     def testSimple(self):
         s = shelve.open("test.db",protocol=2)
@@ -142,12 +157,14 @@ class TestShelve(unittest.TestCase):
         import mob 
         s = shelve.open("test.db",protocol=2)
         m = mob.Mob()
+        m.addListener(StdoutReceiver())
+        print m.listeners
         m.applyCommand("say",["hi"])
         s['a'] = m
         s.close()
         s = shelve.open("test.db",protocol=2)
         m = s['a']
-        m.stdout = sys.stdout
+        m.addListener(StdoutReceiver())
         m.applyCommand("say",["hi"])
         self.assert_(s['a'])
         s.close()
@@ -157,19 +174,21 @@ class TestPersistence(unittest.TestCase):
     def setUp(self):
         if os.path.exists("test.db"): os.remove("test.db")
         P.persist = None
+        self.id = None
 
     def testMob(self):
         import mob 
         P.persist = Persistence("test.db")
         self.assertEquals(P.persist.id,0)
         m = mob.Mob()
+        m.addListener(StdoutReceiver())
         m.applyCommand("say",["hi"])
         P.persist.persist(m)
         P.persist.close()
         P.persist = Persistence("test.db")
         self.assertEquals(P.persist.id,1)
         m = P.persist.get('1')
-        m.stdout = sys.stdout
+        m.addListener(StdoutReceiver())
         m.applyCommand("say",["hi"])
         P.persist.close()
 
@@ -179,6 +198,7 @@ class TestPersistence(unittest.TestCase):
         self.assertEquals(P.persist.id,0)
         for x in xrange(100):
             m = mob.Mob()
+            m.addListener(StdoutReceiver())
             m.applyCommand("say",["hi"])
             P.persist.persist(m)
         for x in xrange(10):
@@ -187,7 +207,7 @@ class TestPersistence(unittest.TestCase):
         P.persist = Persistence("test.db")
         self.assertEquals(P.persist.id,100)
         m = P.persist.get('1')
-        m.stdout = sys.stdout
+        m.addListener(StdoutReceiver())
         m.applyCommand("say",["hi"])
         P.persist.sync()
         P.persist.close()
@@ -198,6 +218,7 @@ class TestPersistence(unittest.TestCase):
         self.assertEquals(P.persist.id,0)
         for x in xrange(100):
             m = mob.Mob()
+            m.addListener(StdoutReceiver())
             m.applyCommand("say",["hi"])
             P.persist.persist(m)
         P.persist.sync()
@@ -218,8 +239,8 @@ class TestP(unittest.TestCase):
         m = P(mob.Mob())
         self.assert_(m())
         self.assertFalse(m().id)
-        m().stdout = sys.stdout
         m().run()
+        m().addListener(StdoutReceiver())
         m().applyCommand("say",['testTemporary'])
         m.ref = None
         self.assertFalse(m())
@@ -231,13 +252,12 @@ class TestP(unittest.TestCase):
         m = P(P.persist.persist(mob.Mob()))
         self.assert_(m())
         self.assert_(m().id)
-        m().stdout = sys.stdout
         m().run()
+        m().addListener(StdoutReceiver())
         m().applyCommand("say",['testPersistent'])
         m.ref = None
         self.assert_(m())
         self.assert_(m().id)
-        m().stdout = sys.stdout
         m().run()
         m().applyCommand("say",['testPersistent'])
         P.persist.close()
@@ -245,7 +265,7 @@ class TestP(unittest.TestCase):
         P.persist = Persistence("test.db")
         self.assert_(m())
         self.assert_(m().id)
-        m().stdout = sys.stdout
+        m().addListener(StdoutReceiver())
         m().run()
         m().applyCommand("say",['testPersistent'])
 

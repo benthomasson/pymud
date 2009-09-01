@@ -14,6 +14,9 @@ class TextFormatter(object):
     def formatsay(self,message):
         return "%(WHITE)s%(name)s says %(BLUE)s'%(message)s'%(CLEAR)s" % message.dict
 
+    def formaterror(self,message):
+        return "%(RED)sERROR:%(error)s%(CLEAR)s" % message.dict
+
 class ColorTextFormatter(TextFormatter):
 
     def formatMessage(self,message):
