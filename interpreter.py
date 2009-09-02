@@ -47,6 +47,13 @@ class InterpreterVisitor(object):
             for expression in node.expressions[1:]:
                 finish(self.visit(expression))
             self.instance.default(map(lambda x: str(x.value),node.expressions))
+    
+    def visitAssign(self,node,*args):
+        yield
+        finish(self.visit(node.variable))
+        for symbol in node.expression:
+            finish(self.visit(symbol))
+        self.instance.variables[str(node.variable.value)] = " ".join(map(lambda x:str(x.value),node.expression))
 
     def visitSymbol(self,node,*args):
         yield
