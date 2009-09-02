@@ -7,7 +7,9 @@ from pymud import cli
 from pymud import telnetserver
 from pymud.persist import P, Persistence
 from pymud.exceptions import *
+import sys
 import time
+import traceback
 
 class Server(object):
 
@@ -45,6 +47,7 @@ class Server(object):
             print "Shutting down server"
         except BaseException, e:
             print e
+            traceback.print_exception(*sys.exc_info())
 
     def close(self):
         self.server.shutdown()
