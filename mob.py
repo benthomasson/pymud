@@ -12,26 +12,41 @@ from pymud.formatter import ColorTextFormatter
 from pymud.persist import Persistent, P
 
 def setVariable(self,name,value):
+    """Remember something for later"""
     self.variables[name] = value
 
 def say(self,*args):
+    """Converse with the locals"""
     self.sendMessage("say",message=" ".join(args),name=self.id)
 
-def look(self):
+def look(self,target=None):
+    """Look at the world around you"""
     if not self.location():
         self.sendMessage("look",description="eternal nothingness")
     else:
-        self.sendMessage("look",description="you see a %s" % self.location().__class__.__name__)
+        self.location().seen(self)
+
+def help(self,commandName="help"):
+    """Get help on commands"""
+    if commandName in self.commands:
+        command = self.commands[commandName]
+        self.sendMessage("help",name=commandName,help=command.__doc__)
+    else:
+        self.sendMessage("invalidcommand",name=commandName)
 
 def uber(self):
-    sys.stdout.write("UBER!")
-    sys.stdout.flush()
+    """Some uber command"""
+    self.sendMessage("action",description="zomg! uber!")
 
 class Mob(Persistent,Channel):
 
     commands = ChainedMap(map={ 'say':say,
                                 'look': look,
+                                'help': help,
                                 'set':setVariable})
+    location = P()
+    description = "an ugly son of a mob"
+
     def __init__(   self,
                     variables=None,
                     commands=None,
@@ -74,15 +89,16 @@ class Mob(Persistent,Channel):
 
     def run(self,n=1):
         #print 'run %s' % self.id
-        try:
-            if not self.currentScript and len(self.commandQueue):
-                self.currentScript = interpret(self.commandQueue.pop(0),self)
-            if self.currentScript:
-                if not step(self.currentScript):
-                    self.currentScript = None
-        except Exception, e:
-            message = " ".join(traceback.format_exception(*sys.exc_info()))
-            self.sendMessage("error",error=message)
+        for x in xrange(n):
+            try:
+                if not self.currentScript and len(self.commandQueue):
+                    self.currentScript = interpret(self.commandQueue.pop(0),self)
+                if self.currentScript:
+                    if not step(self.currentScript):
+                        self.currentScript = None
+            except Exception, e:
+                message = " ".join(traceback.format_exception(*sys.exc_info()))
+                self.sendMessage("error",error=message)
 
 class Test(unittest.TestCase, ColorTextFormatter):
 
