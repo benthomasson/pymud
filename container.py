@@ -16,3 +16,9 @@ class Container(object):
         o.location = P(self)
         self.contains[o.id] = P(o)
 
+    def seen(self,o):
+        for x in self.contains.values():
+            if x():
+                o.sendMessage("look",description=x().description)
+
+
