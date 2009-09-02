@@ -20,6 +20,12 @@ class TextFormatter(object):
     def formatcreated(self,message):
         return "%(RED)s%(name)s created a %(klass)s %(id)s!%(CLEAR)s" % message.dict
 
+    def formatlook(self,message):
+        return "You see %(description)s." % message.dict
+
+    def formataction(self,message):
+        return "You %(description)s." % message.dict
+
 class ColorTextFormatter(TextFormatter):
 
     def formatMessage(self,message):
