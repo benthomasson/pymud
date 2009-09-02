@@ -1,37 +1,48 @@
 #!/usr/bin/env python
 
 import sys
+import traceback
 import unittest
 import pickle
 from pymud.chainedmap import ChainedMap
 from pymud.coroutine import step
 from pymud.interpreter import interpret
-from pymud.message import Channel, Message
+from pymud.message import Channel
 from pymud.formatter import ColorTextFormatter
+from pymud.persist import Persistent, P
 
 def setVariable(self,name,value):
     self.variables[name] = value
 
 def say(self,*args):
-    self.sendMessage(Message("say",message=" ".join(args),name=self.id))
+    self.sendMessage("say",message=" ".join(args),name=self.id)
+
+def look(self):
+    if not self.location():
+        self.sendMessage("look",description="eternal nothingness")
+    else:
+        self.sendMessage("look",description="you see a %s" % self.location().__class__.__name__)
 
 def uber(self):
     sys.stdout.write("UBER!")
     sys.stdout.flush()
 
-class Mob(Channel):
+class Mob(Persistent,Channel):
 
-    commands = ChainedMap(map={'say':say,
-                            'set':setVariable})
+    commands = ChainedMap(map={ 'say':say,
+                                'look': look,
+                                'set':setVariable})
     def __init__(   self,
                     variables=None,
                     commands=None,
                     id=None):
+        Persistent.__init__(self)
         Channel.__init__(self)
         self.id = id
         self.deleted = False
         self.currentScript = None
         self.commandQueue = []
+        self.location = P()
         if variables:
             self.variables = variables
         else:
@@ -70,7 +81,8 @@ class Mob(Channel):
                 if not step(self.currentScript):
                     self.currentScript = None
         except Exception, e:
-            self.sendMessage(Message("error",error=str(e)))
+            message = " ".join(traceback.format_exception(*sys.exc_info()))
+            self.sendMessage("error",error=message)
 
 class Test(unittest.TestCase, ColorTextFormatter):
 
