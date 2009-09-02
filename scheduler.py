@@ -30,7 +30,10 @@ class Scheduler(object):
         for key, entry in self.items.copy().iteritems():
             yield
             if entry(): 
-                entry().run()
+                if hasattr(entry(),"run"):
+                    entry().run()
+                else:
+                    del self.items[key]
             else:
                 del self.items[key]
 
