@@ -35,14 +35,15 @@ class Server(object):
             P.persist.persist(creator)
             Scheduler.scheduler.schedule(creator)
 
-        cli.startCli(P(creator))
+        self.theCli = cli.startCli(P(creator))
         self.server = telnetserver.startServer()
 
     def run(self):
         try:
             while True:
-                time.sleep(0.1)
+                time.sleep(0.01)
                 Scheduler.scheduler.run()
+                self.theCli.receiveMessages()
         except ShutdownSignal, e:
             print "Shutting down server"
         except BaseException, e:
