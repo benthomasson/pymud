@@ -35,7 +35,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         try:
             while True:
                 command = self.socketFile.readline()
-                if not command: break
+                if None == command: break
                 self.onecmd(command.strip())
                 self.socketFile.flush()
         except BaseException, e:
