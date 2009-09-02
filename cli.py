@@ -22,6 +22,7 @@ class Cli(cmd.Cmd, ColorTextFormatter):
         self.mob = mob
         self.prompt = "%s>" % mob.id
         mob().addListener(self)
+        self.messages = []
 
     def onecmd(self,line):
         try:
@@ -35,17 +36,25 @@ class Cli(cmd.Cmd, ColorTextFormatter):
         return self.mob().commands.keys()
 
     def receiveMessage(self,message):
-        sys.stdout.write("\n")
-        sys.stdout.write(self.formatMessage(message))
+        self.messages.append(message)
+
+    def receiveMessages(self):
+        if not self.messages: return
+        for message in self.messages:
+            sys.stdout.write("\n")
+            sys.stdout.write(self.formatMessage(message))
         sys.stdout.write("\n")
         sys.stdout.write(self.prompt)
         sys.stdout.flush()
+        self.messages = []
+
 
 def startCli(m):
     cli = Cli(m)
     server_thread = threading.Thread(target=cli.cmdloop)
     server_thread.setDaemon(True)
     server_thread.start()
+    return cli
 
 if __name__ == '__main__':
     P.persist = Persistence("cli_test.db")
@@ -54,12 +63,13 @@ if __name__ == '__main__':
     else:
         m = P(P.persist.persist(Mob(id="mob")))
 
-    startCli(m)
+    cli = startCli(m)
 
     try:
         while True:
-            time.sleep(0.01)
+            time.sleep(0.1)
             m().run()
+            cli.receiveMessages()
     except BaseException, e:
         print e
 
