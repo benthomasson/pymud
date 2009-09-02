@@ -26,6 +26,16 @@ class TextFormatter(object):
     def formataction(self,message):
         return "You %(description)s." % message.dict
 
+    def formatinvalidcommand(self,message):
+        return "I do not know how to do %(name)s." % message.dict
+
+    def formathelp(self,message):
+        return """\
+%(WHITE)s%(name)s%(CLEAR)s
+-------------------------------------------------------------------------------
+%(help)s
+""" % message.dict
+
 class ColorTextFormatter(TextFormatter):
 
     def formatMessage(self,message):
