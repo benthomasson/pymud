@@ -21,8 +21,11 @@ class P(object):
 
     persist = None
 
-    def __init__(self,o):
-        if isinstance(o,P):
+    def __init__(self,o=None):
+        if not o:
+            self.id = None
+            self.ref = None
+        elif isinstance(o,P):
             self.id = o.id
             self.ref = o()
         else:
@@ -122,6 +125,13 @@ class Persistence(object):
 
     def close(self):
         self.db.close()
+
+
+class Persistent(object):
+
+    def __init__(self):
+        self.id = None
+        self.deleted = False
 
 class StdoutReceiver(ColorTextFormatter):
 
