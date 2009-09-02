@@ -22,7 +22,8 @@ class Channel(object):
         if listener.id in self.listeners:
             del self.listeners[listener.id] 
 
-    def sendMessage(self,message):
+    def sendMessage(self,type,**kwargs):
+        message = Message(type,**kwargs)
         for listener in self.listeners.copy().values():
             if listener(): 
                 listener().receiveMessage(message)
