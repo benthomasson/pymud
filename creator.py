@@ -33,6 +33,16 @@ def goto(self,id):
     newLocation.add(self)
     self.sendMessage("action",description="arrive at %s" % self.location().__class__.__name__)
 
+def gotohelper(self,current,full):
+    rooms = []
+    for x in P.persist.db.cache.values():
+        if isinstance(x,Room):
+            rooms.append(x.id)
+    return filter(lambda x:x.startswith(current),rooms)
+
+
+goto.tabcomplete = gotohelper
+
 def shutdown(self):
     """Shutdown the server"""
     self.sendMessage("say",message="shutdown!",name=self.id)

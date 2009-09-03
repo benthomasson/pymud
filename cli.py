@@ -32,8 +32,18 @@ class Cli(cmd.Cmd, ColorTextFormatter):
         except Exception,e:
             print str(e)
 
-    def completenames(self, *ignored):
-        return self.mob().commands.keys()
+    def completenames(self, text, *ignored):
+        return filter(lambda x: x.startswith(text),self.mob().commands.keys())
+    
+    def completedefault(self, current, full, *ignored):
+        command = full.split(" ")[0]
+        function = self.mob().commands[command]
+        if hasattr(function,"tabcomplete"):
+            try:
+                return function.tabcomplete(self.mob(),current,full)
+            except BaseException,e:
+                print e
+        return None
 
     def receiveMessage(self,message):
         self.messages.append(message)
