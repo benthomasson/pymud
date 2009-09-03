@@ -10,6 +10,7 @@ from pymud.exceptions import *
 import sys
 import time
 import traceback
+import item
 
 class Server(object):
 
