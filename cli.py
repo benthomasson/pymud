@@ -36,14 +36,22 @@ class Cli(cmd.Cmd, ColorTextFormatter):
         return filter(lambda x: x.startswith(text),self.mob().commands.keys())
     
     def completedefault(self, current, full, *ignored):
-        command = full.split(" ")[0]
-        function = self.mob().commands[command]
-        if hasattr(function,"tabcomplete"):
-            try:
+        try:
+            last = full.split(" ")[-1]
+            if last.startswith("$"):
+                variables = []
+                for x in self.mob().variables.keys():
+                    if x:
+                        variables.append(x)
+                return filter(lambda x:x.startswith(last[1:]),variables)
+            command = full.split(" ")[0]
+            function = self.mob().commands[command]
+            if hasattr(function,"tabcomplete"):
                 return function.tabcomplete(self.mob(),current,full)
-            except BaseException,e:
-                print e
-        return None
+            else:
+                return None
+        except BaseException,e:
+            print e
 
     def receiveMessage(self,message):
         self.messages.append(message)
