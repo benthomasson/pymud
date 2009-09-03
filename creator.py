@@ -1,4 +1,5 @@
 
+from sim import Sim
 from mob import Mob
 from room import Room
 from pymud.chainedmap import ChainedMap
@@ -8,23 +9,33 @@ from pymud.exceptions import *
 import sys
 import traceback
 
+def getAllSubclasses(klass):
+    klasses = []
+    klasses += klass.__subclasses__()
+    for x in klass.__subclasses__():
+        klasses += getAllSubclasses(x)
+    return list(set(klasses))
+
 def create(self,klass,id=None):
     """Create an instance of a class"""
-    klasses = {"Mob":Mob, "Room":Room}
+    klasses = dict(map(lambda x:(x.__name__,x),getAllSubclasses(Sim)))
     m = klasses[klass](id=id)
     P.persist.persist(m)
     Scheduler.scheduler.schedule(m)
-    self.sendMessage("created",id=m.id,klass=klass,name=self.id)
+    self.sendMessage("created",id=m.id,klass=klass,article=klasses[klass].article,name=self.id)
+    return m
+
+def createhelper(self,current,full):
+    klasses = map(lambda x:x.__name__,getAllSubclasses(Sim))
+    return filter(lambda x:x.startswith(current),klasses)
+
+create.tabcomplete = createhelper
 
 def createHere(self,klass,id=None):
     """Create an instance of a class in this room"""
-    klasses = {"Mob":Mob, "Room":Room}
-    m = klasses[klass](id=id)
-    P.persist.persist(m)
-    Scheduler.scheduler.schedule(m)
+    m = create(self,klass,id)
     if self.location():
         self.location().add(m)
-    self.sendMessage("created",id=m.id,klass=klass,name=self.id)
 
 def goto(self,id):
     """Go to another room by id"""
