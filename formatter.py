@@ -18,7 +18,7 @@ class TextFormatter(object):
         return "%(RED)sERROR:%(error)s%(CLEAR)s" % message.dict
 
     def formatcreated(self,message):
-        return "%(RED)s%(name)s created a %(klass)s %(id)s!%(CLEAR)s" % message.dict
+        return "%(RED)s%(name)s created %(article)s %(klass)s %(id)s!%(CLEAR)s" % message.dict
 
     def formatlook(self,message):
         return "You see %(description)s." % message.dict
