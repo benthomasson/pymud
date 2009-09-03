@@ -8,10 +8,10 @@ class Scheduler(object):
 
     scheduler = None
 
-    def __init__(self):
+    def __init__(self,id = None):
         self.items = {}
         self.itemsIterator = None
-        self.id = None
+        self.id = id
 
     def schedule(self,o):
         self.items[o.id] = P(o)
