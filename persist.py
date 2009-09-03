@@ -84,6 +84,14 @@ class Persistence(object):
     def get(self,id):
         return self.db[id]
 
+    def getOrCreate(self,id,klass,*args,**kwargs):
+        if self.exists(id):
+            return self.get(id)
+        else:
+            instance = klass(id=id,*args,**kwargs)
+            self.persist(instance)
+            return instance
+
     def exists(self,id):
         try:
             self.db[id]
@@ -235,6 +243,19 @@ class TestPersistence(unittest.TestCase):
         P.persist.delete(m)
         for x in xrange(10):
             print P.persist.sync()
+        P.persist.close()
+
+    def testGetOrCreate(self):
+        import mob 
+        P.persist = Persistence("test.db")
+        x = P.persist.getOrCreate("mob",mob.Mob)
+        x.name = "bob"
+        P.persist.close()
+        P.persist = Persistence("test.db")
+        x = P.persist.getOrCreate("mob",mob.Mob)
+        y = P.persist.getOrCreate("notmob",mob.Mob)
+        self.assertEquals(x.name,"bob")
+        self.assertRaises(AttributeError,lambda: y.name)
         P.persist.close()
 
 class TestP(unittest.TestCase):
