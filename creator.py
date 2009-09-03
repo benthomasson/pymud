@@ -1,7 +1,6 @@
 
-from sim import Sim
-from mob import Mob
-from room import Room
+from pymud.sim import Sim
+from pymud.mob import Mob
 from pymud.chainedmap import ChainedMap
 from pymud.persist import P
 from pymud.scheduler import Scheduler
@@ -36,6 +35,8 @@ def createHere(self,klass,id=None):
     m = create(self,klass,id)
     if self.location():
         self.location().add(m)
+
+createHere.tabcomplete = createhelper
 
 def goto(self,id):
     """Go to another room by id"""

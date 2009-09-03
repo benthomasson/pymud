@@ -11,6 +11,7 @@ import sys
 import time
 import traceback
 import item
+import room
 
 class Server(object):
 
