@@ -9,7 +9,8 @@ from pymud.coroutine import step
 from pymud.interpreter import interpret
 from pymud.message import Channel
 from pymud.formatter import ColorTextFormatter
-from pymud.persist import Persistent, P
+from pymud.sim import Sim
+from pymud.persist import P
 
 def setVariable(self,name,value):
     """Remember something for later"""
@@ -38,7 +39,7 @@ def uber(self):
     """Some uber command"""
     self.sendMessage("action",description="zomg! uber!")
 
-class Mob(Persistent,Channel):
+class Mob(Sim,Channel):
 
     commands = ChainedMap(map={ 'say':say,
                                 'look': look,
@@ -51,7 +52,7 @@ class Mob(Persistent,Channel):
                     variables=None,
                     commands=None,
                     id=None):
-        Persistent.__init__(self)
+        Sim.__init__(self)
         Channel.__init__(self)
         self.id = id
         self.deleted = False
