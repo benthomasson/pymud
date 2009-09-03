@@ -11,6 +11,8 @@ from pymud.coroutine import finish
 from pymud.mob import Mob
 import time
 from pymud.formatter import ColorTextFormatter
+from pymud.mobmarket import MobMarket
+from pymud.message import Message
 
 class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
 
@@ -19,17 +21,20 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         SocketServer.BaseRequestHandler.__init__(self,*args,**kwargs)
 
     def prompt(self):
-        return "%s>" % self.mob.id 
+        if self.mob():
+            return "%s>" % self.mob.id 
+        else:
+            return ""
 
     def handle(self):
         self.socketFile = self.request.makefile('rw')
-        if P.persist.exists("mob"):
-            self.mob = P.persist.get("mob")
-        else:
-            self.mob = Mob(id="mob")
-            P.persist.persist(self.mob)
-        Scheduler.scheduler.schedule(self.mob)
-        self.mob.addListener(self)
+        self.mob = MobMarket.market.getNext()
+        if not self.mob():
+            self.receiveMessage(Message("notice",notice=\
+                "There are no available mobs to play right now. Try again later."))
+            self.socketFile.flush()
+            return
+        self.mob().addListener(self)
         self.socketFile.write(self.prompt())
         self.socketFile.flush()
         try:
@@ -40,12 +45,15 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
                 self.socketFile.flush()
         except BaseException, e:
             print str(e)
+        self.mob().removeListener(self)
+        if not self.mob().deleted:
+            MobMarket.market.add(self.mob())
 
     def onecmd(self,line):
         try:
             if line:
                 print "Command<>%s<>" % line
-                self.mob.commandQueue.append(line + "\n")
+                self.mob().commandQueue.append(line + "\n")
             self.socketFile.write("\n")
             self.socketFile.write(self.prompt())
             self.socketFile.flush()

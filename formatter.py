@@ -29,6 +29,9 @@ class TextFormatter(object):
     def formatinvalidcommand(self,message):
         return "I do not know how to do %(name)s." % message.dict
 
+    def formatnotice(self,message):
+        return "%(notice)s" % message.dict
+
     def formathelp(self,message):
         return """\
 %(WHITE)s%(name)s%(CLEAR)s

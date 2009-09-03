@@ -7,6 +7,7 @@ from pymud import cli
 from pymud import telnetserver
 from pymud.persist import P, Persistence
 from pymud.exceptions import *
+from pymud.mobmarket import MobMarket
 import sys
 import time
 import traceback
@@ -20,22 +21,12 @@ class Server(object):
 
     def start(self):
         P.persist = Persistence("server.db")
-        if P.persist.exists('scheduler'):
-            Scheduler.scheduler = P.persist.get('scheduler')
-        else:
-            Scheduler.scheduler = Scheduler()
-            Scheduler.scheduler.id = 'scheduler'
-            print 'New Scheduler'
-            P.persist.persist(Scheduler.scheduler)
+        Scheduler.scheduler = P.persist.getOrCreate('scheduler',Scheduler)
+        MobMarket.market = P.persist.getOrCreate('market',MobMarket)
+        creator = P.persist.getOrCreate("creator",Creator)
+        Scheduler.scheduler.schedule(creator)
 
         P.persist.syncAll()
-
-        if P.persist.exists('creator'):
-            creator = P.persist.get("creator")
-        else:
-            creator = Creator(id="creator")
-            P.persist.persist(creator)
-            Scheduler.scheduler.schedule(creator)
 
         self.theCli = cli.startCli(P(creator))
         self.server = telnetserver.startServer()
