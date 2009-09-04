@@ -44,6 +44,9 @@ class Server(object):
             traceback.print_exception(*sys.exc_info())
 
     def close(self):
+        print "Saving state"
+        for instance in telnetserver.TelnetInterface.instances.copy():
+            instance.finish()
         self.server.shutdown()
         P.persist.close()
 

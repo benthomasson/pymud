@@ -16,8 +16,11 @@ from pymud.message import Message
 
 class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
 
+    instances = {}
+
     def __init__(self,*args,**kwargs):
         self.id = "telnetui"
+        TelnetInterface.instances[self] = 1
         SocketServer.BaseRequestHandler.__init__(self,*args,**kwargs)
 
     def prompt(self):
@@ -45,9 +48,13 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
                 self.socketFile.flush()
         except BaseException, e:
             print str(e)
-        self.mob().removeListener(self)
-        if not self.mob().deleted:
+
+    def finish(self):
+        if self.mob():
+            self.mob().removeListener(self)
             MobMarket.market.add(self.mob())
+            self.mob = P()
+        del TelnetInterface.instances[self]
 
     def onecmd(self,line):
         try:
