@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 import socket
 import threading
@@ -24,37 +23,48 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         SocketServer.BaseRequestHandler.__init__(self,*args,**kwargs)
 
     def prompt(self):
-        if self.mob():
+        if self.mob and self.mob():
             return "%s>" % self.mob.id 
         else:
-            return ""
+            return "XXX"
 
     def handle(self):
         self.socketFile = self.request.makefile('rw')
         self.mob = MobMarket.market.getNext()
-        if not self.mob():
+        if not self.mob:
             self.receiveMessage(Message("notice",notice=\
                 "There are no available mobs to play right now. Try again later."))
             self.socketFile.flush()
             return
         self.mob().addListener(self)
+        self.mob().interface = self
         self.socketFile.write(self.prompt())
         self.socketFile.flush()
         try:
             while True:
+                if not self.mob or not self.mob():
+                    break
                 command = self.socketFile.readline()
                 if None == command: break
                 self.onecmd(command.strip())
                 self.socketFile.flush()
+                if not self.mob or not self.mob():
+                    self.receiveMessage(Message("notice",notice="Goodbye"))
+                    break
         except BaseException, e:
             print str(e)
+        self.socketFile.flush()
 
-    def finish(self):
-        if self.mob():
+    def quit(self):
+        if self.mob and self.mob():
             self.mob().removeListener(self)
             MobMarket.market.add(self.mob())
-            self.mob = P.null
+            self.mob = None
+
+    def finish(self):
+        self.quit()
         del TelnetInterface.instances[self]
+        self.socketFile.close()
 
     def onecmd(self,line):
         try:

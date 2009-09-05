@@ -18,8 +18,9 @@ class MobMarket(Persistent):
             del self.mobs[mob.id]
 
     def getNext(self):
-        if self.mobs:
-            return self.mobs.popitem()[1]
-        else:
-            return P.null
+        while self.mobs:
+            id, p = self.mobs.popitem()
+            if p():
+                return p
+        return None
 

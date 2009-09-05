@@ -17,6 +17,7 @@ class Creator(Mob):
                             map={   "create":create,
                                     "goto":goto,
                                     "spy":spy,
+                                    "kill":kill,
                                     "createhere":createHere,
                                     "shutdown":shutdown, })
 

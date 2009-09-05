@@ -9,33 +9,41 @@ from pymud.coroutine import step
 from pymud.interpreter import interpret
 from pymud.message import Channel,RepeaterMixin
 from pymud.formatter import ColorTextFormatter
+from pymud.container import Container
 from pymud.sim import Sim
 from pymud.persist import P
 from pymud.exceptions import *
 from commands import *
 
-class Mob(Sim,Channel,RepeaterMixin):
+class Mob(RepeaterMixin,Channel,Container,Sim):
 
     commands = ChainedMap(map={ 'say':say,
                                 'look': look,
                                 'help': help,
+                                'get': get,
+                                'drop': drop,
+                                'inventory': inventory,
+                                'quit': quit,
                                 'set':setVariable})
     location = P.null
     description = "an ugly son of a mob"
     detail = "a really ugly son of a mob"
     attributes = {'name':'mob'}
+    interface = None
 
     def __init__(   self,
                     variables=None,
                     commands=None,
                     id=None):
-        Sim.__init__(self)
         Channel.__init__(self)
+        Container.__init__(self)
+        Sim.__init__(self)
         self.id = id
         self.deleted = False
         self.currentScript = None
         self.commandQueue = []
         self.location = P.null
+        self.interface = None
         if variables:
             self.variables = variables
         else:
@@ -52,10 +60,12 @@ class Mob(Sim,Channel,RepeaterMixin):
         self.__dict__ = state.copy()
         self.commands.parent = self.__class__.commands
         self.currentScript = None
+        self.interface = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
         del state['currentScript']
+        del state['interface']
         return state
 
     def applyCommand(self,command,arguments=[]):

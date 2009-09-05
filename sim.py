@@ -1,5 +1,6 @@
 
 from pymud.persist import Persistent
+from pymud.exceptions import *
 
 class Sim(Persistent):
 
@@ -13,3 +14,10 @@ class Sim(Persistent):
 
     def __repr__(self):
         return "<" + self.__class__.__name__ +  ":" + self.id + ">"
+
+
+    def checkGet(self,getter):
+        raise GameException("You cannot lift it.")
+
+    def checkDrop(self,getter):
+        raise GameException("It's too sticky.")

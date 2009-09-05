@@ -33,17 +33,31 @@ class Container(object):
 
     def get(self,id=None,attribute=None,index=0):
         if id and id in self.containsById:
-            return self.containsById[id]
+            o = self.containsById[id]
+            if not o():
+                del self.containsById[id]
+                raise GameException("Cannot find anything like %s" % attribute)
+            else:
+                return o
         elif attribute and attribute in self.containsByAttribute and \
                 len(self.containsByAttribute[attribute]) > index:
-            return self.containsByAttribute[attribute][index]
+            o = self.containsByAttribute[attribute][index]
+            if not o():
+                self.containsByAttribute[attribute].remove(o)
+                return self.get(attribute=attribute,index=index)
+            else:
+                return o
         else:
             raise GameException("Cannot find anything like %s" % attribute)
+
 
     def seen(self,o):
         for x in self.containsById.values():
             if x():
                 o.sendMessage("look",description=x().description)
+
+    def checkHold(self,o):
+        pass
 
 class Test(unittest.TestCase):
 

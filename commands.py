@@ -1,6 +1,8 @@
 """User commands"""
 
 import unittest
+from pymud.exceptions import *
+from pymud.container import Container
 
 def setVariable(self,name,value):
     """Remember something for later"""
@@ -33,3 +35,30 @@ def help(self,commandName="help"):
 def uber(self):
     """Some uber command"""
     self.sendMessage("action",description="zomg! uber!")
+
+def get(self,target=None):
+    """Get something from the current room"""
+    if not self.location():
+        raise GameException("You are in the void.  There is nothing here.")
+    target = self.location().get(attribute=target)()
+    target.checkGet(self)
+    self.checkHold(target)
+    self.add(target)
+
+def drop(self,target=None):
+    target = self.get(attribute=target)()
+    target.checkDrop(self)
+    if self.location():
+        self.location().checkHold(target)
+        self.location().add(target)
+    else:
+        self.remove(target)
+
+def inventory(self):
+    """See what you are carrying"""
+    Container.seen(self,self)
+
+def quit(self):
+    if self.interface:
+        self.interface.quit()
+

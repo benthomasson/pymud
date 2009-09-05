@@ -66,6 +66,19 @@ def spy(self,target=None):
         target = self
     elif target == "here":
         target = self.location()
+    elif self.location():
+        target = self.location().get(attribute=target)()
     print target.__class__
     for name,value in target.__dict__.iteritems():
         print name,value
+
+def kill(self,target=None):
+    if not target:
+        return
+    if not self.location():
+        return
+    target = self.location().get(attribute=target)
+    id = target.id
+    target.delete()
+    self.sendMessage("notice",notice="You killed %s" % id)
+

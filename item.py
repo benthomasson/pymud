@@ -16,3 +16,12 @@ class Item(Sim):
 
     def seen(self,o):
         o.sendMessage("look",description=self.detail)
+
+    def receiveMessage(self,message):
+        pass
+
+    def checkGet(self,getter):
+        pass
+
+    def checkDrop(self,getter):
+        pass
