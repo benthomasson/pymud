@@ -11,6 +11,7 @@ import interpreter
 import message
 import scheduler
 import script
+import container
 
 class SimpleSuite(unittest.TestSuite):
 
@@ -37,6 +38,7 @@ map(suite.addTestsFromTestCase,[mob.Test,
                                 message.TestChannel,
                                 scheduler.Test,
                                 script.Test,
+                                container.Test,
                                 ])
 
 
