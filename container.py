@@ -35,7 +35,7 @@ class Container(object):
             return self.containsById[id]
         elif attribute and attribute in self.containsByAttribute and\
                 self.containsByAttribute[attribute]:
-            return self.containsByAttribute[attribute]
+            return self.containsByAttribute[attribute][0]
         else:
             return None
 
@@ -56,6 +56,7 @@ class Test(unittest.TestCase):
         self.assertEquals(c.containsById['mob'](), m)
         self.assertEquals(c.containsByAttribute['mob'][0](), m)
         self.assertEquals(c.get(id='mob')(),m)
+        self.assertEquals(c.get(attribute='mob')(),m)
         c.remove(m)
         self.assertFalse('mob' in c.containsById)
         self.assertEquals(c.containsByAttribute['mob'], [])
@@ -71,9 +72,14 @@ class Test(unittest.TestCase):
         c.add(m2)
         self.assertEquals(c.containsById['mob1'](), m1)
         self.assertEquals(c.containsByAttribute['mob'][0](), m1)
+        self.assertEquals(c.get(id='mob1')(),m1)
+        self.assertEquals(c.get(id='mob2')(),m2)
+        self.assertEquals(c.get(attribute='mob')(),m1)
         c.remove(m1)
         self.assertFalse('mob1' in c.containsById)
         self.assertEquals(c.containsByAttribute['mob'][0](), m2)
+        self.assertEquals(c.get(id='mob2')(),m2)
+        self.assertEquals(c.get(attribute='mob')(),m2)
         c.remove(m2)
         self.assertFalse('mob2' in c.containsById)
         self.assertEquals(c.containsByAttribute['mob'], [])
