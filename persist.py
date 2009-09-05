@@ -59,6 +59,8 @@ class P(object):
         state['id'] = self.id
         return state
 
+P.null = P()
+
 class Persistence(object):
 
     def __init__(self,filename):

@@ -7,6 +7,7 @@ class Room(Sim, Channel, Container):
 
     description = "a plain room"
     detail = "a very plain room"
+    attributes = {'name':'room'}
 
     def __init__(self,id=None):
         Sim.__init__(self)

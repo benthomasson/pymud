@@ -4,7 +4,7 @@ from persist import P
 
 class Item(Sim):
 
-    location = P()
+    location = P.null
     description = "a thing"
     detail = "it's nondescript"
     article = "an"

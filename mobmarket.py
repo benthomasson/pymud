@@ -21,5 +21,5 @@ class MobMarket(Persistent):
         if self.mobs:
             return self.mobs.popitem()[1]
         else:
-            return P()
+            return P.null
 

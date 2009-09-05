@@ -73,6 +73,7 @@ class Creator(Mob):
                                     "shutdown":shutdown, })
 
     description = "something strange, like a bunch of green glowing letters"
+    attributes = {'name':'Creator'}
 
     def __init__(self,*args,**kwargs):
         Mob.__init__(self,*args,**kwargs)

@@ -45,8 +45,9 @@ class Mob(Sim,Channel):
                                 'look': look,
                                 'help': help,
                                 'set':setVariable})
-    location = P()
+    location = P.null
     description = "an ugly son of a mob"
+    attributes = {'name':'mob'}
 
     def __init__(   self,
                     variables=None,
@@ -58,7 +59,7 @@ class Mob(Sim,Channel):
         self.deleted = False
         self.currentScript = None
         self.commandQueue = []
-        self.location = P()
+        self.location = P.null
         if variables:
             self.variables = variables
         else:

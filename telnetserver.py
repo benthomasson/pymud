@@ -53,7 +53,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         if self.mob():
             self.mob().removeListener(self)
             MobMarket.market.add(self.mob())
-            self.mob = P()
+            self.mob = P.null
         del TelnetInterface.instances[self]
 
     def onecmd(self,line):
