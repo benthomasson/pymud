@@ -45,7 +45,6 @@ class TestChannel(unittest.TestCase):
 
     def test(self):
         self.id = '1'
-        m = Message("say",message="hello",name="Ed",id="1")
         c = Channel()
         c.addListener(self)
         self.assert_(c.listeners['1'])
@@ -53,9 +52,9 @@ class TestChannel(unittest.TestCase):
         self.assertEquals(c.listeners['1'].ref,self)
         self.assertEquals(c.listeners['1']().id,'1')
         self.assertEquals(c.listeners['1'](),self)
-        c.sendMessage(m)
+        c.sendMessage("say",message="hello",name="Ed",id="1")
         self.deleted = True
-        c.sendMessage(m)
+        c.sendMessage("say",message="hello",name="Ed",id="1")
 
 
 if __name__ == "__main__":
