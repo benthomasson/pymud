@@ -73,6 +73,7 @@ class Creator(Mob):
                                     "shutdown":shutdown, })
 
     description = "something strange, like a bunch of green glowing letters"
+    detail = "what appears to be an infinite string of numbers"
     attributes = {'name':'Creator'}
 
     def __init__(self,*args,**kwargs):

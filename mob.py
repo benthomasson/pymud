@@ -24,8 +24,11 @@ def look(self,target=None):
     """Look at the world around you"""
     if not self.location():
         self.sendMessage("look",description="eternal nothingness")
-    else:
+        return
+    if not target:
         self.location().seen(self)
+        return
+    self.location().get(attribute=target)().seen(self)
 
 def help(self,commandName="help"):
     """Get help on commands"""
@@ -47,6 +50,7 @@ class Mob(Sim,Channel):
                                 'set':setVariable})
     location = P.null
     description = "an ugly son of a mob"
+    detail = "a really ugly son of a mob"
     attributes = {'name':'mob'}
 
     def __init__(   self,
@@ -88,6 +92,9 @@ class Mob(Sim,Channel):
             func(*arguments)
         else:
             func(*[self] + arguments)
+
+    def seen(self,o):
+        o.sendMessage("look",description=self.detail)
 
     def run(self,n=1):
         #print 'run %s' % self.id
