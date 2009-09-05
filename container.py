@@ -34,7 +34,8 @@ class Container(object):
     def get(self,id=None,attribute=None,index=0):
         if id and id in self.containsById:
             return self.containsById[id]
-        elif attribute and attribute in self.containsByAttribute:
+        elif attribute and attribute in self.containsByAttribute and \
+                len(self.containsByAttribute[attribute]) > index:
             return self.containsByAttribute[attribute][index]
         else:
             raise GameException("Cannot find anything like %s" % attribute)
@@ -83,6 +84,8 @@ class Test(unittest.TestCase):
         c.remove(m2)
         self.assertFalse('mob2' in c.containsById)
         self.assertEquals(c.containsByAttribute['mob'], [])
+        self.assertRaises(GameException,c.get,attribute='xcvc')
+        self.assertRaises(GameException,c.get,attribute='mob')
         pass
 
 if __name__ == "__main__":
