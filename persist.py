@@ -59,6 +59,9 @@ class P(object):
         state['id'] = self.id
         return state
 
+    def __repr__(self):
+        return "P" + repr(self())
+
 P.null = P()
 
 class Persistence(object):

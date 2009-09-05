@@ -11,3 +11,5 @@ class Sim(Persistent):
     def __init__(self):
         Persistent.__init__(self)
 
+    def __repr__(self):
+        return "<" + self.__class__.__name__ +  ":" + self.id + ">"

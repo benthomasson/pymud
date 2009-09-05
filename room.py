@@ -15,6 +15,14 @@ class Room(Sim, Channel, Container):
         Container.__init__(self)
         self.id = id
 
+    def add(self,o):
+        self.addListener(o)
+        Container.add(self,o)
+
+    def remove(self,o):
+        self.removeListener(o)
+        Container.remove(self,o)
+
     def seen(self,o):
         o.sendMessage("look",description=self.description)
         Container.seen(self,o)

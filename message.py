@@ -8,7 +8,8 @@ class Message(object):
 
     def __init__(self,type,**kwargs):
         self.type = type
-        self.dict = kwargs
+        self.dict = {'exclude':[]}
+        self.dict.update(kwargs)
 
 class Channel(object):
     
@@ -24,11 +25,21 @@ class Channel(object):
 
     def sendMessage(self,type,**kwargs):
         message = Message(type,**kwargs)
+        self._sendMessage(message)
+
+    def _sendMessage(self,message):
+        exclude = message.dict['exclude']
         for listener in self.listeners.copy().values():
-            if listener(): 
+            if listener() and listener() not in exclude:
                 listener().receiveMessage(message)
-            else:
+            elif not listener():
                 del self.listeners[listener.id]
+
+
+class RepeaterMixin(object):
+
+    def receiveMessage(self,message):
+        self._sendMessage(message)
 
 
 class TestMessage(unittest.TestCase):
@@ -52,9 +63,10 @@ class TestChannel(unittest.TestCase):
         self.assertEquals(c.listeners['1'].ref,self)
         self.assertEquals(c.listeners['1']().id,'1')
         self.assertEquals(c.listeners['1'](),self)
-        c.sendMessage("say",message="hello",name="Ed",id="1")
+        c.sendMessage("say",message="hello1",name="Ed",id="1")
+        c.sendMessage("say",message="hello3",name="Ed",id="1",exclude=[self])
         self.deleted = True
-        c.sendMessage("say",message="hello",name="Ed",id="1")
+        c.sendMessage("say",message="hello2",name="Ed",id="1")
 
 
 if __name__ == "__main__":

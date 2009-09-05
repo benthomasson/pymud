@@ -7,43 +7,14 @@ import pickle
 from pymud.chainedmap import ChainedMap
 from pymud.coroutine import step
 from pymud.interpreter import interpret
-from pymud.message import Channel
+from pymud.message import Channel,RepeaterMixin
 from pymud.formatter import ColorTextFormatter
 from pymud.sim import Sim
 from pymud.persist import P
 from pymud.exceptions import *
+from commands import *
 
-def setVariable(self,name,value):
-    """Remember something for later"""
-    self.variables[name] = value
-
-def say(self,*args):
-    """Converse with the locals"""
-    self.sendMessage("say",message=" ".join(args),name=self.id)
-
-def look(self,target=None):
-    """Look at the world around you"""
-    if not self.location():
-        self.sendMessage("look",description="eternal nothingness")
-        return
-    if not target:
-        self.location().seen(self)
-        return
-    self.location().get(attribute=target)().seen(self)
-
-def help(self,commandName="help"):
-    """Get help on commands"""
-    if commandName in self.commands:
-        command = self.commands[commandName]
-        self.sendMessage("help",name=commandName,help=command.__doc__)
-    else:
-        self.sendMessage("invalidcommand",name=commandName)
-
-def uber(self):
-    """Some uber command"""
-    self.sendMessage("action",description="zomg! uber!")
-
-class Mob(Sim,Channel):
+class Mob(Sim,Channel,RepeaterMixin):
 
     commands = ChainedMap(map={ 'say':say,
                                 'look': look,

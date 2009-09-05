@@ -11,6 +11,9 @@ class TextFormatter(object):
         fn = getattr(self, 'format' + message.type)
         return fn(message)
 
+    def formatyousay(self,message):
+        return "%(WHITE)sYou say %(BLUE)s'%(message)s'%(CLEAR)s" % message.dict
+
     def formatsay(self,message):
         return "%(WHITE)s%(name)s says %(BLUE)s'%(message)s'%(CLEAR)s" % message.dict
 
