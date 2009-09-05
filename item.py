@@ -14,3 +14,5 @@ class Item(Sim):
         self.id = id
 
 
+    def seen(self,o):
+        o.sendMessage("look",description=self.detail)
