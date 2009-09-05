@@ -11,6 +11,7 @@ from pymud.message import Channel
 from pymud.formatter import ColorTextFormatter
 from pymud.sim import Sim
 from pymud.persist import P
+from pymud.exceptions import *
 
 def setVariable(self,name,value):
     """Remember something for later"""
@@ -105,6 +106,8 @@ class Mob(Sim,Channel):
                 if self.currentScript:
                     if not step(self.currentScript):
                         self.currentScript = None
+            except GameException, e:
+                self.sendMessage("exception",error=str(e))
             except Exception, e:
                 message = " ".join(traceback.format_exception(*sys.exc_info()))
                 self.sendMessage("error",error=message)

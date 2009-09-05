@@ -17,6 +17,9 @@ class TextFormatter(object):
     def formaterror(self,message):
         return "%(RED)sERROR:%(error)s%(CLEAR)s" % message.dict
 
+    def formatexception(self,message):
+        return "%(RED)s%(error)s%(CLEAR)s" % message.dict
+
     def formatcreated(self,message):
         return "%(RED)s%(name)s created %(article)s %(klass)s %(id)s!%(CLEAR)s" % message.dict
 

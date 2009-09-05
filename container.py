@@ -2,6 +2,7 @@
 
 import unittest
 from pymud.persist import P
+from pymud.exceptions import *
 
 class Container(object):
 
@@ -30,14 +31,13 @@ class Container(object):
             else:
                 self.containsByAttribute[value] = [p]
 
-    def get(self,id=None,attribute=None):
+    def get(self,id=None,attribute=None,index=0):
         if id and id in self.containsById:
             return self.containsById[id]
-        elif attribute and attribute in self.containsByAttribute and\
-                self.containsByAttribute[attribute]:
-            return self.containsByAttribute[attribute][0]
+        elif attribute and attribute in self.containsByAttribute:
+            return self.containsByAttribute[attribute][index]
         else:
-            return None
+            raise GameException("Cannot find anything like %s" % attribute)
 
     def seen(self,o):
         for x in self.containsById.values():
