@@ -23,6 +23,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         TelnetInterface.instances[self] = 1
         self.line = ""
         self.done = False
+        self.messages = []
         SocketServer.BaseRequestHandler.__init__(self,*args,**kwargs)
 
     def prompt(self):
@@ -51,6 +52,10 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
                     break
                 while not self.done:
                     try:
+                        self.receiveMessages()
+                        if not self.mob or not self.mob():
+                            self.done = True
+                            break
                         read = self.socketFile.read(1)
                         if len(read) == 0:
                             self.done = True
@@ -60,13 +65,13 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
                             command,newline,self.line = self.line.partition("\n")
                             break
                     except socket.error, error:
+                        time.sleep(0.01)
                         if error[0] == 35:
                             pass
                         else:
                             print error[0]
                             self.done = True
                             break
-                    time.sleep(0.01)
                 if self.done: break
                 if None == command: break
                 self.onecmd(command.strip())
@@ -100,11 +105,17 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
             print str(e)
 
     def receiveMessage(self,message):
-        self.socketFile.write("\n")
-        self.socketFile.write(self.formatMessage(message))
+        self.messages.append(message)
+
+    def receiveMessages(self):
+        if not self.messages: return
+        for message in self.messages:
+            self.socketFile.write("\n")
+            self.socketFile.write(self.formatMessage(message))
         self.socketFile.write("\n")
         self.socketFile.write(self.prompt())
         self.socketFile.flush()
+        self.messages = []
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 
