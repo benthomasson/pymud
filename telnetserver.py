@@ -90,6 +90,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
             self.mob = None
 
     def finish(self):
+        self.receiveMessages()
         self.quit()
         del TelnetInterface.instances[self]
         self.socketFile.close()

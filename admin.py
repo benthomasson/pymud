@@ -79,6 +79,7 @@ def kill(self,target=None):
         return
     target = self.location().get(attribute=target)
     id = target.id
+    target().sendMessage("notice",notice="You have been killed by the cruel hand of fate")
     target.delete()
     self.sendMessage("notice",notice="You killed %s" % id)
 
