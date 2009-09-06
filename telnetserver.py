@@ -2,13 +2,14 @@
 import socket
 import threading
 import SocketServer
+import time
+import socket
 
 import pymud.checker as checker
 from pymud.persist import P, Persistence
 from pymud.scheduler import Scheduler
 from pymud.coroutine import finish
 from pymud.mob import Mob
-import time
 from pymud.formatter import ColorTextFormatter
 from pymud.mobmarket import MobMarket
 from pymud.message import Message
@@ -20,6 +21,8 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
     def __init__(self,*args,**kwargs):
         self.id = "telnetui"
         TelnetInterface.instances[self] = 1
+        self.line = ""
+        self.done = False
         SocketServer.BaseRequestHandler.__init__(self,*args,**kwargs)
 
     def prompt(self):
@@ -29,8 +32,10 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
             return "XXX"
 
     def handle(self):
+        self.request.setblocking(0)
         self.socketFile = self.request.makefile('rw')
         self.mob = MobMarket.market.getNext()
+        self.line = ""
         if not self.mob:
             self.receiveMessage(Message("notice",notice=\
                 "There are no available mobs to play right now. Try again later."))
@@ -41,10 +46,28 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         self.socketFile.write(self.prompt())
         self.socketFile.flush()
         try:
-            while True:
+            while not self.done:
                 if not self.mob or not self.mob():
                     break
-                command = self.socketFile.readline()
+                while not self.done:
+                    try:
+                        read = self.socketFile.read(1)
+                        if len(read) == 0:
+                            self.done = True
+                            break
+                        self.line += read
+                        if "\n" in self.line:
+                            command,newline,self.line = self.line.partition("\n")
+                            break
+                    except socket.error, error:
+                        if error[0] == 35:
+                            pass
+                        else:
+                            print error[0]
+                            self.done = True
+                            break
+                    time.sleep(0.01)
+                if self.done: break
                 if None == command: break
                 self.onecmd(command.strip())
                 self.socketFile.flush()
@@ -52,7 +75,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
                     self.receiveMessage(Message("notice",notice="Goodbye"))
                     break
         except BaseException, e:
-            print str(e)
+            print e.__class__, str(e)
         self.socketFile.flush()
 
     def quit(self):
@@ -69,7 +92,6 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
     def onecmd(self,line):
         try:
             if line:
-                print "Command<>%s<>" % line
                 self.mob().commandQueue.append(line + "\n")
             self.socketFile.write("\n")
             self.socketFile.write(self.prompt())
