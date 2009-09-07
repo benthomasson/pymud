@@ -34,6 +34,13 @@ class TextFormatter(object):
     def formatheader(self,message):
         return "{LIGHTBLUE}{title}{CLEAR}".format(**message.dict)
 
+    def formatvariables(self,message):
+        variables = []
+        for name,value in message.dict['variables'].iteritems():
+            if not name: continue
+            variables.append("{WHITE}{0} = {1}{CLEAR}".format(name,value,**message.dict))
+        return "\n".join(variables)
+
     def formatscripts(self,message):
         scripts = []
         for name,script in message.dict['scripts'].iteritems():
@@ -43,6 +50,16 @@ class TextFormatter(object):
 {YELLOW}---------------------{CLEAR}
 {1}""".format(name,script,**message.dict))
         return "\n".join(scripts)
+
+    def formattriggers(self,message):
+        triggers = []
+        for name,trigger in message.dict['triggers'].iteritems():
+            if not name: continue
+            triggers.append("""\
+{WHITE}{0}{CLEAR}
+{YELLOW}---------------------{CLEAR}
+{1}""".format(name,trigger,**message.dict))
+        return "\n".join(triggers)
 
     def formatexit(self,message):
         return "{name}".format(**message.dict)
@@ -74,8 +91,11 @@ class ColorTextFormatter(TextFormatter):
 
     def formatMessage(self,message):
         message.dict.update(colors)
-        fn = getattr(self, 'format' + message.type)
-        return fn(message)
+        if hasattr(self, 'format' + message.type):
+            fn = getattr(self, 'format' + message.type)
+            return fn(message)
+        else:
+            return ""
 
 class Test(unittest.TestCase):
 

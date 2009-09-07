@@ -1,5 +1,5 @@
 
-import traceback
+import sys,traceback
 from pymud.chainedmap import ChainedMap
 from pymud.exceptions import *
 from pymud.coroutine import step
@@ -14,7 +14,19 @@ class Scriptable():
         self.variables = {}
         self.commands = ChainedMap(self.__class__.commands)
         self.scripts = ChainedMap(self.__class__.scripts)
-        self.triggers = ChainedMap(self.__class__.scripts)
+        self.triggers = ChainedMap(self.__class__.triggers)
+
+    def receiveMessage(self,message):
+        if message.type.startswith("_"): return
+        self.runTriggerScript(message.type,**message.dict)
+
+    def runTriggerScript(self,type,**kwargs):
+        if type in self.triggers:
+            script = self.triggers[type]
+            if script in self.scripts:
+                for name,value in kwargs.iteritems():
+                    self.variables[name] = value
+                self.backgroundScript = interpret(self.scripts[script],self)
 
     def run(self,n=1):
         for x in xrange(n):

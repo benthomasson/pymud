@@ -25,12 +25,14 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
                                 'do': do,
                                 'go': go,
                                 'script': script,
+                                'trigger': trigger,
                                 'get': get,
                                 'drop': drop,
                                 'inventory': inventory,
                                 'quit': quit,
                                 'set':setVariable})
     scripts = ChainedMap(map={'hi':'say hi\n'})
+    triggers = ChainedMap()
     location = P.null
     description = "an ugly son of a mob"
     detail = "a really ugly son of a mob"
@@ -59,12 +61,16 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
     def __setstate__(self,state):
         self.__dict__ = state.copy()
         self.commands.parent = self.__class__.commands
+        self.scripts.parent = self.__class__.scripts
+        self.triggers.parent = self.__class__.triggers
         self.commandScript = None
+        self.backgroundScript = None
         self.interface = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
         del state['commandScript']
+        del state['backgroundScript']
         del state['interface']
         return state
 
@@ -77,6 +83,10 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
 
     def seen(self,o):
         o.sendMessage("look",description=self.detail)
+
+    def receiveMessage(self,message):
+        RepeaterMixin.receiveMessage(self,message)
+        Scriptable.receiveMessage(self,message)
 
 class Test(unittest.TestCase, ColorTextFormatter):
 

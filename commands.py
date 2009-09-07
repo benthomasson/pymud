@@ -5,15 +5,25 @@ from pymud.exceptions import *
 from pymud.container import Container
 from pymud.interpreter import interpret
 
-def setVariable(self,name,value):
+def setVariable(self,name=None,value=None):
     """Remember something for later"""
-    self.variables[name] = value
+    if not name:
+        self.sendMessage("variables",variables=self.variables)
+        return
+    if name and not value:
+        del self.variables[name]
+        self.sendMessage("notice",notice="Variable %s cleared" % name)
+        return
+    if name and value:
+        self.variables[name] = value
+        self.sendMessage("notice",notice="Variable %s set to %s" % (name,value))
+        return
 
 def say(self,*args):
     """Converse with the locals"""
-    self.sendMessage("yousay",message=" ".join(args),name=self.id)
+    self.sendMessage("yousay",message=" ".join(map(str,args)),name=self.id)
     if self.location():
-        self.location().sendMessage("say",message=" ".join(args),name=self.id,exclude=[self])
+        self.location().sendMessage("say",message=" ".join(map(str,args)),name=self.id,exclude=[self])
 
 def look(self,target=None):
     """Look at the world around you"""
@@ -88,5 +98,23 @@ def do(self,script):
 def script(self,script=None,*args):
     if not script:
         self.sendMessage("scripts",scripts=self.scripts)
+        return
     self.scripts[script] = " ".join(args) + "\n"
+
+def trigger(self,type=None,script=None):
+    if not type:
+        self.sendMessage("triggers",triggers=self.triggers)
+        return
+    if not script and type in self.triggers:
+        del self.triggers[type]
+        self.sendMessage("notice",notice="Trigger %s cleared" % type)
+        return
+    if not script and type not in self.triggers:
+        raise GameException("No trigger found named %s" % type)
+    if type and script not in self.scripts:
+        raise GameException("No script found named %s" % script)
+    self.triggers[type] = script
+    self.sendMessage("notice",notice="Trigger %s set to run %s" % (type,script))
+
+
 
