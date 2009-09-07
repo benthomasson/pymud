@@ -29,6 +29,9 @@ class TextFormatter(object):
     def formatlook(self,message):
         return "You see %(description)s." % message.dict
 
+    def formatexit(self,message):
+        return "%(name)s." % message.dict
+
     def formataction(self,message):
         return "You %(description)s." % message.dict
 

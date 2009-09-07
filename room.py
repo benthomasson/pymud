@@ -14,6 +14,7 @@ class Room(Sim, Channel, Container):
         Channel.__init__(self)
         Container.__init__(self)
         self.id = id
+        self.exits = {}
 
     def add(self,o):
         self.addListener(o)
@@ -23,7 +24,17 @@ class Room(Sim, Channel, Container):
         self.removeListener(o)
         Container.remove(self,o)
 
+   # def __setstate__(self,state):
+   #     self.__dict__ = state.copy()
+   #     if not hasattr(self,'exits'): self.exits = {}
+
     def seen(self,o):
         o.sendMessage("look",description=self.description)
         Container.seen(self,o)
+        for name,exit in self.exits.copy().iteritems():
+            if exit():
+                o.sendMessage("exit",name=name)
+            else:
+                del self.exits[name]
+
 
