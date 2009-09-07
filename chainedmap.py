@@ -18,6 +18,7 @@ class ChainedMap(MutableMapping):
             yield x
         if self.parent:
             for x in self.parent:
+                if x in self.map: continue
                 yield x
 
     def __len__(self):
