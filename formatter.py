@@ -14,44 +14,61 @@ class TextFormatter(object):
         return ""
 
     def formatyousay(self,message):
-        return "%(WHITE)sYou say %(BLUE)s'%(message)s'%(CLEAR)s" % message.dict
+        return "{WHITE}You say {BLUE}'{message}'{CLEAR}".format(**message.dict)
 
     def formatsay(self,message):
-        return "%(WHITE)s%(name)s says %(BLUE)s'%(message)s'%(CLEAR)s" % message.dict
+        return "{WHITE}{name} says {BLUE}'{message}'{CLEAR}".format(**message.dict)
 
     def formaterror(self,message):
-        return "%(RED)sERROR:%(error)s%(CLEAR)s" % message.dict
+        return "{RED}ERROR:{error}{CLEAR}".format(**message.dict)
 
     def formatexception(self,message):
-        return "%(RED)s%(error)s%(CLEAR)s" % message.dict
+        return "{RED}{error}{CLEAR}".format(**message.dict)
 
     def formatcreated(self,message):
-        return "%(RED)s%(name)s created %(article)s %(klass)s %(id)s!%(CLEAR)s" % message.dict
+        return "{RED}{name} created {article} {klass} {id}!{CLEAR}".format(**message.dict)
 
     def formatlook(self,message):
-        return "You see %(description)s." % message.dict
+        return "You see {description}.".format(**message.dict)
 
     def formatheader(self,message):
-        return "%(LIGHTBLUE)s%(title)s%(CLEAR)s" % message.dict
+        return "{LIGHTBLUE}{title}{CLEAR}".format(**message.dict)
+
+    def formatscripts(self,message):
+        scripts = []
+        for name,script in message.dict['scripts'].iteritems():
+            if not name: continue
+            scripts.append("""\
+{WHITE}{0}{CLEAR}
+{YELLOW}---------------------{CLEAR}
+{1}""".format(name,script,**message.dict))
+        return "\n".join(scripts)
 
     def formatexit(self,message):
-        return "%(name)s" % message.dict
+        return "{name}".format(**message.dict)
 
     def formataction(self,message):
-        return "You %(description)s." % message.dict
+        return "You {description}.".format(**message.dict)
 
     def formatinvalidcommand(self,message):
-        return "I do not know how to do %(name)s." % message.dict
+        return "I do not know how to do {name}.".format(**message.dict)
 
     def formatnotice(self,message):
-        return "%(notice)s" % message.dict
+        return "{notice}".format(**message.dict)
 
     def formathelp(self,message):
         return """\
-%(WHITE)s%(name)s%(CLEAR)s
--------------------------------------------------------------------------------
-%(help)s
-""" % message.dict
+{WHITE}{name}{CLEAR}
+{YELLOW}-------------------------------------------------------------------------------{CLEAR}
+{help}
+""".format(**message.dict)
+
+    def formatcommands(self,message):
+        commands = []
+        for name,function in message.dict['commands'].iteritems():
+            commands.append("{0}".format(name,function,**message.dict))
+        return "Commands\n" + "\n".join(commands)
+
 
 class ColorTextFormatter(TextFormatter):
 
