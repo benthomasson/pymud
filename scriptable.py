@@ -32,3 +32,4 @@ class Scriptable():
             except Exception, e:
                 message = " ".join(traceback.format_exception(*sys.exc_info()))
                 self.sendMessage("error",error=message)
+

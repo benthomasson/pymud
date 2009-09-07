@@ -46,17 +46,12 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
         Scriptable.__init__(self)
         Sim.__init__(self)
         self.id = id
-        self.deleted = False
         self.location = P.null
         self.interface = None
         if variables:
             self.variables = variables
-        else:
-            self.variables = {}
         if commands:
             self.commands = commands
-        else:
-            self.commands = ChainedMap(self.__class__.commands)
 
     def default(self,args):
         say(*[self] + args)
