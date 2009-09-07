@@ -33,6 +33,9 @@ def help(self,commandName="help"):
     else:
         self.sendMessage("invalidcommand",name=commandName)
 
+def commands(self):
+    self.sendMessage("commands",commands=self.commands)
+
 def uber(self):
     """Some uber command"""
     self.sendMessage("action",description="zomg! uber!")
@@ -82,6 +85,8 @@ def do(self,script):
         raise GameException("Cannot find script %s" % script)
 
 
-def script(self,script,*args):
+def script(self,script=None,*args):
+    if not script:
+        self.sendMessage("scripts",scripts=self.scripts)
     self.scripts[script] = " ".join(args) + "\n"
 
