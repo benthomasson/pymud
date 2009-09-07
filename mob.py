@@ -20,7 +20,9 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
     commands = ChainedMap(map={ 'say':say,
                                 'look': look,
                                 'help': help,
+                                'do': do,
                                 'go': go,
+                                'script': script,
                                 'get': get,
                                 'drop': drop,
                                 'inventory': inventory,
@@ -41,7 +43,8 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
         Sim.__init__(self)
         self.id = id
         self.deleted = False
-        self.currentScript = None
+        self.commandScript = None
+        self.backgroundScript = None
         self.commandQueue = []
         self.location = P.null
         self.interface = None
@@ -60,12 +63,13 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
     def __setstate__(self,state):
         self.__dict__ = state.copy()
         self.commands.parent = self.__class__.commands
-        self.currentScript = None
+        self.commandScript = None
         self.interface = None
+        if not hasattr(self,"scripts"): self.scripts = {}
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state['currentScript']
+        del state['commandScript']
         del state['interface']
         return state
 
@@ -83,11 +87,14 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
         #print 'run %s' % self.id
         for x in xrange(n):
             try:
-                if not self.currentScript and len(self.commandQueue):
-                    self.currentScript = interpret(self.commandQueue.pop(0),self)
-                if self.currentScript:
-                    if not step(self.currentScript):
-                        self.currentScript = None
+                if not self.commandScript and len(self.commandQueue):
+                    self.commandScript = interpret(self.commandQueue.pop(0),self)
+                if self.commandScript:
+                    if not step(self.commandScript):
+                        self.commandScript = None
+                elif self.backgroundScript:
+                    if not step(self.backgroundScript):
+                        self.backgroundScript = None
             except GameException, e:
                 self.sendMessage("exception",error=str(e))
             except Exception, e:
@@ -164,20 +171,20 @@ class Test(unittest.TestCase, ColorTextFormatter):
         amob.commandQueue.append("say hi\n")
         amob.commandQueue.append("say hi\n")
         amob.commandQueue.append("say hi\n")
-        self.assertFalse(amob.currentScript)
+        self.assertFalse(amob.commandScript)
         self.assertEquals(len(amob.commandQueue),3)
         amob.run()
         self.assertEquals(len(amob.commandQueue),2)
-        self.assertFalse(amob.currentScript)
+        self.assertFalse(amob.commandScript)
         amob.run()
         self.assertEquals(len(amob.commandQueue),1)
-        self.assertFalse(amob.currentScript)
+        self.assertFalse(amob.commandScript)
         amob.run()
         self.assertEquals(len(amob.commandQueue),0)
-        self.assertFalse(amob.currentScript)
+        self.assertFalse(amob.commandScript)
         amob.run()
         self.assertEquals(len(amob.commandQueue),0)
-        self.assertFalse(amob.currentScript)
+        self.assertFalse(amob.commandScript)
 
 if __name__ == "__main__":
     unittest.main()

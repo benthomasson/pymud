@@ -3,6 +3,7 @@
 import unittest
 from pymud.exceptions import *
 from pymud.container import Container
+from pymud.interpreter import interpret
 
 def setVariable(self,name,value):
     """Remember something for later"""
@@ -72,4 +73,15 @@ def go(self,exit):
         self.sendMessage("notice",notice="You leave %s" % exit)
     else:
         self.sendMessage("notice",notice="You cannot leave that way.")
+
+
+def do(self,script):
+    if script in self.scripts:
+        self.backgroundScript = interpret(self.scripts[script],self)
+    else:
+        raise GameException("Cannot find script %s" % script)
+
+
+def script(self,script,*args):
+    self.scripts[script] = " ".join(args) + "\n"
 

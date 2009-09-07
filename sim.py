@@ -10,6 +10,7 @@ class Sim(Persistent):
     attributes = {'name':'thing'}
 
     def __init__(self):
+        self.scripts = {}
         Persistent.__init__(self)
 
     def __repr__(self):
