@@ -53,7 +53,7 @@ class Container(object):
 
     def seen(self,o):
         for x in self.containsById.values():
-            if x():
+            if x() and x() is not o:
                 o.sendMessage("look",description=x().description)
 
     def checkHold(self,o):
