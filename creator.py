@@ -18,6 +18,7 @@ class Creator(Mob):
                                     "goto":goto,
                                     "spy":spy,
                                     "kill":kill,
+                                    "addexit":addexit,
                                     "createhere":createHere,
                                     "shutdown":shutdown, })
 

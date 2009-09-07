@@ -39,6 +39,10 @@ def createHere(self,klass,id=None):
 
 createHere.tabcomplete = createhelper
 
+def addexit(self,name,to):
+    to = P.persist.get(to)
+    self.location().exits[name] = P(to)
+
 def goto(self,id):
     """Go to another room by id"""
     newLocation = P.persist.get(id)
@@ -82,4 +86,5 @@ def kill(self,target=None):
     target().sendMessage("notice",notice="You have been killed by the cruel hand of fate")
     target.delete()
     self.sendMessage("notice",notice="You killed %s" % id)
+
 
