@@ -20,17 +20,65 @@ class Cli(cmd.Cmd, ColorTextFormatter):
         self.id = "cli"
         cmd.Cmd.__init__(self)
         self.mob = mob
+        self.mob().interface = self
         self.prompt = "%s>" % mob.id
         mob().addListener(self)
         self.messages = []
+        self.lineMode = self.commandMode
+        self.text = None
+        self.callBack = None
+        self.callBackKWArgs = None
+
+    def startTextMode(self,func,**kwargs):
+        self.text = ""
+        self.callBack = func
+        self.callBackKWArgs = kwargs
+        self.lineMode = self.textMode
+        self.prompt = "+" 
+        sys.stdout.write("\n")
+        sys.stdout.write(self.prompt)
+        sys.stdout.flush()
+
+    def startScriptMode(self,func,**kwargs):
+        self.text = "start\n"
+        self.callBack = func
+        self.callBackKWArgs = kwargs
+        self.lineMode = self.scriptMode
+        self.prompt = "..." 
+        sys.stdout.write("\n")
+        sys.stdout.write(self.text)
+        sys.stdout.write(self.prompt)
+        sys.stdout.flush()
 
     def onecmd(self,line):
+        self.lineMode(line)
+
+    def commandMode(self,line):
         try:
             if line:
                 self.mob().commandQueue.append(line + "\n")
             self.prompt = "%s>" % self.mob().id
         except Exception,e:
             print str(e)
+
+    def textMode(self,line):
+        if "end" == line.strip() or "." == line.strip():
+            self.callBackKWArgs.update(text=self.text,self=self.mob())
+            self.callBack(**self.callBackKWArgs)
+            self.text = None
+            self.lineMode = self.commandMode
+            self.prompt = "%s>" % self.mob().id
+        else:
+            self.text += line + "\n"
+
+    def scriptMode(self,line):
+        self.text += line + "\n"
+        if "end" == line.strip():
+            self.callBackKWArgs.update(text=self.text,self=self.mob())
+            self.callBack(**self.callBackKWArgs)
+            self.text = None
+            self.lineMode = self.commandMode
+            self.prompt = "%s>" % self.mob().id
 
     def completenames(self, text, *ignored):
         return filter(lambda x: x.startswith(text),self.mob().commands.keys())

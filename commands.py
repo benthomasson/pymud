@@ -95,11 +95,15 @@ def do(self,script):
         raise GameException("Cannot find script %s" % script)
 
 
-def script(self,script=None,*args):
+def script(self,script=None):
     if not script:
         self.sendMessage("scripts",scripts=self.scripts)
         return
-    self.scripts[script] = " ".join(args) + "\n"
+    self.interface.startScriptMode(setScript,script=script)
+
+def setScript(self,script,text):
+    self.scripts[script] = text
+    self.sendMessage("notice",notice="Changed script %s to:\n%s" % (script, text))
 
 def trigger(self,type=None,script=None):
     if not type:
@@ -116,5 +120,12 @@ def trigger(self,type=None,script=None):
     self.triggers[type] = script
     self.sendMessage("notice",notice="Trigger %s set to run %s" % (type,script))
 
+
+def description(self):
+    self.interface.startTextMode(setDescription)
+
+def setDescription(self,text):
+    self.description = text
+    self.sendMessage("notice",notice="Changed description to:%s" % text)
 
 
