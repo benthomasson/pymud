@@ -58,10 +58,11 @@ class Block(object):
 
 ParserElement.setDefaultWhitespaceChars("")
 
+alphanums = alphas + nums
 empty = ZeroOrMore(White(" ")).suppress()
-word = Combine(Word(alphas + nums) + Optional(Literal(":") + Word(alphas + nums))) + empty
+word = Combine(Word(alphanums) + Optional(Literal(":") + Word(alphanums))) + empty
 word.setParseAction(Symbol)
-variable = Combine( Word("$") + Word(alphas) + Optional(Literal(":") + Word(alphas))) + empty
+variable = Combine( Word("$") + Word(alphanums) + Optional(Literal(":") + Word(alphanums))) + empty
 variable.setParseAction(Variable)
 expression = OneOrMore(variable | word)
 expressionStatement = expression + empty + White("\n").suppress()
