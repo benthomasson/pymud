@@ -25,7 +25,8 @@ class Scriptable():
             script = self.triggers[type]
             if script in self.scripts:
                 for name,value in kwargs.iteritems():
-                    self.variables[name] = value
+                    if name.startswith("_"): continue
+                    self.variables["t:" + name] = value
                 self.backgroundScript = interpret(self.scripts[script],self)
 
     def run(self,n=1):

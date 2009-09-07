@@ -8,7 +8,7 @@ class Message(object):
 
     def __init__(self,type,**kwargs):
         self.type = type
-        self.dict = {'exclude':[]}
+        self.dict = {'_exclude':[]}
         self.dict.update(kwargs)
 
 class Channel(object):
@@ -28,9 +28,9 @@ class Channel(object):
         self._sendMessage(message)
 
     def _sendMessage(self,message):
-        exclude = message.dict['exclude']
+        _exclude = message.dict['_exclude']
         for listener in self.listeners.copy().values():
-            if listener() and listener() not in exclude:
+            if listener() and listener() not in _exclude:
                 listener().receiveMessage(message)
             elif not listener():
                 del self.listeners[listener.id]
@@ -64,7 +64,7 @@ class TestChannel(unittest.TestCase):
         self.assertEquals(c.listeners['1']().id,'1')
         self.assertEquals(c.listeners['1'](),self)
         c.sendMessage("say",message="hello1",name="Ed",id="1")
-        c.sendMessage("say",message="hello3",name="Ed",id="1",exclude=[self])
+        c.sendMessage("say",message="hello3",name="Ed",id="1",_exclude=[self])
         self.deleted = True
         c.sendMessage("say",message="hello2",name="Ed",id="1")
 

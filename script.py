@@ -59,11 +59,11 @@ class Block(object):
 ParserElement.setDefaultWhitespaceChars("")
 
 empty = ZeroOrMore(White(" ")).suppress()
-word = Word(alphas + nums) + empty
+word = Combine(Word(alphas + nums) + Optional(Literal(":") + Word(alphas + nums))) + empty
 word.setParseAction(Symbol)
-variable = Combine( Word("$") + Word(alphas)) + empty
+variable = Combine( Word("$") + Word(alphas) + Optional(Literal(":") + Word(alphas))) + empty
 variable.setParseAction(Variable)
-expression = OneOrMore(word | variable)
+expression = OneOrMore(variable | word)
 expressionStatement = expression + empty + White("\n").suppress()
 expressionStatement.setParseAction(ExpressionStatement)
 fourSpace = White(" ") + White(" ") + White(" ") + White(" ")
@@ -81,6 +81,12 @@ class Test(unittest.TestCase):
     def testVariable(self):
         print variable.parseString('$hello')
         print word.parseString('hello $there')
+        print variable.parseString('$namespace:hello')
+
+    def testExpression(self):
+        print expression.parseString('$hello')
+        print expression.parseString('hello $there')
+        print expression.parseString('hi $namespace:hello')
 
     def testLine(self):
         print expressionStatement.parseString('hello\n')
@@ -88,6 +94,7 @@ class Test(unittest.TestCase):
         print expressionStatement.parseString('hello there\nboo')
         print block.parseString('hello there\nboo')
         print expressionStatement.parseString('hello $there everyone\n')
+        print expressionStatement.parseString('hello $t:there everyone\n')
 
     def testLineComplete(self):
         print expressionStatement.parseString('hello dfdf\n')
@@ -96,6 +103,7 @@ class Test(unittest.TestCase):
         print block.parseString("""hello there
 this is the second line
 this line contains a $variable
+this line contains a $namespace:variable
 x = $a
 """)
 

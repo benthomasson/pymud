@@ -23,7 +23,7 @@ def say(self,*args):
     """Converse with the locals"""
     self.sendMessage("yousay",message=" ".join(map(str,args)),name=self.id)
     if self.location():
-        self.location().sendMessage("say",message=" ".join(map(str,args)),name=self.id,exclude=[self])
+        self.location().sendMessage("say",message=" ".join(map(str,args)),name=self.id,_exclude=[self])
 
 def look(self,target=None):
     """Look at the world around you"""
