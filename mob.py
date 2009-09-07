@@ -11,11 +11,12 @@ from pymud.message import Channel,RepeaterMixin
 from pymud.formatter import ColorTextFormatter
 from pymud.container import Container
 from pymud.sim import Sim
+from pymud.scriptable import Scriptable
 from pymud.persist import P
 from pymud.exceptions import *
 from commands import *
 
-class Mob(RepeaterMixin,Channel,Container,Sim):
+class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
 
     commands = ChainedMap(map={ 'say':say,
                                 'look': look,
@@ -42,15 +43,12 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
                     id=None):
         Channel.__init__(self)
         Container.__init__(self)
+        Scriptable.__init__(self)
         Sim.__init__(self)
         self.id = id
         self.deleted = False
-        self.commandScript = None
-        self.backgroundScript = None
-        self.commandQueue = []
         self.location = P.null
         self.interface = None
-        self.scripts = ChainedMap(self.__class__.scripts)
         if variables:
             self.variables = variables
         else:
@@ -68,7 +66,6 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
         self.commands.parent = self.__class__.commands
         self.commandScript = None
         self.interface = None
-        if not hasattr(self,"scripts"): self.scripts = ChainedMap(self.__class__.scripts)
 
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -85,24 +82,6 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
 
     def seen(self,o):
         o.sendMessage("look",description=self.detail)
-
-    def run(self,n=1):
-        #print 'run %s' % self.id
-        for x in xrange(n):
-            try:
-                if not self.commandScript and len(self.commandQueue):
-                    self.commandScript = interpret(self.commandQueue.pop(0),self)
-                if self.commandScript:
-                    if not step(self.commandScript):
-                        self.commandScript = None
-                elif self.backgroundScript:
-                    if not step(self.backgroundScript):
-                        self.backgroundScript = None
-            except GameException, e:
-                self.sendMessage("exception",error=str(e))
-            except Exception, e:
-                message = " ".join(traceback.format_exception(*sys.exc_info()))
-                self.sendMessage("error",error=message)
 
 class Test(unittest.TestCase, ColorTextFormatter):
 

@@ -9,15 +9,12 @@ class Sim(Persistent):
     detail = "maybe it's nothing"
     article = "a"
     attributes = {'name':'thing'}
-    scripts = ChainedMap()
 
     def __init__(self):
-        self.scripts = ChainedMap(self.__class__.scripts)
         Persistent.__init__(self)
 
     def __repr__(self):
         return "<" + self.__class__.__name__ +  ":" + self.id + ">"
-
 
     def checkGet(self,getter):
         raise GameException("You cannot lift it.")
