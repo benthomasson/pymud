@@ -8,8 +8,10 @@ class TextFormatter(object):
 
     def formatMessage(self,message):
         message.dict.update(nocolors)
-        fn = getattr(self, 'format' + message.type)
-        return fn(message)
+        if hasattr(self, 'format' + message.type):
+            fn = getattr(self, 'format' + message.type)
+            return fn(message)
+        return ""
 
     def formatyousay(self,message):
         return "%(WHITE)sYou say %(BLUE)s'%(message)s'%(CLEAR)s" % message.dict
