@@ -20,6 +20,7 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
     commands = ChainedMap(map={ 'say':say,
                                 'look': look,
                                 'help': help,
+                                'go': go,
                                 'get': get,
                                 'drop': drop,
                                 'inventory': inventory,

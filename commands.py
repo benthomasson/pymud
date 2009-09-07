@@ -63,3 +63,13 @@ def quit(self):
         self.sendMessage("notice",notice="Good bye!")
         self.interface.quit()
 
+def go(self,exit):
+    if not self.location():
+        self.sendMessage("notice",notice="You cannot leave the void that way.")
+        return
+    if exit in self.location().exits:
+        self.location().exits[exit]().add(self)
+        self.sendMessage("notice",notice="You leave %s" % exit)
+    else:
+        self.sendMessage("notice",notice="You cannot leave that way.")
+
