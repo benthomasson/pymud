@@ -30,7 +30,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         if self.mob and self.mob():
             return "%s>" % self.mob.id 
         else:
-            return "XXX"
+            return ""
 
     def handle(self):
         self.request.setblocking(0)
