@@ -20,6 +20,7 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
     commands = ChainedMap(map={ 'say':say,
                                 'look': look,
                                 'help': help,
+                                'commands': commands,
                                 'do': do,
                                 'go': go,
                                 'script': script,
@@ -28,6 +29,7 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
                                 'inventory': inventory,
                                 'quit': quit,
                                 'set':setVariable})
+    scripts = ChainedMap(map={'hi':'say hi\n'})
     location = P.null
     description = "an ugly son of a mob"
     detail = "a really ugly son of a mob"
@@ -48,6 +50,7 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
         self.commandQueue = []
         self.location = P.null
         self.interface = None
+        self.scripts = ChainedMap(self.__class__.scripts)
         if variables:
             self.variables = variables
         else:
@@ -55,7 +58,7 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
         if commands:
             self.commands = commands
         else:
-            self.commands = ChainedMap(Mob.commands)
+            self.commands = ChainedMap(self.__class__.commands)
 
     def default(self,args):
         say(*[self] + args)
@@ -65,7 +68,7 @@ class Mob(RepeaterMixin,Channel,Container,Sim):
         self.commands.parent = self.__class__.commands
         self.commandScript = None
         self.interface = None
-        if not hasattr(self,"scripts"): self.scripts = {}
+        if not hasattr(self,"scripts"): self.scripts = ChainedMap(self.__class__.scripts)
 
     def __getstate__(self):
         state = self.__dict__.copy()

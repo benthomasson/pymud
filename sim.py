@@ -1,6 +1,7 @@
 
 from pymud.persist import Persistent
 from pymud.exceptions import *
+from pymud.chainedmap import ChainedMap
 
 class Sim(Persistent):
 
@@ -8,9 +9,10 @@ class Sim(Persistent):
     detail = "maybe it's nothing"
     article = "a"
     attributes = {'name':'thing'}
+    scripts = ChainedMap()
 
     def __init__(self):
-        self.scripts = {}
+        self.scripts = ChainedMap(self.__class__.scripts)
         Persistent.__init__(self)
 
     def __repr__(self):
