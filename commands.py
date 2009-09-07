@@ -60,5 +60,6 @@ def inventory(self):
 
 def quit(self):
     if self.interface:
+        self.sendMessage("notice",notice="Good bye!")
         self.interface.quit()
 
