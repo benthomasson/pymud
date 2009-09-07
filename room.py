@@ -31,10 +31,12 @@ class Room(Sim, Channel, Container):
     def seen(self,o):
         o.sendMessage("look",description=self.description)
         Container.seen(self,o)
-        for name,exit in self.exits.copy().iteritems():
-            if exit():
-                o.sendMessage("exit",name=name)
-            else:
-                del self.exits[name]
+        if self.exits:
+            o.sendMessage("header",title="Exits")
+            for name,exit in self.exits.copy().iteritems():
+                if exit():
+                    o.sendMessage("exit",name=name)
+                else:
+                    del self.exits[name]
 
 
