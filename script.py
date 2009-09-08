@@ -41,6 +41,14 @@ class IfStatement(object):
     def __repr__(self):
         return "if: %s run %s" % (self.condition, self.script)
 
+class LoopStatement(object):
+
+    def __init__(self,tokens):
+        self.script = tokens[0]
+        self.value = None
+
+    def __repr__(self):
+        return "loop: %s" % (self.script)
 
 class ExpressionStatement(object):
 
@@ -86,7 +94,9 @@ block = Forward()
 script = startStatement.suppress() + block + endStatement.suppress()
 ifStatement = Literal("if").suppress() + empty + word + script
 ifStatement.setParseAction(IfStatement)
-block << OneOrMore(ifStatement|assign|expressionStatement)
+loopStatement = Literal("loop").suppress() + empty + script
+loopStatement.setParseAction(LoopStatement)
+block << OneOrMore(loopStatement|ifStatement|assign|expressionStatement)
 block.setParseAction(Block)
 
 class Test(unittest.TestCase):
@@ -153,6 +163,11 @@ print hi there
 }""")
 
 
+    def testLoopStatement(self):
+        print loopStatement.parseString("""loop {
+
+print hi
+}""")
 
 
 if __name__ == '__main__':

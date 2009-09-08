@@ -3,6 +3,7 @@
 import pymud.script as script
 import unittest
 from pymud.coroutine import coroutine, step, finish
+from pymud.exceptions import *
 
 def classname(obj):
     return obj.__class__.__name__
@@ -64,6 +65,15 @@ class InterpreterVisitor(object):
             call = self.visit(node.script)
             while step(call): yield
 
+    def visitLoopStatement(self,node,*args):
+        yield
+        try:
+            while True:
+                call = self.visit(node.script)
+                while step(call): yield
+        except BreakException,e:
+            print str(e)
+
     def visitSymbol(self,node,*args):
         yield
         node.value = node.name
@@ -73,7 +83,7 @@ class InterpreterVisitor(object):
         if node.name in self.variables:
             node.value = self.variables[node.name]
         else:
-            print None
+            node.value = None
 
 @coroutine
 def interpret(scriptText,instance):
@@ -84,6 +94,9 @@ def interpret(scriptText,instance):
 
 def say(self,*args):
     print args
+
+def breakCommand(self,*args):
+    raise BreakException()
 
 class Test(unittest.TestCase):
 
@@ -114,6 +127,12 @@ variable $var
 say i am alive
 }""",Mob(commands={'say':say},variables={})))
 
+    def testLoop(self):
+        from pymud.mob import Mob
+        finish(interpret("""loop {
+say forever
+break
+}""",Mob(commands={'say':say,'break':breakCommand},variables={})))
 
 
 if __name__ == '__main__':

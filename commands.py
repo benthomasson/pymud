@@ -128,4 +128,10 @@ def setDescription(self,text):
     self.description = text
     self.sendMessage("notice",notice="Changed description to:%s" % text)
 
+def breakCommand(self):
+    raise BreakException("Stop!")
+
+def stop(self):
+    self.backgroundScript = None
+    raise BreakException()
 
