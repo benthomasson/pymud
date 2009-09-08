@@ -10,6 +10,7 @@ from pymud.exceptions import *
 from pymud.mobmarket import MobMarket
 import sys
 import time
+import datetime
 import traceback
 import item
 import room
@@ -33,9 +34,12 @@ class Server(object):
 
     def run(self):
         try:
+            tick = time.time()
             while True:
-                time.sleep(0.01)
-                Scheduler.scheduler.run()
+                if Scheduler.scheduler.run():
+                    #print time.time() - tick
+                    tick = time.time()
+                    time.sleep(0.01)
                 self.theCli.receiveMessages()
         except ShutdownSignal, e:
             print "Shutting down server"

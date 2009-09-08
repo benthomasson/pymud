@@ -88,7 +88,10 @@ def go(self,exit):
         self.sendMessage("notice",notice="You cannot leave that way.")
 
 
-def do(self,script):
+def do(self,script=None):
+    if not script:
+        self.sendMessage("scriptNames",scripts=self.scripts)
+        return
     if script in self.scripts:
         self.backgroundScript = interpret(self.scripts[script],self)
     else:
