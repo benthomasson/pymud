@@ -138,3 +138,9 @@ def stop(self):
     self.backgroundScript = None
     raise BreakException()
 
+def wait(self,time=1):
+    yield
+    for x in xrange(int(time)):
+        yield
+    self.sendMessage("notice",notice="Finished waiting")
+

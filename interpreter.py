@@ -2,6 +2,7 @@
 
 import pymud.script as script
 import unittest
+from types import GeneratorType
 from pymud.coroutine import coroutine, step, finish
 from pymud.exceptions import *
 
@@ -42,9 +43,11 @@ class InterpreterVisitor(object):
             func = self.commands[command.value]
             arguments = map(lambda x: x.value,node.expressions[1:])
             if hasattr(func,'im_self') and func.im_self:
-                apply(func,arguments)
+                call = func(*arguments)
             else:
-                apply(func,[self.instance] + arguments)
+                call =func(*[self.instance] + arguments)
+            if isinstance(call,GeneratorType):
+                while step(call): yield
         else:
             for expression in node.expressions[1:]:
                 finish(self.visit(expression))

@@ -32,6 +32,7 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
                                 'quit': quit,
                                 'description': description,
                                 'break': breakCommand,
+                                'wait': wait,
                                 'stop': stop,
                                 'set':setVariable})
     scripts = ChainedMap(map={'hi':'say hi\n'})
