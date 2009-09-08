@@ -88,15 +88,15 @@ endStatement = Literal("}")
 expression = OneOrMore(variable | word)
 expressionStatement = expression + empty + White("\n").suppress()
 expressionStatement.setParseAction(ExpressionStatement)
-assign = word + Word("=") + empty + expression
+assign = word + Word("=") + empty + expression + White("\n").suppress()
 assign.setParseAction(Assign)
 block = Forward()
 script = startStatement.suppress() + block + endStatement.suppress()
-ifStatement = Literal("if").suppress() + empty + word + script
+ifStatement = Literal("if").suppress() + empty + word + script + White("\n").suppress()
 ifStatement.setParseAction(IfStatement)
-loopStatement = Literal("loop").suppress() + empty + script
+loopStatement = Literal("loop").suppress() + empty + script + White("\n").suppress()
 loopStatement.setParseAction(LoopStatement)
-block << OneOrMore(loopStatement|ifStatement|assign|expressionStatement)
+block << OneOrMore(loopStatement | ifStatement | assign | expressionStatement)
 block.setParseAction(Block)
 
 class Test(unittest.TestCase):
@@ -135,7 +135,8 @@ x = $a
 """)
 
     def testAssign(self):
-        print assign.parseString("""x = a""")
+        print assign.parseString("""x = a
+""")
 
     def testScript(self):
         print script.parseString("""{
@@ -151,23 +152,36 @@ hi there
         print ifStatement.parseString("""if a {
 
 print hi
-}""")
+}
+""")
         print ifStatement.parseString("""if b {
 print hi
 
-}""")
+}
+""")
 
         print block.parseString("""if c {
 print hi there
 
-}""")
+}
+""")
 
 
     def testLoopStatement(self):
         print loopStatement.parseString("""loop {
 
 print hi
-}""")
+}
+""")
+        print block.parseString("""loop {
+
+print hi
+}
+print done
+""")
+        print block.parseString("""a = 5
+print hi
+""")
 
 
 if __name__ == '__main__':

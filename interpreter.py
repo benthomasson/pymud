@@ -72,7 +72,7 @@ class InterpreterVisitor(object):
                 call = self.visit(node.script)
                 while step(call): yield
         except BreakException,e:
-            print str(e)
+            pass
 
     def visitSymbol(self,node,*args):
         yield
