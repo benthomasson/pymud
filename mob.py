@@ -34,6 +34,7 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
                                 'set':setVariable})
     scripts = ChainedMap(map={'hi':'say hi\n'})
     triggers = ChainedMap()
+    conditions = ChainedMap(map={'alive':True})
     location = P.null
     description = "an ugly son of a mob"
     detail = "a really ugly son of a mob"
@@ -64,6 +65,7 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
         self.commands.parent = self.__class__.commands
         self.scripts.parent = self.__class__.scripts
         self.triggers.parent = self.__class__.triggers
+        self.conditions.parent = self.__class__.conditions
         self.commandScript = None
         self.backgroundScript = None
         self.interface = None

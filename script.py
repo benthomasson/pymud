@@ -31,6 +31,17 @@ class Assign(object):
     def __repr__(self):
         return "Assign: %s to %s" % (self.expression, self.variable)
 
+class IfStatement(object):
+
+    def __init__(self,tokens):
+        self.condition = tokens[0]
+        self.script = tokens[1]
+        self.value = None
+
+    def __repr__(self):
+        return "if: %s run %s" % (self.condition, self.script)
+
+
 class ExpressionStatement(object):
 
     def __init__(self,tokens):
@@ -64,13 +75,18 @@ word = Combine(Word(alphanums) + Optional(Literal(":") + Word(alphanums))) + emp
 word.setParseAction(Symbol)
 variable = Combine( Word("$") + Word(alphanums) + Optional(Literal(":") + Word(alphanums))) + empty
 variable.setParseAction(Variable)
+startStatement = Literal("{") + empty + White("\n").suppress()
+endStatement = Literal("}") 
 expression = OneOrMore(variable | word)
 expressionStatement = expression + empty + White("\n").suppress()
 expressionStatement.setParseAction(ExpressionStatement)
-fourSpace = White(" ") + White(" ") + White(" ") + White(" ")
 assign = word + Word("=") + empty + expression
 assign.setParseAction(Assign)
-block = OneOrMore(assign|expressionStatement)
+block = Forward()
+script = startStatement.suppress() + block + endStatement.suppress()
+ifStatement = Literal("if").suppress() + empty + word + script
+ifStatement.setParseAction(IfStatement)
+block << OneOrMore(ifStatement|assign|expressionStatement)
 block.setParseAction(Block)
 
 class Test(unittest.TestCase):
@@ -110,6 +126,34 @@ x = $a
 
     def testAssign(self):
         print assign.parseString("""x = a""")
+
+    def testScript(self):
+        print script.parseString("""{
+hi there
+}
+""")
+        print script.parseString("""{
+hi there
+}
+""")
+
+    def testIfStatement(self):
+        print ifStatement.parseString("""if a {
+
+print hi
+}""")
+        print ifStatement.parseString("""if b {
+print hi
+
+}""")
+
+        print block.parseString("""if c {
+print hi there
+
+}""")
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

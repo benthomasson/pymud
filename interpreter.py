@@ -13,6 +13,7 @@ class InterpreterVisitor(object):
         self.instance = instance
         self.commands = instance.commands
         self.variables = instance.variables
+        self.conditions = instance.conditions
 
     def walk(self,ast):
         call = self.visit(ast)
@@ -54,6 +55,14 @@ class InterpreterVisitor(object):
         for symbol in node.expression:
             finish(self.visit(symbol))
         self.instance.variables[str(node.variable.value)] = " ".join(map(lambda x:str(x.value),node.expression))
+
+    def visitIfStatement(self,node,*args):
+        yield
+        finish(self.visit(node.condition))
+        if node.condition.value in self.conditions and\
+            self.conditions[node.condition.value]:
+            call = self.visit(node.script)
+            while step(call): yield
 
     def visitSymbol(self,node,*args):
         yield
@@ -98,6 +107,12 @@ variable $var
     def testCommand(self):
         from pymud.mob import Mob
         finish(interpret("""say hello\n""",Mob(commands={'say':say},variables={})))
+
+    def testIf(self):
+        from pymud.mob import Mob
+        finish(interpret("""if alive {
+say i am alive
+}""",Mob(commands={'say':say},variables={})))
 
 
 
