@@ -162,6 +162,7 @@ class TestShelve(unittest.TestCase):
 
     def setUp(self):
         if os.path.exists("test.db"): os.remove("test.db")
+        if os.path.exists("test.db.db"): os.remove("test.db.db")
 
     def testSimple(self):
         s = shelve.open("test.db",protocol=2)
@@ -196,6 +197,7 @@ class TestPersistence(unittest.TestCase):
 
     def setUp(self):
         if os.path.exists("test.db"): os.remove("test.db")
+        if os.path.exists("test.db.db"): os.remove("test.db.db")
         P.persist = None
         self.id = None
 
@@ -267,6 +269,7 @@ class TestP(unittest.TestCase):
 
     def setUp(self):
         if os.path.exists("test.db"): os.remove("test.db")
+        if os.path.exists("test.db.db"): os.remove("test.db.db")
         P.persist = None
 
     def testTemporary(self):
