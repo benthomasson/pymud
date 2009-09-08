@@ -50,6 +50,15 @@ class LoopStatement(object):
     def __repr__(self):
         return "loop: %s" % (self.script)
 
+class HelpStatement(object):
+
+    def __init__(self,tokens):
+        self.command = tokens[0]
+        self.value = None
+
+    def __repr__(self):
+        return "help on %s" % (self.command)
+
 class ExpressionStatement(object):
 
     def __init__(self,tokens):
@@ -96,7 +105,9 @@ ifStatement = Literal("if").suppress() + empty + word + script + White("\n").sup
 ifStatement.setParseAction(IfStatement)
 loopStatement = Literal("loop").suppress() + empty + script + White("\n").suppress()
 loopStatement.setParseAction(LoopStatement)
-block << OneOrMore(loopStatement | ifStatement | assign | expressionStatement)
+helpStatement = Literal("?").suppress() + empty + word + White("\n").suppress()
+helpStatement.setParseAction(HelpStatement)
+block << OneOrMore(helpStatement | loopStatement | ifStatement | assign | expressionStatement)
 block.setParseAction(Block)
 
 class Test(unittest.TestCase):
@@ -183,6 +194,11 @@ print done
 print hi
 """)
 
+    def testHelpStatement(self):
+        print helpStatement.parseString("""? command
+""")
+        print block.parseString("""? command
+""")
 
 if __name__ == '__main__':
     unittest.main()

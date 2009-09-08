@@ -74,6 +74,16 @@ class InterpreterVisitor(object):
         except BreakException,e:
             pass
 
+    def visitHelpStatement(self,node,*args):
+        yield
+        finish(self.visit(node.command))
+        commandName = node.command.value
+        if commandName in self.commands:
+            self.instance.sendMessage("help",name=commandName,help=self.commands[commandName].__doc__)
+        else:
+            self.instance.sendMessage("invalidcommand",name=commandName)
+
+
     def visitSymbol(self,node,*args):
         yield
         node.value = node.name
@@ -93,6 +103,7 @@ def interpret(scriptText,instance):
     while step(call):yield
 
 def say(self,*args):
+    """Say something!"""
     print args
 
 def breakCommand(self,*args):
@@ -136,6 +147,11 @@ break
 }
 """,Mob(commands={'say':say,'break':breakCommand},variables={})))
 
+
+    def testHelp(self):
+        from pymud.mob import Mob
+        finish(interpret("""? say
+""",Mob(commands={'say':say,'break':breakCommand},variables={})))
 
 if __name__ == '__main__':
     unittest.main()
