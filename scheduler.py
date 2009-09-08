@@ -4,14 +4,22 @@ import unittest
 from pymud.coroutine import coroutine,step
 from pymud.persist import P
 
+def gettime():
+    return Scheduler.scheduler.tick
+
+def gettimesince(oldtick):
+    return Scheduler.scheduler.tick - oldtick
+
 class Scheduler(object):
 
     scheduler = None
+    tick = 0
 
     def __init__(self,id = None):
         self.items = {}
         self.itemsIterator = None
         self.id = id
+        self.tick = 0
 
     def schedule(self,o):
         self.items[o.id] = P(o)
@@ -22,6 +30,7 @@ class Scheduler(object):
             self.itemsIterator =  self.runItems()
         if not step(self.itemsIterator,n):
             self.itemsIterator = None
+            self.tick += n
             return True
         return False
 
@@ -79,6 +88,20 @@ class Test(unittest.TestCase):
         self.assert_(s.run())
         m.deleted = True
         self.assert_(s.run())
+
+    def testGetTime(self):
+        from pymud.mob import Mob
+        s = Scheduler()
+        m = Mob()
+        m.id = '0'
+        s.schedule(m)
+        Scheduler.scheduler = s
+        self.assertEquals(gettime(),0)
+        s.run()
+        self.assertEquals(gettime(),1)
+        s.run(10)
+        self.assertEquals(gettime(),11)
+
 
 if __name__ == "__main__":
     unittest.main()
