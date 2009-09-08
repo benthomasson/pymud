@@ -41,6 +41,13 @@ class TextFormatter(object):
             variables.append("{WHITE}{0} = {1}{CLEAR}".format(name,value,**message.dict))
         return "\n".join(variables)
 
+    def formatscriptNames(self,message):
+        scripts = []
+        for name in message.dict['scripts'].keys():
+            if not name: continue
+            scripts.append("{WHITE}{0}{CLEAR}".format(name,**message.dict))
+        return "\n".join(scripts)
+
     def formatscripts(self,message):
         scripts = []
         for name,script in message.dict['scripts'].iteritems():
