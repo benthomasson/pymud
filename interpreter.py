@@ -125,14 +125,16 @@ variable $var
         from pymud.mob import Mob
         finish(interpret("""if alive {
 say i am alive
-}""",Mob(commands={'say':say},variables={})))
+}
+""",Mob(commands={'say':say},variables={})))
 
     def testLoop(self):
         from pymud.mob import Mob
         finish(interpret("""loop {
 say forever
 break
-}""",Mob(commands={'say':say,'break':breakCommand},variables={})))
+}
+""",Mob(commands={'say':say,'break':breakCommand},variables={})))
 
 
 if __name__ == '__main__':
