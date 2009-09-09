@@ -68,6 +68,8 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
                         time.sleep(0.01)
                         if error[0] == 35:
                             pass
+                        elif error[0] == 11:
+                            pass
                         else:
                             print error[0]
                             self.done = True
@@ -126,7 +128,7 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 
 
 def startServer():
-    HOST, PORT = "localhost", 8000
+    HOST, PORT = "", 8000
     server = ThreadedTCPServer((HOST, PORT), TelnetInterface)
     ip, port = server.server_address
     server_thread = threading.Thread(target=server.serve_forever)
