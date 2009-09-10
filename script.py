@@ -110,7 +110,14 @@ loopStatement = Literal("loop").suppress() + empty + script + White("\n").suppre
 loopStatement.setParseAction(LoopStatement)
 helpStatement = Literal("?").suppress() + empty + Optional(word) + White("\n").suppress()
 helpStatement.setParseAction(HelpStatement)
-block << OneOrMore(empty + (helpStatement | loopStatement | ifStatement | assign | expressionStatement))
+helpEndStatement = OneOrMore(variable | word) + Suppress("?") + White("\n").suppress()
+helpEndStatement.setParseAction(HelpStatement)
+block << OneOrMore(empty + (helpStatement |\
+                            helpEndStatement |\
+                            loopStatement |\
+                            ifStatement |\
+                            assign |\
+                            expressionStatement))
 block.setParseAction(Block)
 
 class Test(unittest.TestCase):
