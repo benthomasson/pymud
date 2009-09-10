@@ -7,7 +7,18 @@ from pymud.interpreter import interpret
 from pymud.persist import P
 
 def setVariable(self,name=None,value=None):
-    """Remember something for later"""
+    """\
+    Remember something for later.
+
+    set <variable name> <value> - Set a variable to a value
+    set <variable name>         - Clear the value of a variable
+    set                         - Display all your variables
+
+    Example:
+
+    set target zombie
+
+    """
     if not name:
         self.sendMessage("variables",variables=self.variables)
         return
@@ -21,7 +32,24 @@ def setVariable(self,name=None,value=None):
         return
 
 def say(self,*args):
-    """Converse with the locals"""
+    """\
+    Converse with the locals. 
+    
+    Talk to other characters in the room with you.  Messages that do not
+    start with another command are treated as talking to others.
+
+    say <mesage>
+    <message>
+
+    Example:
+
+    say hello everyone here
+
+    OR
+
+    hello everyone here
+    
+    """
     self.sendMessage("yousay",message=" ".join(map(str,args)),name=self.id)
     if self.location():
         self.location().sendMessage("say",
@@ -31,7 +59,18 @@ def say(self,*args):
 
 
 def chat(self,*args):
-    """Converse with the locals"""
+    """\
+    Converse with the globals.
+
+    Chat with everyone on the server.  
+
+    chat <message>
+
+    Example:
+
+    chat hello everyone everywhere
+
+    """
     chat = P.persist.get("globalchat")
     chat.sendMessage(   "chat",
                         message=" ".join(map(str,args)),
@@ -39,7 +78,19 @@ def chat(self,*args):
                         channel=chat.name)
 
 def look(self,target=None):
-    """Look at the world around you"""
+    """\
+    Look at the world around you.
+
+    Look at the current room you are in, or look at items or characters in that room.
+
+    look
+    look <item>
+    look <mob>
+
+    Example:
+
+    look apple
+    """
     if not self.location():
         self.sendMessage("look",description="eternal nothingness")
         return
@@ -49,7 +100,17 @@ def look(self,target=None):
     self.location().get(attribute=target)().seen(self)
 
 def help(self,commandName="help"):
-    """Get help on commands"""
+    """\
+    Get help on commands.
+
+    help <command>
+    help
+    ? <command>
+    ?
+
+    Help will print the help for a command or topic. To get
+    a list of commands type: commands.
+    """
     if commandName in self.commands:
         command = self.commands[commandName]
         self.sendMessage("help",name=commandName,help=command.__doc__)
@@ -57,14 +118,27 @@ def help(self,commandName="help"):
         self.sendMessage("invalidcommand",name=commandName)
 
 def commands(self):
+    """\
+    Print a list of commands for your character.
+
+    commands
+
+    """
     self.sendMessage("commands",commands=self.commands)
 
 def uber(self):
-    """Some uber command"""
+    """\
+    Some uber command.
+    """
     self.sendMessage("action",description="zomg! uber!")
 
 def get(self,target=None):
-    """Get something from the current room"""
+    """\
+    Get something from the current room.
+
+    get <item>
+
+    """
     if not self.location():
         raise GameException("You are in the void.  There is nothing here.")
     target = self.location().get(attribute=target)()
@@ -73,6 +147,12 @@ def get(self,target=None):
     self.add(target)
 
 def drop(self,target=None):
+    """\
+    Drop something from your inventory into the room.
+
+    drop <item>
+
+    """
     target = self.get(attribute=target)()
     target.checkDrop(self)
     if self.location():
@@ -82,15 +162,33 @@ def drop(self,target=None):
         self.remove(target)
 
 def inventory(self):
-    """See what you are carrying"""
+    """\
+    See what you are carrying.
+
+    inventory
+    """
     Container.seen(self,self)
 
 def quit(self):
+    """\
+    Rest your imagination and return to reality.
+
+    quit
+    """
     if self.interface:
         self.sendMessage("notice",notice="Good bye!")
         self.interface.quit()
 
 def go(self,exit):
+    """\
+    Leave through an exit to another room.
+
+    go <exit>
+
+    Example:
+
+    go east
+    """
     if not self.location():
         self.sendMessage("notice",notice="You cannot leave the void that way.")
         return
@@ -102,6 +200,18 @@ def go(self,exit):
 
 
 def do(self,script=None):
+    """\
+    Execute a common task.
+
+    Run one of your stored scripts.
+
+    do <name>
+
+    Example:
+
+    do gohome
+
+    """
     if not script:
         self.sendMessage("scriptNames",scripts=self.scripts)
         return
@@ -112,6 +222,21 @@ def do(self,script=None):
 
 
 def script(self,script=None):
+    """\
+    Write or review your scripts.  
+    
+    Type 'end' on a line by itself to return to the game.
+
+    script          - Review your scripts
+    script <name>   - Compose a new named script
+
+    Example:
+
+    script hi
+    say hi
+    end
+
+    """
     if not script:
         self.sendMessage("scripts",scripts=self.scripts)
         return
@@ -138,20 +263,55 @@ def trigger(self,type=None,script=None):
 
 
 def description(self):
+    """\
+    Change the description of your character.
+
+    Type 'end' on a line by itself to finish the description.
+
+    description
+
+    Example:
+
+    description
+    a nasty scoundrel
+    end
+
+    """
     self.interface.startTextMode(setDescription)
 
 def setDescription(self,text):
-    self.description = text
+    self.detail = text
     self.sendMessage("notice",notice="Changed description to:%s" % text)
 
 def breakCommand(self):
+    """\
+    Stop executing a loop in a script.
+
+    break
+
+    """
     raise BreakException("Stop!")
 
 def stop(self):
+    """\
+    Stop running all scripts.
+
+    stop
+    """
     self.backgroundScript = None
     raise BreakException()
 
 def wait(self,time=1):
+    """\
+    Wait for a number of turns.
+
+    wait 
+    wait <time>
+
+    Example:
+
+    wait 500
+    """
     yield
     for x in xrange(int(time)):
         yield
