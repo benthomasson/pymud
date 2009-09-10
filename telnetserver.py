@@ -35,7 +35,8 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
     def configureLogger(self):
         self.logger = logging.getLogger(self.address)
         self.logger.setLevel(logging.DEBUG)
-        self.logger.addHandler(logging.handlers.RotatingFileHandler(self.logFile(),maxBytes=1000000,backupCount=0))
+        self.loghandler = logging.handlers.RotatingFileHandler(self.logFile(),maxBytes=1000000,backupCount=0)
+        self.logger.addHandler(self.loghandler)
         self.logger.info("%s joined at %s" % \
             (self.address,str(datetime.datetime.now())))
 
@@ -112,6 +113,9 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
     def finish(self):
         self.logger.info("%s left at %s" % \
             (self.address,str(datetime.datetime.now())))
+        self.loghandler.flush()
+        self.loghandler.close()
+        self.logger.removeHandler(self.loghandler)
         self.receiveMessages()
         self.quit()
         del TelnetInterface.instances[self]
