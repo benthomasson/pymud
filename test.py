@@ -22,6 +22,12 @@ class SimpleSuite(unittest.TestSuite):
     def addTestsFromTestCase(self,klass):
         self.addTests(self.loader.loadTestsFromTestCase(klass))
 
+    def addTestsFromModule(self,module):
+        if type(module) == type(""):
+            exec "import %s" % module
+            module = eval(module)
+        self.addTests(self.loader.loadTestsFromModule(module))
+
     def runSelf(self):
         unittest.TextTestRunner(verbosity=2).run(suite)
 
@@ -41,6 +47,9 @@ map(suite.addTestsFromTestCase,[mob.Test,
                                 container.Test,
                                 ])
 
+map(suite.addTestsFromModule,['pymud.mob',
+                              'pymud.tests.chat',
+                                ])
 
 if __name__ == "__main__":
    suite.runSelf()
