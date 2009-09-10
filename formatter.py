@@ -4,10 +4,16 @@ import unittest
 
 from pymud.colors import colors, nocolors
 
+widgets = {
+    'SINGLEBAR':"--------------------------------------------------------------------------------",
+    'DOUBLEBAR':"================================================================================",
+}
+
 class TextFormatter(object):
 
     def formatMessage(self,message):
         message.dict.update(nocolors)
+        message.dict.update(widgets)
         if hasattr(self, 'format' + message.type):
             fn = getattr(self, 'format' + message.type)
             return fn(message)
@@ -63,7 +69,7 @@ class TextFormatter(object):
             if not name: continue
             scripts.append("""\
 {WHITE}{0}{CLEAR}
-{YELLOW}---------------------{CLEAR}
+{YELLOW}{SINGLEBAR}{CLEAR}
 {1}""".format(name,script,**message.dict))
         return "\n".join(scripts)
 
@@ -73,7 +79,7 @@ class TextFormatter(object):
             if not name: continue
             triggers.append("""\
 {WHITE}{0}{CLEAR}
-{YELLOW}---------------------{CLEAR}
+{YELLOW}{SINGLEBAR}{CLEAR}
 {1}""".format(name,trigger,**message.dict))
         return "\n".join(triggers)
 
@@ -92,21 +98,31 @@ class TextFormatter(object):
     def formathelp(self,message):
         return """\
 {WHITE}{name}{CLEAR}
-{YELLOW}-------------------------------------------------------------------------------{CLEAR}
+{YELLOW}{SINGLEBAR}{CLEAR}
 {help}
 """.format(**message.dict)
 
     def formatcommands(self,message):
         commands = []
-        for name,function in message.dict['commands'].iteritems():
-            commands.append("{0}".format(name,function,**message.dict))
-        return "Commands\n" + "\n".join(commands)
+        for name in sorted(message.dict['commands'].keys()):
+            function = message.dict['commands'][name]
+            doc = function.__doc__
+            if doc:
+                doc = doc.partition('.')[0]
+            if doc:
+                doc = doc.strip()
+            else:
+                doc = ""
+            commands.append("{MAGENTA}{0:20} {WHITE}{1}{CLEAR}".format(name,doc,**message.dict))
+        title = "{WHITE}Commands\n{YELLOW}{SINGLEBAR}{CLEAR}\n".format(**message.dict)
+        return title + "\n".join(commands)
 
 
 class ColorTextFormatter(TextFormatter):
 
     def formatMessage(self,message):
         message.dict.update(colors)
+        message.dict.update(widgets)
         if hasattr(self, 'format' + message.type):
             fn = getattr(self, 'format' + message.type)
             return fn(message)
