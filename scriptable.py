@@ -47,3 +47,6 @@ class Scriptable():
                 message = " ".join(traceback.format_exception(*sys.exc_info()))
                 self.sendMessage("error",error=message)
 
+    def doCommand(self,command):
+        self.commandQueue.append(command+"\n")
+        self.run()
