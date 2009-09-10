@@ -32,10 +32,11 @@ def say(self,*args):
 
 def chat(self,*args):
     """Converse with the locals"""
-    P.persist.get("globalchat").sendMessage("chat",
-                                            message=" ".join(map(str,args)),
-                                            name=self.id,
-                                            channel='chat')
+    chat = P.persist.get("globalchat")
+    chat.sendMessage(   "chat",
+                        message=" ".join(map(str,args)),
+                        name=self.id,
+                        channel=chat.name)
 
 def look(self,target=None):
     """Look at the world around you"""

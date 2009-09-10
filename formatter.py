@@ -22,6 +22,12 @@ class TextFormatter(object):
     def formatchat(self,message):
         return "{LIGHTCYAN}<{channel}>{LIGHTYELLOW}[{name}]:{LIGHTCYAN} {message}{CLEAR}".format(**message.dict)
 
+    def formatchatjoin(self,message):
+        return "{LIGHTCYAN}<{channel}> {name} joins the chat.{CLEAR}".format(**message.dict)
+
+    def formatchatleave(self,message):
+        return "{LIGHTCYAN}<{channel}> {name} leaves the chat.{CLEAR}".format(**message.dict)
+
     def formaterror(self,message):
         return "{RED}ERROR:{error}{CLEAR}".format(**message.dict)
 

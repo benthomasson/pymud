@@ -89,7 +89,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
     def quit(self):
         if self.mob and self.mob():
             self.mob().removeListener(self)
-            P.persist.get("globalchat").addListener(self.mob())
+            P.persist.get("globalchat").removeListener(self.mob())
             MobMarket.market.add(self.mob())
             self.mob = None
 
