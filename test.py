@@ -12,6 +12,7 @@ import message
 import scheduler
 import script
 import container
+import testfixture
 
 class SimpleSuite(unittest.TestSuite):
 
@@ -45,10 +46,11 @@ map(suite.addTestsFromTestCase,[mob.Test,
                                 scheduler.Test,
                                 script.Test,
                                 container.Test,
+                                testfixture.TestTestFixture,
                                 ])
 
-map(suite.addTestsFromModule,['pymud.mob',
-                              'pymud.tests.chat',
+map(suite.addTestsFromModule,[ 'pymud.tests.chat',
+                               'pymud.tests.commands',
                                 ])
 
 if __name__ == "__main__":
