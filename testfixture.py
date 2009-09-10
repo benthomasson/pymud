@@ -13,6 +13,7 @@ class TestFixture(ColorTextFormatter,unittest.TestCase):
     def receiveMessage(self,message):
         sys.stdout.write(self.formatMessage(message))
         sys.stdout.write("\n")
+        self.messages.append(message)
 
     def setUp(self):
         if os.path.exists("test.db"): os.remove("test.db")
@@ -23,7 +24,7 @@ class TestFixture(ColorTextFormatter,unittest.TestCase):
         self.persist = P.persist
         self.scheduler = Scheduler.scheduler
         self.id = 'test'
-
+        self.messages = []
 
 class RoomTestFixture(TestFixture):
 
@@ -31,15 +32,24 @@ class RoomTestFixture(TestFixture):
         from pymud.room import Room
         TestFixture.setUp(self)
         self.room = self.persist.getOrCreate('world',Room)
+        self.room.addListener(self)
+
+    def createHere(self,id,klass,*args,**kwargs):
+        o = self.persist.getOrCreate(id,klass,*args,**kwargs)
+        o.location = P(self.room)
+        if hasattr(o,'addListener'):
+            o.addListener(self)
+        return o
 
 class TestTestFixture(RoomTestFixture):
 
     def test(self):
         from pymud.mob import Mob
-        mob = self.persist.getOrCreate("mob",Mob)
-        mob.location = P(self.room)
+        mob = self.createHere("mob",Mob)
         self.assertEquals(mob.id,"mob")
         self.assertEquals(mob.location(),self.room)
+        mob.doCommand("say hi\n")
+        self.assertEquals(len(self.messages),2)
 
 if __name__ == "__main__":
     unittest.main()
