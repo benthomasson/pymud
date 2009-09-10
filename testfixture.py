@@ -34,9 +34,17 @@ class RoomTestFixture(TestFixture):
         self.room = self.persist.getOrCreate('world',Room)
         self.room.addListener(self)
 
+    def create(self,id,klass,*args,**kwargs):
+        o = self.persist.getOrCreate(id,klass,*args,**kwargs)
+        self.__dict__[id] = o
+        if hasattr(o,'addListener'):
+            o.addListener(self)
+        return o
+
     def createHere(self,id,klass,*args,**kwargs):
         o = self.persist.getOrCreate(id,klass,*args,**kwargs)
         self.room.add(o)
+        self.__dict__[id] = o
         if hasattr(o,'addListener'):
             o.addListener(self)
         return o
