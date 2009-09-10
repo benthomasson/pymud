@@ -59,6 +59,72 @@ class TestCommands(RoomTestFixture):
         self.mob.doCommand("go home")
         self.assertEquals(self.mob.location(),self.home)
 
+    def testBreak(self):
+        self.mob.doCommand("break")
+        self.assertEquals(len(self.messages),1)
+
+    def testStop(self):
+        self.mob.doCommand("stop")
+        self.assertEquals(len(self.messages),1)
+
+    def testDo(self):
+        self.mob.doCommand("do hi")
+        self.mob.run()
+        self.assertEquals(len(self.messages),2)
+
+    def testScript(self):
+        self.mob.scripts['looptest'] = """\
+loop {
+say hi
+}
+"""
+        self.mob.doCommand("script")
+        self.mob.run()
+        self.assertEquals(len(self.messages),1)
+
+    def testScript2(self):
+        self.mob.scripts['looptest'] = """\
+loop {
+    say ho
+}
+"""
+        self.mob.doCommand("do looptest")
+        self.mob.run()
+        self.mob.run()
+        self.mob.run()
+        self.mob.run()
+        self.mob.run()
+        self.assertEquals(len(self.messages),8)
+
+    def testScript3(self):
+        self.mob.scripts['looptest'] = """\
+loop {
+    say ho
+    break
+}
+"""
+        self.mob.doCommand("do looptest")
+        self.mob.run()
+        self.mob.run()
+        self.mob.run()
+        self.mob.run()
+        self.mob.run()
+        self.assertEquals(len(self.messages),2)
+
+    def testScript4(self):
+        self.mob.scripts['looptest'] = """\
+loop {
+    say ho
+    stop
+}
+"""
+        self.mob.doCommand("do looptest")
+        self.mob.run()
+        self.mob.run()
+        self.mob.run()
+        self.mob.run()
+        self.mob.run()
+        self.assertEquals(len(self.messages),2)
 
 if __name__ == "__main__":
     unittest.main()

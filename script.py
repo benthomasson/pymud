@@ -107,7 +107,7 @@ loopStatement = Literal("loop").suppress() + empty + script + White("\n").suppre
 loopStatement.setParseAction(LoopStatement)
 helpStatement = Literal("?").suppress() + empty + word + White("\n").suppress()
 helpStatement.setParseAction(HelpStatement)
-block << OneOrMore(helpStatement | loopStatement | ifStatement | assign | expressionStatement)
+block << OneOrMore(empty + (helpStatement | loopStatement | ifStatement | assign | expressionStatement))
 block.setParseAction(Block)
 
 class Test(unittest.TestCase):
