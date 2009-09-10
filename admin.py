@@ -76,6 +76,11 @@ def spy(self,target=None):
     for name,value in target.__dict__.iteritems():
         print name,value
 
+def spyp(self,id):
+    target = P.persist.get(id)
+    for name,value in target.__dict__.iteritems():
+        print name,value
+
 def kill(self,target=None):
     if not target:
         return
