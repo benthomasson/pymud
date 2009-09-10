@@ -53,7 +53,10 @@ class LoopStatement(object):
 class HelpStatement(object):
 
     def __init__(self,tokens):
-        self.command = tokens[0]
+        if len(tokens) > 0:
+            self.command = tokens[0]
+        else:
+            self.command = Symbol(["help"])
         self.value = None
 
     def __repr__(self):
@@ -105,7 +108,7 @@ ifStatement = Literal("if").suppress() + empty + word + script + White("\n").sup
 ifStatement.setParseAction(IfStatement)
 loopStatement = Literal("loop").suppress() + empty + script + White("\n").suppress()
 loopStatement.setParseAction(LoopStatement)
-helpStatement = Literal("?").suppress() + empty + word + White("\n").suppress()
+helpStatement = Literal("?").suppress() + empty + Optional(word) + White("\n").suppress()
 helpStatement.setParseAction(HelpStatement)
 block << OneOrMore(empty + (helpStatement | loopStatement | ifStatement | assign | expressionStatement))
 block.setParseAction(Block)
@@ -198,6 +201,8 @@ print hi
         print helpStatement.parseString("""? command
 """)
         print block.parseString("""? command
+""")
+        print block.parseString("""? 
 """)
 
 if __name__ == '__main__':
