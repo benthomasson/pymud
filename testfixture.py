@@ -18,12 +18,21 @@ class TestFixture(unittest.TestCase):
         self.scheduler = Scheduler.scheduler
 
 
-class TestTestFixture(TestFixture):
+class RoomTestFixture(TestFixture):
+
+    def setUp(self):
+        from pymud.room import Room
+        TestFixture.setUp(self)
+        self.room = self.persist.getOrCreate('world',Room)
+
+class TestTestFixture(RoomTestFixture):
 
     def test(self):
         from pymud.mob import Mob
         mob = self.persist.getOrCreate("mob",Mob)
+        mob.location = P(self.room)
         self.assertEquals(mob.id,"mob")
+        self.assertEquals(mob.location(),self.room)
 
 if __name__ == "__main__":
     unittest.main()
