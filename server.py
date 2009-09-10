@@ -28,7 +28,6 @@ class Server(object):
         creator = P.persist.getOrCreate("creator",Creator)
         chat = P.persist.getOrCreate("globalchat",ChatRoom,name="global")
         chat.addListener(creator)
-        print chat
         Scheduler.scheduler.schedule(creator)
 
         P.persist.syncAll()
