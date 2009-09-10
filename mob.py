@@ -20,6 +20,7 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
 
     commands = ChainedMap(map={ 'say':say,
                                 'look': look,
+                                'chat': chat,
                                 'help': help,
                                 'commands': commands,
                                 'do': do,

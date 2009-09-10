@@ -19,6 +19,9 @@ class TextFormatter(object):
     def formatsay(self,message):
         return "{WHITE}{name} says {BLUE}'{message}'{CLEAR}".format(**message.dict)
 
+    def formatchat(self,message):
+        return "{LIGHTCYAN}<{channel}>{LIGHTYELLOW}[{name}]:{LIGHTCYAN} {message}{CLEAR}".format(**message.dict)
+
     def formaterror(self,message):
         return "{RED}ERROR:{error}{CLEAR}".format(**message.dict)
 

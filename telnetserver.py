@@ -43,6 +43,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
             self.socketFile.flush()
             return
         self.mob().addListener(self)
+        P.persist.get("globalchat").addListener(self.mob())
         self.mob().interface = self
         self.socketFile.write(self.prompt())
         self.socketFile.flush()
@@ -88,6 +89,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
     def quit(self):
         if self.mob and self.mob():
             self.mob().removeListener(self)
+            P.persist.get("globalchat").addListener(self.mob())
             MobMarket.market.add(self.mob())
             self.mob = None
 

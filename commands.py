@@ -4,6 +4,7 @@ import unittest
 from pymud.exceptions import *
 from pymud.container import Container
 from pymud.interpreter import interpret
+from pymud.persist import P
 
 def setVariable(self,name=None,value=None):
     """Remember something for later"""
@@ -23,7 +24,18 @@ def say(self,*args):
     """Converse with the locals"""
     self.sendMessage("yousay",message=" ".join(map(str,args)),name=self.id)
     if self.location():
-        self.location().sendMessage("say",message=" ".join(map(str,args)),name=self.id,_exclude=[self])
+        self.location().sendMessage("say",
+                                    message=" ".join(map(str,args)),
+                                    name=self.id,
+                                    _exclude=[self])
+
+
+def chat(self,*args):
+    """Converse with the locals"""
+    P.persist.get("globalchat").sendMessage("chat",
+                                            message=" ".join(map(str,args)),
+                                            name=self.id,
+                                            channel='chat')
 
 def look(self,target=None):
     """Look at the world around you"""

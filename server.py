@@ -2,6 +2,7 @@
 
 from pymud.mob import Mob
 from pymud.creator import Creator
+from pymud.chat import ChatRoom
 from pymud.scheduler import Scheduler
 from pymud import cli
 from pymud import telnetserver
@@ -25,6 +26,9 @@ class Server(object):
         Scheduler.scheduler = P.persist.getOrCreate('scheduler',Scheduler)
         MobMarket.market = P.persist.getOrCreate('market',MobMarket)
         creator = P.persist.getOrCreate("creator",Creator)
+        chat = P.persist.getOrCreate("globalchat",ChatRoom,name="global")
+        chat.addListener(creator)
+        print chat
         Scheduler.scheduler.schedule(creator)
 
         P.persist.syncAll()
