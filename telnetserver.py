@@ -4,7 +4,11 @@ import threading
 import SocketServer
 import time
 import socket
+import logging,logging.handlers
+import os
+import datetime
 
+import pymud
 import pymud.checker as checker
 from pymud.persist import P, Persistence
 from pymud.scheduler import Scheduler
@@ -18,13 +22,25 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
 
     instances = {}
 
-    def __init__(self,*args,**kwargs):
+    def __init__(self,socket,(address,port),server):
+        self.address = address
+        self.configureLogger()
         self.id = "telnetui"
         TelnetInterface.instances[self] = 1
         self.line = ""
         self.done = False
         self.messages = []
-        SocketServer.BaseRequestHandler.__init__(self,*args,**kwargs)
+        SocketServer.BaseRequestHandler.__init__(self,socket,(address,port),server)
+    
+    def configureLogger(self):
+        self.logger = logging.getLogger(self.address)
+        self.logger.setLevel(logging.DEBUG)
+        self.logger.addHandler(logging.handlers.RotatingFileHandler(self.logFile(),maxBytes=1000000,backupCount=0))
+        self.logger.info("%s joined at %s" % \
+            (self.address,str(datetime.datetime.now())))
+
+    def logFile(self):
+        return os.path.join(pymud.__path__[0],'logs',self.address + ".log")
 
     def prompt(self):
         if self.mob and self.mob():
@@ -100,6 +116,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         self.socketFile.close()
 
     def onecmd(self,line):
+        self.logger.info("%s%s" % (self.prompt(),str(line)))
         try:
             if line:
                 self.mob().commandQueue.append(line + "\n")
@@ -115,8 +132,10 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
     def receiveMessages(self):
         if not self.messages: return
         for message in self.messages:
+            formatted = self.formatMessage(message)
             self.socketFile.write("\n")
-            self.socketFile.write(self.formatMessage(message))
+            self.socketFile.write(formatted)
+            self.logger.info(formatted)
         self.socketFile.write("\n")
         self.socketFile.write(self.prompt())
         self.socketFile.flush()
