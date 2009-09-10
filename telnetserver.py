@@ -110,6 +110,8 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
             self.mob = None
 
     def finish(self):
+        self.logger.info("%s left at %s" % \
+            (self.address,str(datetime.datetime.now())))
         self.receiveMessages()
         self.quit()
         del TelnetInterface.instances[self]
