@@ -72,14 +72,12 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
         self.conditions.parent = self.__class__.conditions
         self.commandScript = None
         self.scriptsQueue = []
-        self.backgroundScript = None
         self.interface = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
         del state['commandScript']
         del state['scriptsQueue']
-        del state['backgroundScript']
         del state['interface']
         return state
 
@@ -170,16 +168,7 @@ class Test(unittest.TestCase, ColorTextFormatter):
         self.assertFalse(amob.commandScript)
         self.assertEquals(len(amob.commandQueue),3)
         amob.run()
-        self.assertEquals(len(amob.commandQueue),2)
-        self.assertFalse(amob.commandScript)
-        amob.run()
-        self.assertEquals(len(amob.commandQueue),1)
-        self.assertFalse(amob.commandScript)
-        amob.run()
-        self.assertEquals(len(amob.commandQueue),0)
-        self.assertFalse(amob.commandScript)
-        amob.run()
-        self.assertEquals(len(amob.commandQueue),0)
+        self.assertEquals(len(amob.scriptsQueue),0)
         self.assertFalse(amob.commandScript)
 
 if __name__ == "__main__":
