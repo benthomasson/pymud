@@ -128,7 +128,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         try:
             if line:
                 self.mob().commandQueue.append(line + "\n")
-            self.socketFile.write("\n")
+            self.socketFile.write("\n\r")
             self.socketFile.write(self.prompt())
             self.socketFile.flush()
         except Exception,e:
@@ -141,10 +141,10 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         if not self.messages: return
         for message in self.messages:
             formatted = self.formatMessage(message)
-            self.socketFile.write("\n")
-            self.socketFile.write(formatted)
+            self.socketFile.write("\n\r")
+            self.socketFile.write(formatted.replace("\n","\n\r"))
             self.logger.info(formatted)
-        self.socketFile.write("\n")
+        self.socketFile.write("\n\r")
         self.socketFile.write(self.prompt())
         self.socketFile.flush()
         self.messages = []
