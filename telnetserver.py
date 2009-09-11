@@ -44,7 +44,9 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         return os.path.join(pymud.__path__[0],'logs',self.address + ".log")
 
     def prompt(self):
-        if self.mob and self.mob():
+        if self.mob and self.mob() and self.mob().waiting:
+            return "(%s)%s>" % (self.mob().waiting, self.mob.id )
+        elif self.mob and self.mob():
             return "%s>" % self.mob.id 
         else:
             return ""

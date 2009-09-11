@@ -16,6 +16,7 @@ class Scriptable():
         self.scripts = ChainedMap(self.__class__.scripts)
         self.triggers = ChainedMap(self.__class__.triggers)
         self.conditions = ChainedMap(self.__class__.conditions)
+        self.waiting = None
 
     def receiveMessage(self,message):
         if message.type.startswith("_"): return

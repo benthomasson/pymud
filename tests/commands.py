@@ -126,5 +126,10 @@ loop {
         self.mob.run()
         self.assertEquals(len(self.messages),2)
 
+    def testWait(self):
+        self.mob.doCommand("wait 10")
+        self.mob.run(10)
+        self.assertEquals(len(self.messages),2)
+
 if __name__ == "__main__":
     unittest.main()

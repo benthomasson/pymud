@@ -108,8 +108,9 @@ def help(self,commandName="help"):
     ? <command>
     ?
 
-    Help will print the help for a command or topic. To get
-    a list of commands type: commands.
+    Help will print the help for a command or topic. 
+
+    To get a list of commands type: commands.
     """
     if commandName in self.commands:
         command = self.commands[commandName]
@@ -321,8 +322,10 @@ def wait(self,time=1):
 
     wait 500
     """
-    yield
-    for x in xrange(int(time)):
+    self.sendMessage("notice",notice="Waiting for %s ticks" % time)
+    for x in xrange(int(time),0,-1):
+        self.waiting = "Waiting %d" % x
         yield
     self.sendMessage("notice",notice="Finished waiting")
+    self.waiting = None
 

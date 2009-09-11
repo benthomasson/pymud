@@ -21,13 +21,19 @@ class Cli(cmd.Cmd, ColorTextFormatter):
         cmd.Cmd.__init__(self)
         self.mob = mob
         self.mob().interface = self
-        self.prompt = "%s>" % mob.id
+        self.updatePrompt()
         mob().addListener(self)
         self.messages = []
         self.lineMode = self.commandMode
         self.text = None
         self.callBack = None
         self.callBackKWArgs = None
+    
+    def updatePrompt(self):
+        if self.mob().waiting:
+            self.prompt = "(%s)%s>" % (self.mob().waiting,self.mob().id)
+        else:
+            self.prompt = "%s>" % self.mob().id
 
     def startTextMode(self,func,**kwargs):
         self.text = ""
@@ -56,7 +62,7 @@ class Cli(cmd.Cmd, ColorTextFormatter):
         try:
             if line:
                 self.mob().commandQueue.append(line + "\n")
-            self.prompt = "%s>" % self.mob().id
+            self.updatePrompt()
         except Exception,e:
             print str(e)
 
@@ -110,6 +116,7 @@ class Cli(cmd.Cmd, ColorTextFormatter):
             sys.stdout.write("\n")
             sys.stdout.write(self.formatMessage(message))
         sys.stdout.write("\n")
+        self.updatePrompt()
         sys.stdout.write(self.prompt)
         sys.stdout.flush()
         self.messages = []
