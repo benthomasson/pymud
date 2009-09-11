@@ -6,6 +6,7 @@ from pymud.room import Room
 from pymud.persist import P
 from pymud.scheduler import Scheduler
 from pymud.mobmarket import MobMarket
+from pymud.exceptions import *
 
 def getAllSubclasses(klass):
     klasses = []
@@ -15,7 +16,12 @@ def getAllSubclasses(klass):
     return list(set(klasses))
 
 def create(self,klass,id=None):
-    """Create an instance of a class"""
+    """\
+    Create an instance of a class.
+
+    create <class> <id>
+
+    """
     klasses = dict(map(lambda x:(x.__name__,x),getAllSubclasses(Sim)))
     m = klasses[klass](id=id)
     P.persist.persist(m)
@@ -32,7 +38,11 @@ def createhelper(self,current,full):
 create.tabcomplete = createhelper
 
 def createHere(self,klass,id=None):
-    """Create an instance of a class in this room"""
+    """\
+    Create an instance of a class in this room.
+
+    createhere <class> <id>
+    """
     m = create(self,klass,id)
     if self.location():
         self.location().add(m)
@@ -40,11 +50,19 @@ def createHere(self,klass,id=None):
 createHere.tabcomplete = createhelper
 
 def addexit(self,name,to):
+    """\
+    Add an exit from the current room to another.
+    addexit <name> <to-id>
+    """
     to = P.persist.get(to)
     self.location().exits[name] = P(to)
 
 def goto(self,id):
-    """Go to another room by id"""
+    """\
+    Go to another room by id.
+
+    goto <id>
+    """
     newLocation = P.persist.get(id)
     self.sendMessage("action",description="leave %s" % self.location().__class__.__name__)
     newLocation.add(self)
@@ -60,12 +78,21 @@ def gotohelper(self,current,full):
 goto.tabcomplete = gotohelper
 
 def shutdown(self):
-    """Shutdown the server"""
+    """\
+    Shutdown the server.
+
+    shutdown
+    """
     self.sendMessage("say",message="shutdown!",name=self.id)
     raise ShutdownSignal("shutdown!")
 
 
 def spy(self,target=None):
+    """\
+    Inspect the variables on an item or mob.
+
+    spy <target>
+    """
     if not target:
         target = self
     elif target == "here":
@@ -77,11 +104,21 @@ def spy(self,target=None):
         print name,value
 
 def spyp(self,id):
+    """\
+    Inspect the variables on an item or mob by id.
+
+    spyp <id>
+    """
     target = P.persist.get(id)
     for name,value in target.__dict__.iteritems():
         print name,value
 
 def kill(self,target=None):
+    """\
+    Instantly and painlessly kill a mob.
+
+    kill <target>
+    """
     if not target:
         return
     if not self.location():

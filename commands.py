@@ -247,6 +247,15 @@ def setScript(self,script,text):
     self.sendMessage("notice",notice="Changed script %s to:\n%s" % (script, text))
 
 def trigger(self,type=None,script=None):
+    """\
+    Setup a trigger to run a script.  
+
+    Triggers cause a script to be run when something happens.
+
+    trigger <event-name> <script-name>  - Create a new trigger
+    trigger <event-name>                - Clear an existing trigger
+    trigger                             - Display all your current triggers
+    """
     if not type:
         self.sendMessage("triggers",triggers=self.triggers)
         return
