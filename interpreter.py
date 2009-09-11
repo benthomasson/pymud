@@ -86,6 +86,9 @@ class InterpreterVisitor(object):
         else:
             self.instance.sendMessage("invalidcommand",name=commandName)
 
+    def visitSayStatement(self,node,*args):
+        yield
+        self.instance.default(node.words)
 
     def visitSymbol(self,node,*args):
         yield

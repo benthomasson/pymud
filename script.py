@@ -62,6 +62,15 @@ class HelpStatement(object):
     def __repr__(self):
         return "help on %s" % (self.command)
 
+class SayStatement(object):
+
+    def __init__(self,tokens):
+        self.words = list(tokens)
+        self.value = None
+
+    def __repr__(self):
+        return "say %s" % " ".join(self.words)
+
 class ExpressionStatement(object):
 
     def __init__(self,tokens):
@@ -91,6 +100,7 @@ ParserElement.setDefaultWhitespaceChars("")
 
 alphanums = alphas + nums
 empty = ZeroOrMore(White(" ")).suppress()
+anyword = Word(alphanums) + empty
 word = Combine(Word(alphanums) + Optional(Literal(":") + Word(alphanums))) + empty
 word.setParseAction(Symbol)
 variable = Combine( Word("$") + Word(alphanums) + Optional(Literal(":") + Word(alphanums))) + empty
@@ -112,8 +122,11 @@ helpStatement = Literal("?").suppress() + empty + Optional(word) + White("\n").s
 helpStatement.setParseAction(HelpStatement)
 helpEndStatement = OneOrMore(variable | word) + Suppress("?") + White("\n").suppress()
 helpEndStatement.setParseAction(HelpStatement)
+sayStatement = Suppress("'") + empty + ZeroOrMore(anyword) + White("\n").suppress()
+sayStatement.setParseAction(SayStatement)
 block << OneOrMore(empty + (helpStatement |\
                             helpEndStatement |\
+                            sayStatement |\
                             loopStatement |\
                             ifStatement |\
                             assign |\
@@ -210,6 +223,18 @@ print hi
         print block.parseString("""? command
 """)
         print block.parseString("""? 
+""")
+
+    def testSayStatement(self):
+        print sayStatement.parseString("""' command
+""")
+        print block.parseString("""' command
+""")
+        print block.parseString("""' 
+""")
+        print block.parseString("""'hi
+""")
+        print block.parseString("""'hi there
 """)
 
 if __name__ == '__main__':
