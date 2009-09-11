@@ -140,12 +140,14 @@ def get(self,target=None):
     get <item>
 
     """
+    yield
     if not self.location():
         raise GameException("You are in the void.  There is nothing here.")
     target = self.location().get(attribute=target)()
     target.checkGet(self)
     self.checkHold(target)
     self.add(target)
+    self.sendMessage("notice",notice="You get %s"  % target.id)
 
 def drop(self,target=None):
     """\
@@ -154,6 +156,7 @@ def drop(self,target=None):
     drop <item>
 
     """
+    yield
     target = self.get(attribute=target)()
     target.checkDrop(self)
     if self.location():
@@ -161,6 +164,7 @@ def drop(self,target=None):
         self.location().add(target)
     else:
         self.remove(target)
+    self.sendMessage("notice",notice="You drop %s"  % target.id)
 
 def inventory(self):
     """\
@@ -348,6 +352,7 @@ def wait(self,time=1):
 
     wait 500
     """
+    yield
     self.sendMessage("notice",notice="Waiting for %s ticks" % time)
     for x in xrange(int(time),0,-1):
         self.waiting = "Waiting %d" % x
