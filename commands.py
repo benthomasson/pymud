@@ -295,23 +295,47 @@ def setDescription(self,text):
 
 def breakCommand(self):
     """\
-    Stop executing a loop in a script.
+    Stop doing repetitive things.
 
     break
+
+    Example:
+
+    loop {
+        say hi
+        break
+    }
 
     """
     raise BreakException("Stop!")
 
-def stop(self):
+def stop(self,option=None):
     """\
-    Stop running all scripts.
+    Stop what you are doing.
 
-    stop
+    stop     - Stop your current task.
+    stop all - Stop your current task and queued tasks.
+
+    Example:
+
+    loop {
+        say hi
+    }
+
+    stop all
     """
-    self.scriptsQueue = []
-    self.commandScript = None
-    self.waiting = None
-    raise BreakException()
+    if not option:
+        self.commandScript = None
+        self.waiting = None
+        raise BreakException()
+
+    if option == "all":
+        self.scriptsQueue = []
+        self.commandScript = None
+        self.waiting = None
+        raise BreakException()
+
+    raise GameException("I dont know how to stop %s" % option)
 
 def wait(self,time=1):
     """\
