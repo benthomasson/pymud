@@ -71,12 +71,14 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
         self.triggers.parent = self.__class__.triggers
         self.conditions.parent = self.__class__.conditions
         self.commandScript = None
+        self.scriptsQueue = []
         self.backgroundScript = None
         self.interface = None
 
     def __getstate__(self):
         state = self.__dict__.copy()
         del state['commandScript']
+        del state['scriptsQueue']
         del state['backgroundScript']
         del state['interface']
         return state

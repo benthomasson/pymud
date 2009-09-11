@@ -217,7 +217,7 @@ def do(self,script=None):
         self.sendMessage("scriptNames",scripts=self.scripts)
         return
     if script in self.scripts:
-        self.backgroundScript = interpret(self.scripts[script],self)
+        self.scriptsQueue.append(interpret(self.scripts[script],self))
     else:
         raise GameException("Cannot find script %s" % script)
 
@@ -308,7 +308,9 @@ def stop(self):
 
     stop
     """
-    self.backgroundScript = None
+    self.scriptsQueue = []
+    self.commandScript = None
+    self.waiting = None
     raise BreakException()
 
 def wait(self,time=1):
