@@ -300,9 +300,7 @@ def breakCommand(self):
     break
 
     """
-    self.commandScript = None
-    self.waiting = None
-    raise BreakException()
+    raise BreakException("Stop!")
 
 def stop(self):
     """\
