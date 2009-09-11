@@ -94,7 +94,7 @@ loop {
         self.mob.run()
         self.mob.run()
         self.mob.run()
-        self.assertEquals(len(self.messages),8)
+        self.assertEquals(len(self.messages),10)
 
     def testScript3(self):
         self.mob.scripts['looptest'] = """\
