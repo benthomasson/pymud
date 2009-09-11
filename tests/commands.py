@@ -49,7 +49,7 @@ class TestCommands(RoomTestFixture):
         self.assertEquals(self.thingy.location(),self.mob)
         self.mob.doCommand("drop thing")
         self.assertEquals(self.thingy.location(),self.room)
-        self.assertEquals(len(self.messages),1)
+        self.assertEquals(len(self.messages),3)
 
     def testGo(self):
         from pymud.room import Room
