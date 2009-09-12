@@ -21,3 +21,7 @@ class Sim(Persistent):
 
     def checkDrop(self,getter):
         raise GameException("It's too sticky.")
+
+    def run(self,*ignore):
+        pass
+
