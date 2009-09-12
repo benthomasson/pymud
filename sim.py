@@ -9,6 +9,7 @@ class Sim(Persistent):
     detail = "maybe it's nothing"
     article = "a"
     attributes = {'name':'thing'}
+    ticksPerTurn = 5
 
     def __init__(self):
         Persistent.__init__(self)

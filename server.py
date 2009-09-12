@@ -39,10 +39,9 @@ class Server(object):
         try:
             tick = time.time()
             while True:
-                if Scheduler.scheduler.run():
-                    #print time.time() - tick
-                    tick = time.time()
-                    time.sleep(0.01)
+                Scheduler.scheduler.run()
+                tick = time.time()
+                time.sleep(0.1)
                 self.theCli.receiveMessages()
         except ShutdownSignal, e:
             print "Shutting down server"

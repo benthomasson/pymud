@@ -278,7 +278,7 @@ class TestP(unittest.TestCase):
         m = P(mob.Mob())
         self.assert_(m())
         self.assertFalse(m().id)
-        m().run()
+        m().run(0)
         m().addListener(StdoutReceiver())
         m().applyCommand("say",['testTemporary'])
         m.ref = None
@@ -291,13 +291,13 @@ class TestP(unittest.TestCase):
         m = P(P.persist.persist(mob.Mob()))
         self.assert_(m())
         self.assert_(m().id)
-        m().run()
+        m().run(0)
         m().addListener(StdoutReceiver())
         m().applyCommand("say",['testPersistent'])
         m.ref = None
         self.assert_(m())
         self.assert_(m().id)
-        m().run()
+        m().run(0)
         m().applyCommand("say",['testPersistent'])
         P.persist.close()
         m.ref = None
@@ -305,7 +305,7 @@ class TestP(unittest.TestCase):
         self.assert_(m())
         self.assert_(m().id)
         m().addListener(StdoutReceiver())
-        m().run()
+        m().run(0)
         m().applyCommand("say",['testPersistent'])
 
     def testDeletedPersistent(self):
@@ -313,7 +313,7 @@ class TestP(unittest.TestCase):
         import sys
         P.persist = Persistence("test.db")
         m = P(P.persist.persist(mob.Mob()))
-        m().run()
+        m().run(0)
         P.persist.delete(m)
         self.assertTrue(m.ref.deleted)
         self.assertFalse(m())
@@ -327,7 +327,7 @@ class TestP(unittest.TestCase):
         import sys
         P.persist = Persistence("test.db")
         m = P(P.persist.persist(mob.Mob()))
-        m().run()
+        m().run(0)
         m.delete()
         self.assertFalse(m())
         m.delete()

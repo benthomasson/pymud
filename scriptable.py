@@ -31,25 +31,24 @@ class Scriptable():
                     self.variables["t:" + name] = value
                 self.scriptsQueue.append(interpret(self.scripts[script],self))
 
-    def run(self,n=1):
-        for x in xrange(n):
-            try:
-                while len(self.commandQueue) > 0:
-                    command = interpret(self.commandQueue.pop(0),self)
-                    if step(command):
-                        self.scriptsQueue.append(command)
-                if not self.commandScript and len(self.scriptsQueue):
-                    self.commandScript = self.scriptsQueue.pop(0)
-                if self.commandScript:
-                    if not step(self.commandScript):
-                        self.commandScript = None
-            except GameException, e:
-                self.sendMessage("exception",error=str(e))
-            except Exception, e:
-                #message = " ".join(traceback.format_exception(*sys.exc_info()))
-                self.sendMessage("error",error=str(e))
+    def run(self,tick):
+        try:
+            while len(self.commandQueue) > 0:
+                command = interpret(self.commandQueue.pop(0),self)
+                if step(command):
+                    self.scriptsQueue.append(command)
+            if not self.commandScript and len(self.scriptsQueue):
+                self.commandScript = self.scriptsQueue.pop(0)
+            if self.commandScript:
+                if not step(self.commandScript):
+                    self.commandScript = None
+        except GameException, e:
+            self.sendMessage("exception",error=str(e))
+        except Exception, e:
+            #message = " ".join(traceback.format_exception(*sys.exc_info()))
+            self.sendMessage("error",error=str(e))
 
     def doCommand(self,command):
         self.commandQueue.append(command+"\n")
-        self.run()
+        self.run(0)
 

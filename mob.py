@@ -156,7 +156,7 @@ class Test(unittest.TestCase, ColorTextFormatter):
 
     def testRunEmpty(self):
         amob = Mob()
-        amob.run()
+        amob.run(0)
 
     def testRun(self):
         from pymud.persist import P
@@ -167,7 +167,7 @@ class Test(unittest.TestCase, ColorTextFormatter):
         amob.commandQueue.append("say hi\n")
         self.assertFalse(amob.commandScript)
         self.assertEquals(len(amob.commandQueue),3)
-        amob.run()
+        amob.run(0)
         self.assertEquals(len(amob.scriptsQueue),0)
         self.assertFalse(amob.commandScript)
 

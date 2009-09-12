@@ -69,7 +69,7 @@ class TestCommands(RoomTestFixture):
 
     def testDo(self):
         self.mob.doCommand("do hi")
-        self.mob.run()
+        self.mob.run(0)
         self.assertEquals(len(self.messages),2)
 
     def testScript(self):
@@ -79,7 +79,7 @@ say hi
 }
 """
         self.mob.doCommand("script")
-        self.mob.run()
+        self.mob.run(0)
         self.assertEquals(len(self.messages),1)
 
     def testScript2(self):
@@ -89,11 +89,11 @@ loop {
 }
 """
         self.mob.doCommand("do looptest")
-        self.mob.run()
-        self.mob.run()
-        self.mob.run()
-        self.mob.run()
-        self.mob.run()
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
         self.assertEquals(len(self.messages),10)
 
     def testScript3(self):
@@ -104,11 +104,11 @@ loop {
 }
 """
         self.mob.doCommand("do looptest")
-        self.mob.run()
-        self.mob.run()
-        self.mob.run()
-        self.mob.run()
-        self.mob.run()
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
         self.assertEquals(len(self.messages),2)
 
     def testScript4(self):
@@ -119,16 +119,17 @@ loop {
 }
 """
         self.mob.doCommand("do looptest")
-        self.mob.run()
-        self.mob.run()
-        self.mob.run()
-        self.mob.run()
-        self.mob.run()
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
         self.assertEquals(len(self.messages),2)
 
     def testWait(self):
         self.mob.doCommand("wait 10")
-        self.mob.run(10)
+        for x in xrange(10):
+            self.mob.run(x)
         self.assertEquals(len(self.messages),2)
 
 if __name__ == "__main__":
