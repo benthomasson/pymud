@@ -14,8 +14,8 @@ class ChatRoom(Channel,Persistent):
 
     def addListener(self,listener):
         Channel.addListener(self,listener)
-        self.sendMessage("chatjoin",name=listener.id,channel=self.name)
+        self.sendMessage("chatjoin",name=listener.attributes['name'],channel=self.name)
 
     def removeListener(self,listener):
-        self.sendMessage("chatleave",name=listener.id,channel=self.name)
+        self.sendMessage("chatleave",name=listener.attributes['name'],channel=self.name)
         Channel.removeListener(self,listener)

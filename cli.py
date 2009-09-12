@@ -31,9 +31,9 @@ class Cli(cmd.Cmd, ColorTextFormatter):
     
     def updatePrompt(self):
         if self.mob().waiting:
-            self.prompt = "(%s)%s>" % (self.mob().waiting,self.mob().id)
+            self.prompt = "(%s)%s>" % (self.mob().waiting,self.mob().attributes['name'])
         else:
-            self.prompt = "%s>" % self.mob().id
+            self.prompt = "%s>" % self.mob().attributes['name']
 
     def startTextMode(self,func,**kwargs):
         self.text = ""
@@ -72,7 +72,7 @@ class Cli(cmd.Cmd, ColorTextFormatter):
             self.callBack(**self.callBackKWArgs)
             self.text = None
             self.lineMode = self.commandMode
-            self.prompt = "%s>" % self.mob().id
+            self.prompt = "%s>" % self.mob().attributes['name']
         else:
             self.text += line + "\n"
 
@@ -82,7 +82,7 @@ class Cli(cmd.Cmd, ColorTextFormatter):
             self.callBack(**self.callBackKWArgs)
             self.text = None
             self.lineMode = self.commandMode
-            self.prompt = "%s>" % self.mob().id
+            self.prompt = "%s>" % self.mob().attributes['name']
         else:
             self.text += line + "\n"
 
