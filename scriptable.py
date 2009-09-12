@@ -46,9 +46,10 @@ class Scriptable():
             except GameException, e:
                 self.sendMessage("exception",error=str(e))
             except Exception, e:
-                message = " ".join(traceback.format_exception(*sys.exc_info()))
-                self.sendMessage("error",error=message)
+                #message = " ".join(traceback.format_exception(*sys.exc_info()))
+                self.sendMessage("error",error=str(e))
 
     def doCommand(self,command):
         self.commandQueue.append(command+"\n")
         self.run()
+
