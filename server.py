@@ -41,7 +41,7 @@ class Server(object):
             while True:
                 Scheduler.scheduler.run()
                 tick = time.time()
-                time.sleep(0.1)
+                time.sleep(0.01)
                 self.theCli.receiveMessages()
         except ShutdownSignal, e:
             print "Shutting down server"

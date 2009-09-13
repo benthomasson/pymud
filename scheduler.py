@@ -42,7 +42,6 @@ class Scheduler(object):
 
         #time.sleep(1)
 
-    @coroutine
     def runItemQueue(self,queue):
         items = self.itemQueues[queue].copy()
         count = len(items)

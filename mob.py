@@ -95,6 +95,19 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
         RepeaterMixin.receiveMessage(self,message)
         Scriptable.receiveMessage(self,message)
 
+class SlowMob(Mob):
+
+    def __init__(self,id=None):
+        Mob.__init__(self,id)
+        self.ticksPerTurn = 100
+
+
+class ReallySlowMob(Mob):
+
+    def __init__(self,id=None):
+        Mob.__init__(self,id)
+        self.ticksPerTurn = 1000
+
 class Test(unittest.TestCase, ColorTextFormatter):
 
     def setUp(self):
