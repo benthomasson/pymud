@@ -26,3 +26,6 @@ class Sim(Persistent):
     def run(self,*ignore):
         pass
 
+    def update(self,tick):
+        self.lastUpdate = tick
+

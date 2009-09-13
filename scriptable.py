@@ -32,6 +32,7 @@ class Scriptable():
                 self.scriptsQueue.append(interpret(self.scripts[script],self))
 
     def run(self,tick):
+        self.update(tick)
         try:
             while len(self.commandQueue) > 0:
                 command = interpret(self.commandQueue.pop(0),self)
