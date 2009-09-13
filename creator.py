@@ -21,7 +21,9 @@ class Creator(Mob):
                                     "kill":kill,
                                     "addexit":addexit,
                                     "createhere":createHere,
-                                    "shutdown":shutdown, })
+                                    "shutdown":shutdown,
+                                    "EOF":shutdown,
+                                    })
 
     description = "something strange, like a bunch of green glowing letters"
     detail = "what appears to be an infinite string of numbers"
