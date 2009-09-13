@@ -120,7 +120,8 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         self.logger.removeHandler(self.loghandler)
         self.receiveMessages()
         self.quit()
-        del TelnetInterface.instances[self]
+        if self in TelnetInterface.instances:
+            del TelnetInterface.instances[self]
         self.socketFile.close()
 
     def onecmd(self,line):
