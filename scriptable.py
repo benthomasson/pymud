@@ -5,7 +5,12 @@ from pymud.exceptions import *
 from pymud.coroutine import step
 from pymud.interpreter import interpret
 
-class Scriptable():
+class Updatable():
+
+    def run(self,tick):
+        self.update(tick)
+
+class Scriptable(Updatable):
 
     def __init__(self):
         self.commandQueue = []
@@ -32,7 +37,7 @@ class Scriptable():
                 self.scriptsQueue.append(interpret(self.scripts[script],self))
 
     def run(self,tick):
-        self.update(tick)
+        Updatable.run(self,tick)
         try:
             while len(self.commandQueue) > 0:
                 command = interpret(self.commandQueue.pop(0),self)
