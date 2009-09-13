@@ -25,6 +25,9 @@ class Scheduler(object):
 
     def schedule(self,o):
         queue = o.ticksPerTurn
+        for itemQueue in self.itemQueues.values():
+            if queue in itemQueue:
+                del itemQueue[queue]
         if queue not in self.itemQueues:
             self.itemQueues[queue] = {}
         self.itemQueues[queue][o.id] = P(o)
