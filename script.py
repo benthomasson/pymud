@@ -101,7 +101,7 @@ ParserElement.setDefaultWhitespaceChars("")
 alphanums = alphas + nums
 empty = ZeroOrMore(White(" ")).suppress()
 anyword = Word(alphanums) + empty
-word = Combine(Word(alphanums) + Optional(Literal(":") + Word(alphanums))) + empty
+word = Combine(Word(alphanums + ".") + Optional(Literal(":") + Word(alphanums +"."))) + empty
 word.setParseAction(Symbol)
 variable = Combine( Word("$") + Word(alphanums) + Optional(Literal(":") + Word(alphanums))) + empty
 variable.setParseAction(Variable)

@@ -15,6 +15,11 @@ def getAllSubclasses(klass):
         klasses += getAllSubclasses(x)
     return list(set(klasses))
 
+def load(self,moduleName):
+    exec "import %s" % moduleName
+    module = eval(moduleName)
+    self.sendMessage("notice",notice="Loaded %s" % moduleName)
+
 def create(self,klass,id=None):
     """\
     Create an instance of a class.
