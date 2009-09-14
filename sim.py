@@ -12,6 +12,7 @@ class Sim(Persistent):
     attributes = []
     ticksPerTurn = 5
     name = 'thing'
+    location = P.null
 
     def __init__(self):
         Persistent.__init__(self)
@@ -36,4 +37,8 @@ class Sim(Persistent):
 
     def delete(self):
         P.persist.delete(self)
+
+    def sendLocationMessage(self,*args,**kwargs):
+        if self.location():
+            self.location().sendMessage(*args,**kwargs)
 
