@@ -9,7 +9,7 @@ class Sim(Persistent):
     description = "something"
     detail = "maybe it's nothing"
     article = "a"
-    attributes = {'name':'thing'}
+    attributes = []
     ticksPerTurn = 5
     name = 'thing'
 

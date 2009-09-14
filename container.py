@@ -8,15 +8,10 @@ class Container(object):
 
     def __init__(self):
         self.containsById = {}
-        self.containsByAttribute = {}
 
     def remove(self,o):
         if o.id in self.containsById:
-            p = self.containsById[o.id]
             del self.containsById[o.id]
-            for value in o.attributes.values() + [o.name]:
-                if value in self.containsByAttribute:
-                    self.containsByAttribute[value].remove(p)
 
 
     def add(self,o):
@@ -25,11 +20,6 @@ class Container(object):
         o.location = P(self)
         p = P(o)
         self.containsById[o.id] = p
-        for value in o.attributes.values() + [ o.name ]:
-            if value in self.containsByAttribute:
-                self.containsByAttribute[value].append(p)
-            else:
-                self.containsByAttribute[value] = [p]
 
     def get(self,id=None,attribute=None,index=0):
         if id and id in self.containsById:
@@ -39,14 +29,14 @@ class Container(object):
                 raise GameException("Cannot find anything like %s" % attribute)
             else:
                 return o
-        elif attribute and attribute in self.containsByAttribute and \
-                len(self.containsByAttribute[attribute]) > index:
-            o = self.containsByAttribute[attribute][index]
-            if not o():
-                self.containsByAttribute[attribute].remove(o)
-                return self.get(attribute=attribute,index=index)
-            else:
-                return o
+        elif attribute:
+            for o in self.containsById.values():
+                if o():
+                    if attribute == o().name:
+                        return o
+                    elif attribute in o().attributes:
+                        return o
+            raise GameException("Cannot find anything like %s" % attribute)
         else:
             raise GameException("Cannot find anything like %s" % attribute)
 
@@ -69,12 +59,10 @@ class Test(unittest.TestCase):
         m = Mob(id='mob')
         c.add(m)
         self.assertEquals(c.containsById['mob'](), m)
-        self.assertEquals(c.containsByAttribute['mob'][0](), m)
         self.assertEquals(c.get(id='mob')(),m)
         self.assertEquals(c.get(attribute='mob')(),m)
         c.remove(m)
         self.assertFalse('mob' in c.containsById)
-        self.assertEquals(c.containsByAttribute['mob'], [])
         pass
 
     def testMultiple(self):
@@ -86,18 +74,15 @@ class Test(unittest.TestCase):
         c.add(m1)
         c.add(m2)
         self.assertEquals(c.containsById['mob1'](), m1)
-        self.assertEquals(c.containsByAttribute['mob'][0](), m1)
         self.assertEquals(c.get(id='mob1')(),m1)
         self.assertEquals(c.get(id='mob2')(),m2)
-        self.assertEquals(c.get(attribute='mob')(),m1)
+        self.assertEquals(c.get(attribute='mob')(),m2)
         c.remove(m1)
         self.assertFalse('mob1' in c.containsById)
-        self.assertEquals(c.containsByAttribute['mob'][0](), m2)
         self.assertEquals(c.get(id='mob2')(),m2)
         self.assertEquals(c.get(attribute='mob')(),m2)
         c.remove(m2)
         self.assertFalse('mob2' in c.containsById)
-        self.assertEquals(c.containsByAttribute['mob'], [])
         self.assertRaises(GameException,c.get,attribute='xcvc')
         self.assertRaises(GameException,c.get,attribute='mob')
         pass

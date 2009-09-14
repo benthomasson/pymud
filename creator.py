@@ -24,11 +24,12 @@ class Creator(Mob):
                                     "createhere":createHere,
                                     "shutdown":shutdown,
                                     "EOF":shutdown,
+                                    "quit":shutdown,
                                     })
 
     description = "something strange, like a bunch of green glowing letters"
     detail = "what appears to be an infinite string of numbers"
-    attributes = {'name':'Creator'}
+    attributes = []
     name = 'Creator'
 
     def __init__(self,*args,**kwargs):

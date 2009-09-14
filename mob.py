@@ -43,7 +43,7 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
     location = P.null
     description = "an ugly son of a mob"
     detail = "a really ugly son of a mob"
-    attributes = {'name':'mob'}
+    attributes = []
     name = 'mob'
     interface = None
 
