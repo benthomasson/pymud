@@ -51,8 +51,7 @@ def say(self,*args):
     
     """
     self.sendMessage("yousay",message=" ".join(map(str,args)),name=self.name)
-    if self.location():
-        self.location().sendMessage("say",
+    self.sendLocationMessage("say",
                                     message=" ".join(map(str,args)),
                                     name=self.name,
                                     _exclude=[self])
