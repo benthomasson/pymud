@@ -44,6 +44,7 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
     description = "an ugly son of a mob"
     detail = "a really ugly son of a mob"
     attributes = {'name':'mob'}
+    name = 'mob'
     interface = None
 
     def __init__(   self,

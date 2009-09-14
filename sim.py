@@ -1,7 +1,8 @@
 
-from pymud.persist import Persistent
+from pymud.persist import Persistent, P
 from pymud.exceptions import *
 from pymud.chainedmap import ChainedMap
+from pymud.scheduler import Scheduler
 
 class Sim(Persistent):
 
@@ -10,6 +11,7 @@ class Sim(Persistent):
     article = "a"
     attributes = {'name':'thing'}
     ticksPerTurn = 5
+    name = 'thing'
 
     def __init__(self):
         Persistent.__init__(self)
@@ -28,4 +30,10 @@ class Sim(Persistent):
 
     def update(self,tick):
         self.lastUpdate = tick
+
+    def mutate(self):
+        Scheduler.scheduler.schedule(self)
+
+    def delete(self):
+        P.persist.delete(self)
 

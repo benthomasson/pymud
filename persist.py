@@ -256,13 +256,13 @@ class TestPersistence(unittest.TestCase):
         import mob 
         P.persist = Persistence("test.db")
         x = P.persist.getOrCreate("mob",mob.Mob)
-        x.name = "bob"
+        x.nameAttribute = "bob"
         P.persist.close()
         P.persist = Persistence("test.db")
         x = P.persist.getOrCreate("mob",mob.Mob)
         y = P.persist.getOrCreate("notmob",mob.Mob)
-        self.assertEquals(x.name,"bob")
-        self.assertRaises(AttributeError,lambda: y.name)
+        self.assertEquals(x.nameAttribute,"bob")
+        self.assertRaises(AttributeError,lambda: y.nameAttribute)
         P.persist.close()
 
 class TestP(unittest.TestCase):

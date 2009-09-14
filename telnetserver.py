@@ -45,9 +45,9 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
 
     def prompt(self):
         if self.mob and self.mob() and self.mob().waiting:
-            return "(%s)%s>" % (self.mob().waiting, self.mob().attributes['name'])
+            return "(%s)%s>" % (self.mob().waiting, self.mob().name)
         elif self.mob and self.mob():
-            return "%s>" % self.mob().attributes['name']
+            return "%s>" % self.mob().name
         else:
             return ""
 

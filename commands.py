@@ -50,11 +50,11 @@ def say(self,*args):
     hello everyone here
     
     """
-    self.sendMessage("yousay",message=" ".join(map(str,args)),name=self.attributes['name'])
+    self.sendMessage("yousay",message=" ".join(map(str,args)),name=self.name)
     if self.location():
         self.location().sendMessage("say",
                                     message=" ".join(map(str,args)),
-                                    name=self.attributes['name'],
+                                    name=self.name,
                                     _exclude=[self])
 
 
@@ -147,7 +147,7 @@ def get(self,target=None):
     target.checkGet(self)
     self.checkHold(target)
     self.add(target)
-    self.sendMessage("notice",notice="You get %s"  % target.attributes['name'])
+    self.sendMessage("notice",notice="You get %s"  % target.name)
 
 def drop(self,target=None):
     """\
@@ -164,7 +164,7 @@ def drop(self,target=None):
         self.location().add(target)
     else:
         self.remove(target)
-    self.sendMessage("notice",notice="You drop %s"  % target.attributes['name'])
+    self.sendMessage("notice",notice="You drop %s"  % target.name)
 
 def inventory(self):
     """\

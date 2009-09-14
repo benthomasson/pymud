@@ -14,7 +14,7 @@ class Container(object):
         if o.id in self.containsById:
             p = self.containsById[o.id]
             del self.containsById[o.id]
-            for value in o.attributes.values():
+            for value in o.attributes.values() + [o.name]:
                 if value in self.containsByAttribute:
                     self.containsByAttribute[value].remove(p)
 
@@ -25,7 +25,7 @@ class Container(object):
         o.location = P(self)
         p = P(o)
         self.containsById[o.id] = p
-        for value in o.attributes.values():
+        for value in o.attributes.values() + [ o.name ]:
             if value in self.containsByAttribute:
                 self.containsByAttribute[value].append(p)
             else:

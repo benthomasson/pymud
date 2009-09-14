@@ -7,7 +7,7 @@ from pymud.chat import ChatRoom
 class TestChat(TestFixture):
 
     def test(self):
-        self.attributes = { "name": "TestChat" }
+        self.name = "TestChat"
         chat = self.persist.getOrCreate("globalchat",ChatRoom,name="global")
         chat.addListener(self)
         chat.sendMessage("chat",message="hi",name="ed",channel=chat.name)

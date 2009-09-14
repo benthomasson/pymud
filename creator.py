@@ -29,6 +29,7 @@ class Creator(Mob):
     description = "something strange, like a bunch of green glowing letters"
     detail = "what appears to be an infinite string of numbers"
     attributes = {'name':'Creator'}
+    name = 'Creator'
 
     def __init__(self,*args,**kwargs):
         Mob.__init__(self,*args,**kwargs)
