@@ -10,7 +10,7 @@ class Sim(Persistent):
     detail = "maybe it's nothing"
     article = "a"
     attributes = []
-    ticksPerTurn = 5
+    ticksPerTurn = 0
     name = 'thing'
     location = P.null
 

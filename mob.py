@@ -46,6 +46,7 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
     attributes = []
     name = 'mob'
     interface = None
+    ticksPerTurn = 5
 
     def __init__(   self,
                     variables=None,

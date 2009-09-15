@@ -24,13 +24,14 @@ class Scheduler(object):
         self.tick = 0
 
     def schedule(self,o):
-        queue = o.ticksPerTurn
         for itemQueue in self.itemQueues.values():
-            if queue in itemQueue:
-                del itemQueue[queue]
-        if queue not in self.itemQueues:
-            self.itemQueues[queue] = {}
-        self.itemQueues[queue][o.id] = P(o)
+            if o.id in itemQueue:
+                del itemQueue[o.id]
+        queue = o.ticksPerTurn
+        if queue:
+            if queue not in self.itemQueues:
+                self.itemQueues[queue] = {}
+            self.itemQueues[queue][o.id] = P(o)
 
     def run(self,n=1):
         self.tick += n
