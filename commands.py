@@ -144,7 +144,6 @@ def get(self,target=None):
         raise GameException("You are in the void.  There is nothing here.")
     target = self.location().get(attribute=target)()
     target.checkGet(self)
-    self.checkHold(target)
     self.add(target)
     self.sendMessage("notice",notice="You get %s"  % target.name)
 

@@ -10,11 +10,13 @@ class Container(object):
         self.containsById = {}
 
     def remove(self,o):
+        self.checkRemove(o)
         if o.id in self.containsById:
             del self.containsById[o.id]
 
 
     def add(self,o):
+        self.checkHold(o)
         if o.location():
             o.location().remove(o)
         o.location = P(self)
@@ -47,6 +49,9 @@ class Container(object):
                 o.sendMessage("look",description=x().description)
 
     def checkHold(self,o):
+        pass
+
+    def checkRemove(self,o):
         pass
 
 class Test(unittest.TestCase):
