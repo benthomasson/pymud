@@ -196,7 +196,7 @@ def go(self,exit):
         self.sendMessage("notice",notice="You cannot leave the void that way.")
         return
     if exit in self.location().exits:
-        self.location().exits[exit]().add(self)
+        self.location().exits[exit]().enter(self)
         self.sendMessage("notice",notice="You leave %s" % exit)
     else:
         self.sendMessage("notice",notice="You cannot leave that way.")

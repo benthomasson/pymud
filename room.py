@@ -17,6 +17,24 @@ class Room(Sim, Channel, Container):
         self.id = id
         self.exits = {}
 
+    def checkEnter(self,o):
+        pass
+
+    def checkLeave(self,o):
+        pass
+
+    def enter(self,o):
+        self.checkEnter(o)
+        if o.location() and isinstance(o.location(),Room):
+            o.location().leave(o)
+        self.addListener(o)
+        Container.add(self,o)
+
+    def leave(self,o):
+        self.checkLeave(o)
+        self.removeListener(o)
+        Container.remove(self,o)
+
     def add(self,o):
         self.addListener(o)
         Container.add(self,o)
