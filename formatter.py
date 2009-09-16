@@ -117,6 +117,22 @@ class TextFormatter(object):
         title = "{WHITE}Commands\n{YELLOW}{SINGLEBAR}{CLEAR}\n".format(**message.dict)
         return title + "\n".join(commands)
 
+    def formatmap(self,message):
+        location = message.dict['location']
+        zone = message.dict['zone']
+        if location.id not in zone.coordinates: return ""
+        (x,y,z) = zone.coordinates[location.id]
+        map = ""
+        for j in xrange(y-zone.mapDistance,y+zone.mapDistance):
+            for i in xrange(x-zone.mapDistance,x+zone.mapDistance):
+                if (i,j,z) in zone.rooms:
+                    map += zone.rooms[i,j,z]().mapColor
+                    map += zone.rooms[i,j,z]().mapCharacter
+                else:
+                    map += "{CLEAR} "
+            map +="\n"
+        map += "{CLEAR} "
+        return map.format(**message.dict)
 
 class ColorTextFormatter(TextFormatter):
 

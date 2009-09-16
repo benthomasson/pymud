@@ -10,6 +10,8 @@ class Room(Sim, Channel, Container):
     detail = "a very plain room"
     attributes = []
     name = 'room'
+    mapCharacter = ' '
+    mapColor = ""
 
     def __init__(self,id=None):
         Sim.__init__(self)
@@ -17,7 +19,7 @@ class Room(Sim, Channel, Container):
         Container.__init__(self)
         self.id = id
         self.exits = {}
-        self.zone = None
+        self.zone = P.null
 
     def checkEnter(self,o):
         pass
@@ -67,6 +69,7 @@ class Zone(Sim,Channel,Container):
     detail = "a very plain zone"
     attributes = []
     name = 'zone'
+    mapDistance = 5
 
     def __init__(self,id=None):
         Sim.__init__(self)
@@ -82,7 +85,7 @@ class Zone(Sim,Channel,Container):
         self.rooms[(x,y,z)] = P(o)
         self.addListener(o)
         Container.add(self,o)
-        o.zone = self
+        o.zone = P(self)
 
     def remove(self,o):
         if o.id in self.coordinates:
@@ -94,4 +97,6 @@ class Zone(Sim,Channel,Container):
         Container.remove(self,o)
         o.zone = self
 
+    def showMap(self,observer,location):
+        observer.sendMessage("map",location=location,zone=self)
 

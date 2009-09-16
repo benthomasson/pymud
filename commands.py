@@ -98,6 +98,15 @@ def look(self,target=None):
         return
     self.location().get(attribute=target)().seen(self)
 
+def lookMap(self,target=None):
+    """
+    See the map of the area where you are.
+    """
+    if not self.location(): return
+    if not self.location().zone(): return
+    self.location().zone().showMap(self,self.location())
+
+
 def help(self,commandName="help"):
     """\
     Get help on commands.
