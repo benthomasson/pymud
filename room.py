@@ -69,7 +69,7 @@ class Zone(Sim,Channel,Container):
     detail = "a very plain zone"
     attributes = []
     name = 'zone'
-    mapDistance = 5
+    mapDistance = 10
 
     def __init__(self,id=None):
         Sim.__init__(self)

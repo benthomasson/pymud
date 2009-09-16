@@ -21,6 +21,8 @@ class P(object):
 
     persist = None
 
+    __slots__ = ['id','ref']
+
     def __init__(self,o=None):
         if not o:
             self.id = None
@@ -41,7 +43,8 @@ class P(object):
             return None
         if not self.id: return None
         try:
-            return P.persist.get(self.id)
+            self.ref = P.persist.get(self.id)
+            return self.ref
         except KeyError,e:
             return None
 
@@ -290,19 +293,30 @@ class TestP(unittest.TestCase):
         P.persist = Persistence("test.db")
         m = P(P.persist.persist(mob.Mob()))
         self.assert_(m())
+        self.assert_(m.id)
+        self.assert_(m.ref)
+        self.assertEquals(m().__class__,mob.Mob)
         self.assert_(m().id)
+        print m()
         m().run(0)
         m().addListener(StdoutReceiver())
         m().applyCommand("say",['testPersistent'])
         m.ref = None
         self.assert_(m())
+        self.assert_(m.id)
+        self.assert_(m.ref)
+        self.assertEquals(m().__class__,mob.Mob)
         self.assert_(m().id)
+        print m()
         m().run(0)
         m().applyCommand("say",['testPersistent'])
         P.persist.close()
         m.ref = None
         P.persist = Persistence("test.db")
         self.assert_(m())
+        self.assert_(m.id)
+        self.assert_(m.ref)
+        self.assertEquals(m().__class__,mob.Mob)
         self.assert_(m().id)
         m().addListener(StdoutReceiver())
         m().run(0)
