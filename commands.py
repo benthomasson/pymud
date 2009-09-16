@@ -96,9 +96,12 @@ def look(self,target=None):
     if not target:
         self.location().seen(self)
         return
+    if target == "around":
+        lookMap(self,)
+        return
     self.location().get(attribute=target)().seen(self)
 
-def lookMap(self,target=None):
+def lookMap(self):
     """
     See the map of the area where you are.
     """
