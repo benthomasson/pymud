@@ -211,8 +211,7 @@ def go(self,exit):
         self.location().exits[exit]().enter(self)
         self.sendMessage("notice",notice="You leave %s" % exit)
     else:
-        self.sendMessage("notice",notice="You cannot leave that way.")
-
+        raise GameException("You cannot leave that way.")
 
 def do(self,script=None):
     """\
