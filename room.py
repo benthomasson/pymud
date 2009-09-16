@@ -49,8 +49,6 @@ class Room(Sim, Channel, Container):
 
     def __setstate__(self,state):
         self.__dict__ = state.copy()
-        if not hasattr(self,'exits'): self.exits = {}
-        if not hasattr(self,'scripts'): self.scripts = {}
 
     def seen(self,o):
         o.sendMessage("look",description=self.description)
