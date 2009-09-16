@@ -40,13 +40,20 @@ class ContainerChannel(Channel,Container):
     
     def __init__(self):
         Container.__init__(self)
-        self.listeners = self.containsById
 
     def addListener(self,listener):
         Container.add(self,listener)
 
     def removeListener(self,listener):
         Container.remove(self,listener)
+
+    def _sendMessage(self,message):
+        _exclude = message.dict['_exclude']
+        for listener in self.containsById.copy().values():
+            if listener() and listener() not in _exclude:
+                listener().receiveMessage(message)
+            elif not listener():
+                del self.containsById[listener.id]
 
 class RepeaterMixin(object):
 
