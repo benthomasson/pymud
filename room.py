@@ -2,6 +2,7 @@
 from pymud.message import Channel
 from pymud.container import Container
 from pymud.sim import Sim
+from pymud.persist import P
 
 class Room(Sim, Channel, Container):
 
@@ -16,6 +17,7 @@ class Room(Sim, Channel, Container):
         Container.__init__(self)
         self.id = id
         self.exits = {}
+        self.zone = None
 
     def checkEnter(self,o):
         pass
@@ -58,5 +60,38 @@ class Room(Sim, Channel, Container):
                     o.sendMessage("exit",name=name)
                 else:
                     del self.exits[name]
+
+class Zone(Sim,Channel,Container):
+
+    description = "a plain zone"
+    detail = "a very plain zone"
+    attributes = []
+    name = 'zone'
+
+    def __init__(self,id=None):
+        Sim.__init__(self)
+        Channel.__init__(self)
+        Container.__init__(self)
+        self.id = id
+        self.rooms = {}
+        self.coordinates = {}
+
+
+    def add(self,o,x,y,z=0):
+        self.coordinates[o.id] = (x,y,z)
+        self.rooms[(x,y,z)] = P(o)
+        self.addListener(o)
+        Container.add(self,o)
+        o.zone = self
+
+    def remove(self,o):
+        if o.id in self.coordinates:
+            (x,y,z) = self.coordinates[o.id]
+            del self.coordinates[o.id]
+            if (x,y,z) in self.rooms:
+                del self.rooms[(x,y,z)]
+        self.removeListener(o)
+        Container.remove(self,o)
+        o.zone = self
 
 

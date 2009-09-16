@@ -15,6 +15,7 @@ class Creator(Mob):
 
     commands = ChainedMap(  parent=Mob.commands,
                             map={   "create":create,
+                                    "add2dzone":add2dzone,
                                     "goto":goto,
                                     "load":load,
                                     "spy":spy,

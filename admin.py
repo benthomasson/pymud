@@ -7,6 +7,7 @@ from pymud.persist import P
 from pymud.scheduler import Scheduler
 from pymud.mobmarket import MobMarket
 from pymud.exceptions import *
+from pymud import builder 
 
 def getAllSubclasses(klass):
     klasses = []
@@ -61,6 +62,14 @@ def addexit(self,name,to):
     """
     to = P.persist.get(to)
     self.location().exits[name] = P(to)
+
+def add2dzone(self,width,breadth,klass):
+    width = int(width)
+    breadth = int(breadth)
+    klasses = dict(map(lambda x:(x.__name__,x),getAllSubclasses(Room)))
+    start = builder.add2dZone(width,breadth,klasses[klass])
+    self.sendMessage("created",id=start.id,klass=klass,article=klasses[klass].article,name=self.id)
+
 
 def goto(self,id):
     """\
