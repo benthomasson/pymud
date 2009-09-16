@@ -3,6 +3,7 @@
 import unittest
 
 from pymud.persist import P
+from pymud.container import Container
 
 class Message(object):
 
@@ -35,6 +36,17 @@ class Channel(object):
             elif not listener():
                 del self.listeners[listener.id]
 
+class ContainerChannel(Channel,Container):
+    
+    def __init__(self):
+        Container.__init__(self)
+        self.listeners = self.containsById
+
+    def addListener(self,listener):
+        Container.add(self,listener)
+
+    def removeListener(self,listener):
+        Container.remove(self,listener)
 
 class RepeaterMixin(object):
 

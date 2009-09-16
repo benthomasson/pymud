@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from pymud.sim import Sim
 from pymud.persist import P, Persistence
 from pymud.scheduler import Scheduler
 from pymud.formatter import ColorTextFormatter
@@ -26,11 +27,14 @@ class TestFixture(ColorTextFormatter,unittest.TestCase):
         self.id = 'test'
         self.messages = []
 
-class RoomTestFixture(TestFixture):
+class RoomTestFixture(TestFixture,Sim):
 
     def setUp(self):
+        Sim.__init__(self)
+        self.name = self.__class__.__name__
         from pymud.room import Room
         TestFixture.setUp(self)
+        self.location = P.null
         self.room = self.persist.getOrCreate('world',Room)
         self.room.addListener(self)
 

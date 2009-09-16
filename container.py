@@ -14,7 +14,6 @@ class Container(object):
         if o.id in self.containsById:
             del self.containsById[o.id]
 
-
     def add(self,o):
         self.checkHold(o)
         if o.location():

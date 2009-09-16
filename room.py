@@ -1,10 +1,9 @@
 
-from pymud.message import Channel
-from pymud.container import Container
+from pymud.message import ContainerChannel, Container
 from pymud.sim import Sim
 from pymud.persist import P
 
-class Room(Sim, Channel, Container):
+class Room(Sim, ContainerChannel):
 
     description = "a plain room"
     detail = "a very plain room"
@@ -12,14 +11,13 @@ class Room(Sim, Channel, Container):
     name = 'room'
     mapCharacter = ' '
     mapColor = ""
+    zone = P.null
 
     def __init__(self,id=None):
         Sim.__init__(self)
-        Channel.__init__(self)
-        Container.__init__(self)
+        ContainerChannel.__init__(self)
         self.id = id
         self.exits = {}
-        self.zone = P.null
 
     def checkEnter(self,o):
         pass
@@ -32,20 +30,16 @@ class Room(Sim, Channel, Container):
         if o.location() and isinstance(o.location(),Room):
             o.location().leave(o)
         self.addListener(o)
-        Container.add(self,o)
 
     def leave(self,o):
         self.checkLeave(o)
         self.removeListener(o)
-        Container.remove(self,o)
 
     def add(self,o):
         self.addListener(o)
-        Container.add(self,o)
 
     def remove(self,o):
         self.removeListener(o)
-        Container.remove(self,o)
 
     def __setstate__(self,state):
         self.__dict__ = state.copy()
@@ -61,7 +55,7 @@ class Room(Sim, Channel, Container):
                 else:
                     del self.exits[name]
 
-class Zone(Sim,Channel,Container):
+class Zone(Sim,ContainerChannel):
 
     description = "a plain zone"
     detail = "a very plain zone"
@@ -71,8 +65,7 @@ class Zone(Sim,Channel,Container):
 
     def __init__(self,id=None):
         Sim.__init__(self)
-        Channel.__init__(self)
-        Container.__init__(self)
+        ContainerChannel.__init__(self)
         self.id = id
         self.rooms = {}
         self.coordinates = {}
@@ -82,7 +75,6 @@ class Zone(Sim,Channel,Container):
         self.coordinates[o.id] = (x,y,z)
         self.rooms[(x,y,z)] = P(o)
         self.addListener(o)
-        Container.add(self,o)
         o.zone = P(self)
 
     def remove(self,o):
@@ -92,7 +84,6 @@ class Zone(Sim,Channel,Container):
             if (x,y,z) in self.rooms:
                 del self.rooms[(x,y,z)]
         self.removeListener(o)
-        Container.remove(self,o)
         o.zone = self
 
     def showMap(self,observer,location):

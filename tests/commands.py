@@ -22,7 +22,7 @@ class TestCommands(RoomTestFixture):
 
     def testLook(self):
         self.mob.doCommand("look")
-        self.assertEquals(len(self.messages),1)
+        self.assertEquals(len(self.messages),2)
 
     def testLook2(self):
         self.mob.doCommand("look mob")
