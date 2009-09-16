@@ -5,7 +5,7 @@ from pymud.exceptions import *
 from pymud.coroutine import step
 from pymud.interpreter import interpret
 
-class Updatable():
+class Updatable(object):
 
     def run(self,tick):
         self.update(tick)
@@ -58,3 +58,11 @@ class Scriptable(Updatable):
         self.commandQueue.append(command+"\n")
         self.run(0)
 
+
+class Mutable(object):
+
+    def update(self,tick):
+        self.lifetime += -1
+        if self.lifetime <= 0:
+            self.__class__ = self.nextClass
+            self.mutate()
