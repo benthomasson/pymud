@@ -13,6 +13,7 @@ class Sim(Persistent):
     ticksPerTurn = 0
     name = 'thing'
     location = P.null
+    lifetime = 1
 
     def __init__(self):
         Persistent.__init__(self)
@@ -34,6 +35,7 @@ class Sim(Persistent):
 
     def mutate(self):
         Scheduler.scheduler.schedule(self)
+        self.lifetime = self.__class__.lifetime
 
     def delete(self):
         P.persist.delete(self)

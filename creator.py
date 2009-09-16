@@ -17,6 +17,7 @@ class Creator(Mob):
                             map={   "create":create,
                                     "add2dzone":add2dzone,
                                     "goto":goto,
+                                    "mutate":mutate,
                                     "load":load,
                                     "spy":spy,
                                     "spyp":spyp,

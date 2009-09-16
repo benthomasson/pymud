@@ -144,3 +144,16 @@ def kill(self,target=None):
     self.sendMessage("notice",notice="You killed %s" % id)
 
 
+def mutate(self,target,klass):
+
+    if target == "here":
+        target = self.location()
+    else:
+        target = self.location().get(attribute=target)()
+    klasses = dict(map(lambda x:(x.__name__,x),getAllSubclasses(Sim)))
+    oldname = target.name
+    target.__class__ = klasses[klass]
+    target.mutate()
+    self.sendMessage("notice",notice="%s mutated into a %s" % (oldname,target.name))
+    
+
