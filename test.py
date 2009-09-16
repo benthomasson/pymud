@@ -13,6 +13,7 @@ import scheduler
 import script
 import container
 import testfixture
+import null
 
 class SimpleSuite(unittest.TestSuite):
 
@@ -46,6 +47,7 @@ map(suite.addTestsFromTestCase,[mob.Test,
                                 scheduler.Test,
                                 script.Test,
                                 container.Test,
+                                null.Test,
                                 testfixture.TestTestFixture,
                                 ])
 
