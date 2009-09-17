@@ -48,6 +48,9 @@ class P(object):
         except KeyError,e:
             return None
 
+    def __nonzero__(self):
+        return self() != None
+
     def delete(self):
         P.persist.delete(self)
         self.id = None
