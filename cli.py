@@ -11,6 +11,7 @@ import threading
 from pymud.mob import Mob
 from pymud.formatter import ColorTextFormatter
 from pymud.persist import P, Persistence
+from pymud.colors import *
 
 class Cli(cmd.Cmd, ColorTextFormatter):
 
@@ -31,9 +32,9 @@ class Cli(cmd.Cmd, ColorTextFormatter):
     
     def updatePrompt(self):
         if self.mob().waiting:
-            self.prompt = "(%s)%s>" % (self.mob().waiting,self.mob().name)
+            self.prompt = "%s(%s)%s>%s" % (BLUE,self.mob().waiting,self.mob().name,CLEAR)
         else:
-            self.prompt = "%s>" % self.mob().name
+            self.prompt = "%s%s>%s" % (BLUE,self.mob().name,CLEAR)
 
     def startTextMode(self,func,**kwargs):
         self.text = ""
