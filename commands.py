@@ -2,7 +2,7 @@
 
 import unittest
 from pymud.exceptions import *
-from pymud.container import Container
+from pymud.container import Container,SlottedContainer
 from pymud.interpreter import interpret
 from pymud.persist import P
 
@@ -182,7 +182,16 @@ def inventory(self):
 
     inventory
     """
-    Container.seen(self,self)
+    self.sendMessage("inventory",inventory=self.contains)
+
+def equipment(self,target=None,slot=None):
+    """\
+    See what you are wearing.
+
+    equipment <slot>
+
+    """
+    self.sendMessage("equipment",equipment=self.slots)
 
 def quit(self):
     """\

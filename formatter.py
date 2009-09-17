@@ -63,6 +63,17 @@ class TextFormatter(object):
         buf += "\n".join(map(lambda x:x().description,items.values()))
         return buf.format(**message.dict)
 
+    def formatequipment(self,message):
+        items = message.dict['equipment']
+        buf = "{GREEN}You are wearing:\n"
+        lines = []
+        for slot,x in items.iteritems():
+            if x:
+                lines.append("%s - %s" % (slot,x().description))
+        buf += "{CLEAR}\n{GREEN}".join(lines)
+        buf += "{CLEAR}"
+        return buf.format(**message.dict)
+
     def formatheader(self,message):
         return "{LIGHTBLUE}{title}{CLEAR}".format(**message.dict)
 
