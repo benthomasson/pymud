@@ -46,6 +46,23 @@ class TextFormatter(object):
     def formatlook(self,message):
         return "You see {description}.".format(**message.dict)
 
+    def formatcontainer(self,message):
+        items = message.dict['contains']
+        buf = "{GREEN}"
+        lines = []
+        for x in items.values():
+            if x:
+                lines.append(x().description.capitalize())
+        buf += "{CLEAR}\n{GREEN}".join(lines)
+        buf += "{CLEAR}"
+        return buf.format(**message.dict)
+
+    def formatinventory(self,message):
+        items = message.dict['inventory']
+        buf = "{GREEN}You are holding:{CLEAR}\n"
+        buf += "\n".join(map(lambda x:x().description,items.values()))
+        return buf.format(**message.dict)
+
     def formatheader(self,message):
         return "{LIGHTBLUE}{title}{CLEAR}".format(**message.dict)
 

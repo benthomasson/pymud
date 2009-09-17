@@ -42,11 +42,8 @@ class Container(object):
         else:
             raise GameException("Cannot find anything like %s" % attribute)
 
-
     def seen(self,o):
-        for x in self.contains.values():
-            if x() and x() is not o:
-                o.sendMessage("look",description=x().description)
+        o.sendMessage("container",contains = self.contains)
 
     def checkHold(self,o):
         pass
