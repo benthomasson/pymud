@@ -90,6 +90,17 @@ def look(self,target=None):
 
     look apple
     """
+    if target:
+        try:
+            self.getFromSlots(attribute=target)().seen(self)
+            return
+        except GameException,e:
+            pass
+        try:
+            self.get(attribute=target)().seen(self)
+            return
+        except GameException,e:
+            pass
     if not self.location():
         self.sendMessage("look",description="eternal nothingness")
         return
@@ -167,7 +178,10 @@ def drop(self,target=None):
 
     """
     yield
-    target = self.get(attribute=target)()
+    try:
+        target = self.getFromSlots(attribute=target)()
+    except GameException, e:
+        target = self.get(attribute=target)()
     target.checkDrop(self)
     if self.location():
         self.location().checkHold(target)
@@ -200,7 +214,10 @@ def wear(self,target=None,slot=None):
     wear <thing>
     """
     yield
-    target = self.get(attribute=target)()
+    try:
+        target = self.get(attribute=target)()
+    except GameException, e:
+        target = self.location().get(attribute=target)()
     if slot:
         self.add(target,slot)
         self.sendMessage("notice",notice="You put %s on %s" % (target.name,slot))
