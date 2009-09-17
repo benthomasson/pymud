@@ -9,14 +9,14 @@ from pymud.coroutine import step
 from pymud.interpreter import interpret
 from pymud.message import Channel,RepeaterMixin
 from pymud.formatter import ColorTextFormatter
-from pymud.container import Container
+from pymud.container import SlottedContainer
 from pymud.sim import Sim
 from pymud.scriptable import Scriptable
 from pymud.persist import P
 from pymud.exceptions import *
 from commands import *
 
-class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
+class Mob(RepeaterMixin,Channel,SlottedContainer,Scriptable,Sim):
 
     commands = ChainedMap(map={ 'say':say,
                                 'look': look,
@@ -54,7 +54,7 @@ class Mob(RepeaterMixin,Channel,Container,Scriptable,Sim):
                     commands=None,
                     id=None):
         Channel.__init__(self)
-        Container.__init__(self)
+        SlottedContainer.__init__(self)
         Scriptable.__init__(self)
         Sim.__init__(self)
         self.id = id
