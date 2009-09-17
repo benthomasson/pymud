@@ -45,15 +45,7 @@ class Room(Sim, ContainerChannel):
         self.__dict__ = state.copy()
 
     def seen(self,o):
-        o.sendMessage("look",description=self.description)
-        Container.seen(self,o)
-        if self.exits:
-            o.sendMessage("header",title="Exits")
-            for name,exit in self.exits.copy().iteritems():
-                if exit():
-                    o.sendMessage("exit",name=name)
-                else:
-                    del self.exits[name]
+        o.sendMessage("room",room=self,contains=self.contains,exits=self.exits)
 
 class Zone(Sim,ContainerChannel):
 

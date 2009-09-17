@@ -57,6 +57,26 @@ class TextFormatter(object):
         buf += "{CLEAR}"
         return buf.format(**message.dict)
 
+    def formatexits(self,message):
+        lines = []
+        for name,exit in message.dict['exits'].iteritems():
+            if exit:
+                lines.append("%s - %s" % (name,exit().name))
+        buf = "{BLUE}Exits\n"
+        buf += "{CLEAR}\n{BLUE}".join(lines)
+        buf += "{CLEAR}"
+        return buf.format(**message.dict)
+
+    def formatroom(self,message):
+        buf = """\
+{YELLOW}{room.name}{CLEAR}
+{MAGENTA}{room.description}{CLEAR}
+""".format(**message.dict)
+        buf += self.formatcontainer(message)
+        buf += "\n"
+        buf += self.formatexits(message)
+        return buf
+
     def formatinventory(self,message):
         items = message.dict['inventory']
         buf = "{GREEN}You are holding:{CLEAR}\n"
