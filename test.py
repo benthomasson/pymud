@@ -47,6 +47,7 @@ map(suite.addTestsFromTestCase,[mob.Test,
                                 scheduler.Test,
                                 script.Test,
                                 container.Test,
+                                container.TestSlotted,
                                 null.Test,
                                 testfixture.TestTestFixture,
                                 ])
