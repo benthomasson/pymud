@@ -191,7 +191,36 @@ def equipment(self,target=None,slot=None):
     equipment <slot>
 
     """
-    self.sendMessage("equipment",equipment=self.slots)
+    self.sendMessage("equipment",equipment=self.slots,slot=slot)
+
+def wear(self,target=None,slot=None):
+    """\
+    Put on an item.
+
+    wear <thing>
+    """
+    yield
+    target = self.get(attribute=target)()
+    if slot:
+        self.add(target,slot)
+        self.sendMessage("notice",notice="You put %s on %s" % (target.name,slot))
+        return
+    else:
+        for slot in target.fitsInSlots:
+            if slot in self.slotNames:
+                self.add(target,slot)
+                self.sendMessage("notice",notice="You put %s on %s"  % (target.name,slot))
+                return
+        raise GameException("You cannot wear that")
+
+def remove(self,target=None):
+    if target:
+        target = self.getFromSlots(attribute=target)()
+        slot = target.locationSlot
+        self.add(target)
+        self.sendMessage("notice",notice="You remove %s from %s"  % (target.name,slot))
+        return
+    raise GameException("Remove what?")
 
 def quit(self):
     """\

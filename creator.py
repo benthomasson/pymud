@@ -33,6 +33,7 @@ class Creator(Mob):
     detail = "what appears to be an infinite string of numbers"
     attributes = []
     name = 'Creator'
+    slotNames = ['head']
 
     def __init__(self,*args,**kwargs):
         Mob.__init__(self,*args,**kwargs)

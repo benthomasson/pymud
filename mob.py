@@ -32,6 +32,8 @@ class Mob(RepeaterMixin,Channel,SlottedContainer,Scriptable,Sim):
                                 'drop': drop,
                                 'inventory': inventory,
                                 'equipment': equipment,
+                                'wear': wear,
+                                'remove': remove,
                                 'quit': quit,
                                 'EOF': quit,
                                 'description': description,

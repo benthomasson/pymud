@@ -65,9 +65,11 @@ class TextFormatter(object):
 
     def formatequipment(self,message):
         items = message.dict['equipment']
+        onlySlot = message.dict['slot']
         buf = "{GREEN}You are wearing:\n"
         lines = []
         for slot,x in items.iteritems():
+            if onlySlot and slot != onlySlot: continue
             if x:
                 lines.append("%s - %s" % (slot,x().description))
         buf += "{CLEAR}\n{GREEN}".join(lines)

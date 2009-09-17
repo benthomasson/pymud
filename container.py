@@ -67,6 +67,8 @@ class SlottedContainer(Container):
         if slot in self.slots:
             other = self.slots[slot]()
             self.add(other)
+        if o.location:
+            o.location().remove(o)
         self.slots[slot] = P(o)
         o.location = P(self)
         o.locationSlot = slot
@@ -79,6 +81,24 @@ class SlottedContainer(Container):
             del self.slots[o.locationSlot]
         o.location = P.null
         o.locationSlot = None
+    
+    def getFromSlots(self,id=None,attribute=None,slot=None):
+        if slot:
+            if slot not in self.slots:
+                raise GameException("You find nothing there")
+            return self.slots[slot]
+        if id:
+            for x in self.slots.values():
+                if x.id == id:
+                    return x
+        if attribute:
+            for x in self.slots.values():
+                if attribute == x().name:
+                    return x
+                if attribute in x().attributes:
+                    return x
+            raise GameException("Cannot find anything like %s" % attribute)
+        raise GameException("Cannot find that here")
 
     def checkHoldSlot(self,o,slot):
         if slot not in self.slotNames:
