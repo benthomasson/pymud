@@ -13,6 +13,7 @@ class Container(object):
         self.checkRemove(o)
         if o.id in self.contains:
             del self.contains[o.id]
+        o.location = P.null
 
     def add(self,o):
         self.checkHold(o)
@@ -53,8 +54,40 @@ class Container(object):
     def checkRemove(self,o):
         pass
 
-class Test(unittest.TestCase):
+class SlottedContainer(Container):
 
+    def __init__(self):
+        Container.__init__(self)
+        self.slots = {}
+
+    def add(self,o,slot=None):
+        if not slot:
+            Container.add(self,o)
+            return
+        self.checkHoldSlot(o,slot)
+        if slot in self.slots:
+            other = self.slots[slot]()
+            self.add(other)
+        self.slots[slot] = P(o)
+        o.location = P(self)
+        o.locationSlot = slot
+
+    def remove(self,o):
+        if not o.locationSlot:
+            Container.remove(self,o)
+            return
+        if o.locationSlot and o.locationSlot in self.slots:
+            del self.slots[o.locationSlot]
+        o.location = P.null
+        o.locationSlot = None
+
+    def checkHoldSlot(self,o,slot):
+        pass
+
+    def checkRemoveSlot(self,o,slot):
+        pass
+
+class Test(unittest.TestCase):
 
     def testSingle(self):
         from mob import Mob
@@ -65,8 +98,10 @@ class Test(unittest.TestCase):
         self.assertEquals(c.contains['mob'](), m)
         self.assertEquals(c.get(id='mob')(),m)
         self.assertEquals(c.get(attribute='mob')(),m)
+        self.assert_(m.location)
         c.remove(m)
         self.assertFalse('mob' in c.contains)
+        self.assertFalse(m.location)
         pass
 
     def testMultiple(self):
@@ -89,7 +124,47 @@ class Test(unittest.TestCase):
         self.assertFalse('mob2' in c.contains)
         self.assertRaises(GameException,c.get,attribute='xcvc')
         self.assertRaises(GameException,c.get,attribute='mob')
-        pass
+
+class TestSlotted(unittest.TestCase):
+    
+    def testNonSlotted(self):
+        from item import Item
+        c = SlottedContainer()
+        c.id = "container"
+        thing = Item(id='thing')
+        c.add(thing)
+        self.assertEquals(thing.location(),c)
+        self.assert_('thing' in c.contains)
+        c.remove(thing)
+        self.assertFalse(thing.location)
+        self.assertFalse('thing' in c.contains)
+
+    def testSlotted(self):
+        from item import Item
+        c = SlottedContainer()
+        c.id = "container"
+        thing = Item(id='thing')
+        c.add(thing,'hand')
+        self.assertEquals(c.slots['hand'](),thing)
+        self.assertEquals(thing.location(),c)
+        self.assertEquals(thing.locationSlot,'hand')
+        c.remove(thing)
+        self.assertFalse(thing.location)
+        self.assertFalse(thing.locationSlot)
+
+    def testMoveSlots(self):
+        from item import Item
+        c = SlottedContainer()
+        c.id = "container"
+        thing = Item(id='thing')
+        c.add(thing,'hand')
+        self.assertEquals(c.slots['hand'](),thing)
+        self.assertEquals(thing.location(),c)
+        self.assertEquals(thing.locationSlot,'hand')
+        c.add(thing,'head')
+        self.assertEquals(c.slots['head'](),thing)
+        self.assertEquals(thing.location(),c)
+        self.assertEquals(thing.locationSlot,'head')
 
 if __name__ == "__main__":
     unittest.main()

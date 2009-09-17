@@ -13,6 +13,7 @@ class Sim(Persistent):
     ticksPerTurn = 0
     name = 'thing'
     location = P.null
+    locationSlot = None
     lifetime = 1
 
     def __init__(self):
