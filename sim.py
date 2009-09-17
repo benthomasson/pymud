@@ -14,6 +14,7 @@ class Sim(Persistent):
     name = 'thing'
     location = P.null
     locationSlot = None
+    fitsInSlots = []
     lifetime = 1
 
     def __init__(self):

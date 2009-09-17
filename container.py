@@ -86,6 +86,8 @@ class SlottedContainer(Container):
     def checkHoldSlot(self,o,slot):
         if slot not in self.slotNames:
             raise GameException("You cannot put something there")
+        if slot not in o.fitsInSlots:
+            raise GameException("It does not fit there")
 
     def checkRemoveSlot(self,o,slot):
         pass
@@ -148,6 +150,7 @@ class TestSlotted(unittest.TestCase):
         c.id = "container"
         c.slotNames = ['hand']
         thing = Item(id='thing')
+        thing.fitsInSlots = ['hand']
         c.add(thing,'hand')
         self.assertEquals(c.slots['hand'](),thing)
         self.assertEquals(thing.location(),c)
@@ -163,6 +166,7 @@ class TestSlotted(unittest.TestCase):
         c.id = "container"
         c.slotNames = ['head','hand']
         thing = Item(id='thing')
+        thing.fitsInSlots = ['hand','head']
         c.add(thing,'hand')
         self.assertEquals(c.slots['hand'](),thing)
         self.assertEquals(thing.location(),c)
