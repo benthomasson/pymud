@@ -29,6 +29,9 @@ class Sim(Persistent):
     def checkDrop(self,getter):
         raise GameException("It's too sticky.")
 
+    def checkUse(self,getter):
+        raise GameException("%s does not look usable" % self.name)
+
     def run(self,*ignore):
         pass
 

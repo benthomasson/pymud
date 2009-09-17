@@ -190,6 +190,24 @@ def drop(self,target=None):
         self.remove(target)
     self.sendMessage("notice",notice="You drop %s"  % target.name)
 
+def use(self,target=None):
+    """\
+    Use something.  Who knows what will happen!
+
+    use <item>
+
+    """
+    yield
+    try:
+        target = self.getFromSlots(attribute=target)()
+    except GameException, e:
+        try:
+            target = self.get(attribute=target)()
+        except GameException, e:
+            target = self.location().get(attribute=target)()
+    target.checkUse(self)
+    target(self)
+
 def inventory(self):
     """\
     See what you are carrying.

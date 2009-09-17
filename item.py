@@ -1,6 +1,7 @@
 
 from pymud.sim import Sim
-from persist import P
+from pymud.persist import P
+from pymud.exceptions import *
 
 class Item(Sim):
 
@@ -25,3 +26,10 @@ class Item(Sim):
 
     def checkDrop(self,getter):
         pass
+
+    def checkUse(self,getter):
+        pass
+
+    def __call__(self,*ignore,**ignorekw):
+        raise GameException("%s is not usable" % self.name)
+
