@@ -3,10 +3,12 @@
 from pymud.sim import Sim
 from pymud.persist import P, Persistence
 from pymud.scheduler import Scheduler
+from pymud.mobmarket import MobMarket
 from pymud.formatter import ColorTextFormatter
 import unittest
 import os
 import sys
+from pymud import builder
 
 
 class TestFixture(ColorTextFormatter,unittest.TestCase):
@@ -21,6 +23,7 @@ class TestFixture(ColorTextFormatter,unittest.TestCase):
         if os.path.exists("test.db.db"): os.remove("test.db.db")
         P.persist = Persistence("test.db")
         Scheduler.scheduler = P.persist.getOrCreate('scheduler',Scheduler)
+        MobMarket.market = MobMarket()
         P.persist.syncAll()
         self.persist = P.persist
         self.scheduler = Scheduler.scheduler
@@ -35,7 +38,7 @@ class RoomTestFixture(TestFixture,Sim):
         from pymud.room import Room
         TestFixture.setUp(self)
         self.location = P.null
-        self.room = self.persist.getOrCreate('world',Room)
+        self.room = builder.create(Room,'world')
         self.room.addListener(self)
 
     def create(self,id,klass,*args,**kwargs):
@@ -52,6 +55,20 @@ class RoomTestFixture(TestFixture,Sim):
         if hasattr(o,'addListener'):
             o.addListener(self)
         return o
+
+class ZoneTestFixture(TestFixture,Sim):
+
+    def setUp(self):
+        from pymud.room import Room
+        Sim.__init__(self)
+        self.name = self.__class__.__name__
+        from pymud.room import Zone
+        TestFixture.setUp(self)
+        self.location = P.null
+        self.zone = builder.add2dZone(3,3,Room).location()
+        for x in self.zone.rooms.values():
+            x().addListener(self)
+        self.room = self.zone.rooms[1,1,0]()
 
 class TestTestFixture(RoomTestFixture):
 
