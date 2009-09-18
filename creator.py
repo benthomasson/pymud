@@ -1,14 +1,6 @@
 
-from pymud.sim import Sim
 from pymud.mob import Mob
-from pymud.room import Room
 from pymud.chainedmap import ChainedMap
-from pymud.persist import P
-from pymud.scheduler import Scheduler
-from pymud.mobmarket import MobMarket
-from pymud.exceptions import *
-import sys
-import traceback
 from admin import *
 
 class Creator(Mob):
