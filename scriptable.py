@@ -5,6 +5,10 @@ from pymud.exceptions import *
 from pymud.coroutine import step
 from pymud.interpreter import interpret
 
+import logging
+
+errorLogger = logging.getLogger("pymud.error")
+
 class Updatable(object):
 
     def run(self,tick):
@@ -54,8 +58,14 @@ class Scriptable(Updatable):
         except GameException, e:
             self.sendMessage("exception",error=str(e))
         except Exception, e:
-            #message = " ".join(traceback.format_exception(*sys.exc_info()))
             self.sendMessage("error",error=str(e))
+            message = " ".join(traceback.format_exception(*sys.exc_info()))
+            errorLogger.error("""\
+--------------------------------------------------------------------------------
+%s 
+%s
+--------------------------------------------------------------------------------
+""" % (self.name,message))
 
     def doCommand(self,command):
         self.commandQueue.append(command+"\n")

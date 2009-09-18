@@ -15,6 +15,10 @@ import datetime
 import traceback
 import item
 import room
+import logging
+import logging.handlers
+
+errorLogger = logging.getLogger("pymud.error")
 
 class Server(object):
 
@@ -22,6 +26,9 @@ class Server(object):
         pass
 
     def start(self):
+        errorLogger.setLevel(logging.DEBUG)
+        loghandler = logging.handlers.RotatingFileHandler("error.log",maxBytes=1000000,backupCount=0)
+        errorLogger.addHandler(loghandler)
         P.persist = Persistence("server.db")
         Scheduler.scheduler = P.persist.getOrCreate('scheduler',Scheduler)
         MobMarket.market = P.persist.getOrCreate('market',MobMarket)
