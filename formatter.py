@@ -175,7 +175,10 @@ class TextFormatter(object):
         map = ""
         for j in xrange(y-zone.mapDistance,y+zone.mapDistance):
             for i in xrange(x-zone.mapDistance,x+zone.mapDistance):
-                if (i,j,z) in zone.rooms:
+                if (i,j,z) == (x,y,z):
+                    map += '{WHITE}'
+                    map += '@'
+                elif (i,j,z) in zone.rooms:
                     map += zone.rooms[i,j,z]().mapColor
                     map += zone.rooms[i,j,z]().mapCharacter
                 else:
