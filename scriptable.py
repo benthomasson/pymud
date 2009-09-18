@@ -1,6 +1,6 @@
 
 import sys,traceback
-from pymud.chainedmap import ChainedMap
+from pymud.chainedmap import ChainedMap, MultipleMap
 from pymud.exceptions import *
 from pymud.coroutine import step
 from pymud.interpreter import interpret
@@ -17,11 +17,14 @@ class Scriptable(Updatable):
         self.scriptsQueue = []
         self.commandScript = None
         self.variables = {}
-        self.commands = ChainedMap(self.__class__.commands)
+        self.commands = MultipleMap(self.__class__.commands,mapsFunc=self.getOtherCommands)
         self.scripts = ChainedMap(self.__class__.scripts)
         self.triggers = ChainedMap(self.__class__.triggers)
         self.conditions = ChainedMap(self.__class__.conditions)
         self.waiting = None
+
+    def getOtherCommands(self):
+        return []
 
     def receiveMessage(self,message):
         if message.type.startswith("_"): return

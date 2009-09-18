@@ -72,9 +72,16 @@ class Mob(RepeaterMixin,Channel,SlottedContainer,Scriptable,Sim):
     def default(self,args):
         say(*[self] + args)
 
+    def getOtherCommands(self):
+        commands = []
+        for item in self.slots.values():
+            commands.append(item().commands)
+        return commands
+
     def __setstate__(self,state):
         self.__dict__ = state.copy()
         self.commands.parent = self.__class__.commands
+        self.commands.mapsFunc = self.getOtherCommands
         self.scripts.parent = self.__class__.scripts
         self.triggers.parent = self.__class__.triggers
         self.conditions.parent = self.__class__.conditions

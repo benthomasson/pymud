@@ -156,6 +156,18 @@ class MultipleMap(ChainedMap):
                         pass
             raise KeyError, key
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['parent']
+        del state['mapsFunc']
+        return state
+
+    def __setstate__(self,state):
+        self.__dict__ = state.copy()
+        self.parent = None
+        self.mapsFunc = None
+        return state
+
 class TestMultipleMap(unittest.TestCase):
 
     def mapsFunction(self):

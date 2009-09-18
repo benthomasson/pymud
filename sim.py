@@ -16,6 +16,7 @@ class Sim(Persistent):
     locationSlot = None
     fitsInSlots = []
     lifetime = 1
+    commands = {}
 
     def __init__(self):
         Persistent.__init__(self)
