@@ -121,6 +121,67 @@ class Test(unittest.TestCase):
         self.assertFalse(cmap2 is ccmap)
         self.assert_(ccmap.parent)
         self.assertFalse(cmap2.parent)
+
+class MultipleMap(ChainedMap):
+    
+    def __init__(self,parent=None,map=None,mapsFunc=None):
+        ChainedMap.__init__(self,parent,map)
+        self.mapsFunc = mapsFunc
+
+    def __iter__(self):
+        for x in ChainedMap.__iter__(self):
+            yield x
+        if self.mapsFunc:
+            for map in self.mapsFunc():
+                for x in map:
+                    yield x
+
+    def __len__(self):
+        length = ChainedMap.__len__(self)
+        if not self.mapsFunc:
+            return length
+        else:
+            return length + reduce(lambda x,y:x+y, map(len,self.mapsFunc()))
+        
+
+    def __getitem__(self,key):
+        try:
+            return ChainedMap.__getitem__(self,key)
+        except KeyError:
+            if self.mapsFunc:
+                for map in self.mapsFunc():
+                    try:
+                        return map[key]
+                    except KeyError:
+                        pass
+            raise KeyError, key
+
+class TestMultipleMap(unittest.TestCase):
+
+    def mapsFunction(self):
+        return [ {'a':1}, {'b':2}, {'a':5}]
+
+    def testNoParent(self):
+        mm = MultipleMap(mapsFunc = self.mapsFunction)
+        self.assertEquals(len(mm),3)
+        self.assertEquals(mm['a'],1)
+        self.assertEquals(mm['b'],2)
+        i = iter(mm)
+        self.assertEquals(i.next(),'a')
+        self.assertEquals(i.next(),'b')
+        self.assertEquals(i.next(),'a')
+     
+    def testParent(self):
+        pcmap = ChainedMap(map={"a":99})
+        mm = MultipleMap(parent=pcmap,mapsFunc = self.mapsFunction)
+        self.assertEquals(len(mm),4)
+        self.assertEquals(mm['a'],99)
+        self.assertEquals(mm['b'],2)
+        i = iter(mm)
+        self.assertEquals(i.next(),'a')
+        self.assertEquals(i.next(),'a')
+        self.assertEquals(i.next(),'b')
+        self.assertEquals(i.next(),'a')
     
 if __name__ == "__main__":
     unittest.main()
