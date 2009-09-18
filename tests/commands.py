@@ -61,11 +61,11 @@ class TestCommands(RoomTestFixture):
 
     def testBreak(self):
         self.mob.doCommand("break")
-        self.assertEquals(len(self.messages),1)
+        self.assertEquals(len(self.messages),0)
 
     def testStop(self):
         self.mob.doCommand("stop")
-        self.assertEquals(len(self.messages),1)
+        self.assertEquals(len(self.messages),0)
 
     def testDo(self):
         self.mob.doCommand("do hi")
