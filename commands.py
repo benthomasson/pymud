@@ -348,7 +348,7 @@ def setScript(self,script,text):
     self.scripts[script] = text
     self.sendMessage("notice",notice="Changed script %s to:\n%s" % (script, text))
 
-def trigger(self,event=None):
+def trigger(self,event=None,*args):
     """\
     Setup a trigger to run a script.  
 
@@ -361,11 +361,25 @@ def trigger(self,event=None):
     if not event:
         self.sendMessage("triggers",triggers=self.triggers)
         return
+    if args == ('clear',):
+        if event in self.triggers:
+            del self.triggers[event]
+            self.sendMessage("notice",notice="Trigger %s cleared" % event)
+        return
+    if args:
+        text = " ".join(args)
+        self.triggers[event] = text
+        self.sendMessage("notice",notice="Trigger %s set to run: %s" % (event,text))
+        return
     self.interface.startScriptMode(setTrigger,event=event)
 
 def setTrigger(self,event,text):
-    self.triggers[event] = text
-    self.sendMessage("notice",notice="Trigger %s set to run %s" % (event,text))
+    if text.strip():
+        self.triggers[event] = text
+        self.sendMessage("notice",notice="Trigger %s set to run: %s" % (event,text))
+    elif event in self.triggers:
+        del self.triggers[event]
+        self.sendMessage("notice",notice="Trigger %s cleared" % event)
 
 def description(self):
     """\
