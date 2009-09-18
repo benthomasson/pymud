@@ -32,16 +32,18 @@ class Scriptable(Updatable):
 
     def receiveMessage(self,message):
         if message.type.startswith("_"): return
-        self.runTriggerScript(message.type,**message.dict)
+        self.runTrigger(message.type,**message.dict)
 
-    def runTriggerScript(self,type,**kwargs):
-        if type in self.triggers:
-            script = self.triggers[type]
-            if script in self.scripts:
-                for name,value in kwargs.iteritems():
-                    if name.startswith("_"): continue
-                    self.variables["t:" + name] = value
-                self.scriptsQueue.append(interpret(self.scripts[script],self))
+    def runTrigger(self,event,**kwargs):
+        if event in self.triggers:
+            for name,value in kwargs.iteritems():
+                if name.startswith("_"): continue
+                self.variables["t:" + name] = value
+            script = self.triggers[event]
+            if script.strip():
+                self.scriptsQueue.append(interpret(script + "\n",self))
+                return True
+        return False
 
     def run(self,tick):
         Updatable.run(self,tick)

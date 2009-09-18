@@ -285,6 +285,7 @@ def go(self,exit):
     if exit in self.location().exits:
         self.location().exits[exit]().enter(self)
         self.sendMessage("notice",notice="You leave %s" % exit)
+        self.runTrigger('enter')
     else:
         raise GameException("You cannot leave that way.")
 
@@ -346,7 +347,7 @@ def setScript(self,script,text):
     self.scripts[script] = text
     self.sendMessage("notice",notice="Changed script %s to:\n%s" % (script, text))
 
-def trigger(self,type=None,script=None):
+def trigger(self,event=None):
     """\
     Setup a trigger to run a script.  
 
@@ -356,20 +357,14 @@ def trigger(self,type=None,script=None):
     trigger <event-name>                - Clear an existing trigger
     trigger                             - Display all your current triggers
     """
-    if not type:
+    if not event:
         self.sendMessage("triggers",triggers=self.triggers)
         return
-    if not script and type in self.triggers:
-        del self.triggers[type]
-        self.sendMessage("notice",notice="Trigger %s cleared" % type)
-        return
-    if not script and type not in self.triggers:
-        raise GameException("No trigger found named %s" % type)
-    if type and script not in self.scripts:
-        raise GameException("No script found named %s" % script)
-    self.triggers[type] = script
-    self.sendMessage("notice",notice="Trigger %s set to run %s" % (type,script))
+    self.interface.startScriptMode(setTrigger,event=event)
 
+def setTrigger(self,event,text):
+    self.triggers[event] = text
+    self.sendMessage("notice",notice="Trigger %s set to run %s" % (event,text))
 
 def description(self):
     """\
