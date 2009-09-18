@@ -101,7 +101,7 @@ def look(self,target=None):
         try:
             for target in self.get(attribute=target):
                 if target:
-                    target().seen(self)
+                    target.seen(self)
             return
         except GameException,e:
             pass
@@ -171,7 +171,6 @@ def get(self,target=None):
         raise GameException("You are in the void.  There is nothing here.")
     for target in self.location().get(attribute=target):
         if target:
-            target = target()
             if target == self: continue
             target.checkGet(self)
             self.add(target)
@@ -185,13 +184,9 @@ def drop(self,target=None):
 
     """
     yield
-    try:
-        targets = [ self.getFromSlots(attribute=target) ]
-    except GameException, e:
-        targets = self.get(attribute=target)
+    targets = self.get(attribute=target)
     for target in targets:
         if target:
-            target = target()
             target.checkDrop(self)
             if self.location():
                 self.location().checkHold(target)
@@ -217,7 +212,6 @@ def use(self,target=None):
             targets = self.location().get(attribute=target)
     for target in targets:
         if target:
-            target = target()
             target.checkUse(self)
             target(self)
 
@@ -252,14 +246,12 @@ def wear(self,target=None,slot=None):
     if slot:
         for target in targets:
             if target:
-                target = target()
                 self.add(target,slot)
                 self.sendMessage("notice",notice="You put %s on %s" % (target.name,slot))
                 return
     else:
         for target in targets:
             if target:
-                target = target()
                 for slot in target.fitsInSlots:
                     if slot in self.slotNames:
                         self.add(target,slot)
@@ -269,7 +261,7 @@ def wear(self,target=None,slot=None):
 
 def remove(self,target=None):
     if target:
-        target = self.getFromSlots(attribute=target)()
+        target = self.getFromSlots(attribute=target)
         slot = target.locationSlot
         self.add(target)
         self.sendMessage("notice",notice="You remove %s from %s"  % (target.name,slot))

@@ -30,27 +30,29 @@ class Container(object):
                 del self.contains[id]
                 raise GameException("Cannot find anything like %s" % attribute)
             else:
-                return o
+                return o()
         elif attribute:
             if attribute == 'all':
-                return self.contains.values()
+                return map(lambda x:x(),self.contains.values())
             if attribute.startswith('all.'):
                 attribute = attribute[4:]
                 matches = []
                 for o in self.contains.values():
-                    if o():
-                        if attribute == o().name:
+                    if o:
+                        o = o()
+                        if attribute == o.name:
                             matches.append(o)
-                        elif attribute in o().attributes:
+                        elif attribute in o.attributes:
                             matches.append(o)
                 if not matches:
                     raise GameException("Cannot find anything like %s" % attribute)
                 return matches
             for o in self.contains.values():
-                if o():
-                    if attribute == o().name:
+                if o:
+                    o = o()
+                    if attribute == o.name:
                         return [o]
-                    elif attribute in o().attributes:
+                    elif attribute in o.attributes:
                         return [o]
             raise GameException("Cannot find anything like %s" % attribute)
         else:
@@ -104,12 +106,13 @@ class SlottedContainer(Container):
         if id:
             for x in self.slots.values():
                 if x.id == id:
-                    return x
+                    return x()
         if attribute:
             for x in self.slots.values():
-                if attribute == x().name:
+                x = x()
+                if attribute == x.name:
                     return x
-                if attribute in x().attributes:
+                if attribute in x.attributes:
                     return x
             raise GameException("Cannot find anything like %s" % attribute)
         raise GameException("Cannot find that here")
@@ -132,8 +135,8 @@ class Test(unittest.TestCase):
         m = Mob(id='mob')
         c.add(m)
         self.assertEquals(c.contains['mob'](), m)
-        self.assertEquals(c.get(id='mob')(),m)
-        self.assertEquals(c.get(attribute='mob')(),m)
+        self.assertEquals(c.get(id='mob'),m)
+        self.assertEquals(c.get(attribute='mob'),[m])
         self.assert_(m.location)
         c.remove(m)
         self.assertFalse('mob' in c.contains)
@@ -149,13 +152,13 @@ class Test(unittest.TestCase):
         c.add(m1)
         c.add(m2)
         self.assertEquals(c.contains['mob1'](), m1)
-        self.assertEquals(c.get(id='mob1')(),m1)
-        self.assertEquals(c.get(id='mob2')(),m2)
-        self.assertEquals(c.get(attribute='mob')(),m2)
+        self.assertEquals(c.get(id='mob1'),m1)
+        self.assertEquals(c.get(id='mob2'),m2)
+        self.assertEquals(c.get(attribute='mob'),[m2])
         c.remove(m1)
         self.assertFalse('mob1' in c.contains)
-        self.assertEquals(c.get(id='mob2')(),m2)
-        self.assertEquals(c.get(attribute='mob')(),m2)
+        self.assertEquals(c.get(id='mob2'),m2)
+        self.assertEquals(c.get(attribute='mob'),[m2])
         c.remove(m2)
         self.assertFalse('mob2' in c.contains)
         self.assertRaises(GameException,c.get,attribute='xcvc')
