@@ -159,6 +159,51 @@ class TestCommands2(ZoneTestFixture):
         self.mob.doCommand("go west")
         self.assertEquals(self.mob.location(),self.room)
 
+    def testTrigger(self):
+        self.mob.doCommand("trigger enter map")
+        self.assertEquals(self.mob.triggers['enter'],"map")
+        self.mob.doCommand("go east")
+        self.assertEquals(len(self.messages),3)
+
+    def testTriggerClear(self):
+        self.mob.doCommand("trigger enter map")
+        self.mob.doCommand("trigger enter clear")
+        self.assertFalse('enter' in self.mob.triggers)
+        self.mob.doCommand("go east")
+        self.assertEquals(len(self.messages),3)
+
+    def testGetAll(self):
+        from pymud.item import Item
+        self.a = builder.create(Item,None,self.room)
+        self.b = builder.create(Item,None,self.room)
+        self.c = builder.create(Item,None,self.room)
+        self.d = builder.create(Item,None,self.room)
+        self.assertEquals(self.a.location(),self.room)
+        self.assertEquals(self.b.location(),self.room)
+        self.assertEquals(self.c.location(),self.room)
+        self.assertEquals(self.d.location(),self.room)
+        self.mob.doCommand("get all")
+        self.assertEquals(self.a.location(),self.mob)
+        self.assertEquals(self.b.location(),self.mob)
+        self.assertEquals(self.c.location(),self.mob)
+        self.assertEquals(self.d.location(),self.mob)
+
+    def testDropAll(self):
+        self.testGetAll()
+        self.mob.doCommand("drop all")
+        self.assertEquals(self.a.location(),self.room)
+        self.assertEquals(self.b.location(),self.room)
+        self.assertEquals(self.c.location(),self.room)
+        self.assertEquals(self.d.location(),self.room)
+
+
+    def testDropAllThing(self):
+        self.testGetAll()
+        self.mob.doCommand("drop all.thing")
+        self.assertEquals(self.a.location(),self.room)
+        self.assertEquals(self.b.location(),self.room)
+        self.assertEquals(self.c.location(),self.room)
+        self.assertEquals(self.d.location(),self.room)
 
 if __name__ == "__main__":
     unittest.main()
