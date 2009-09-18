@@ -26,6 +26,7 @@ class Mob(RepeaterMixin,Channel,SlottedContainer,Scriptable,Sim):
                                 'commands': commands,
                                 'do': do,
                                 'go': go,
+                                'wander': wander,
                                 'script': script,
                                 'trigger': trigger,
                                 'get': get,

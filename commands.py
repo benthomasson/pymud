@@ -6,6 +6,8 @@ from pymud.container import Container,SlottedContainer
 from pymud.interpreter import interpret
 from pymud.persist import P
 
+import random
+
 def setVariable(self,name=None,value=None):
     """\
     Remember something for later.
@@ -285,6 +287,17 @@ def go(self,exit):
         self.sendMessage("notice",notice="You leave %s" % exit)
     else:
         raise GameException("You cannot leave that way.")
+
+def wander(self):
+    """\
+    Wander about.
+
+    wander
+    """
+    if not self.location(): return
+    exit = random.choice(self.location().exits.keys())
+    self.location().exits[exit]().enter(self)
+    self.sendMessage("notice",notice="You leave %s" % exit)
 
 def do(self,script=None):
     """\
