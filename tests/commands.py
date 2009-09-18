@@ -196,7 +196,6 @@ class TestCommands2(ZoneTestFixture):
         self.assertEquals(self.c.location(),self.room)
         self.assertEquals(self.d.location(),self.room)
 
-
     def testDropAllThing(self):
         self.testGetAll()
         self.mob.doCommand("drop all.thing")
@@ -204,6 +203,33 @@ class TestCommands2(ZoneTestFixture):
         self.assertEquals(self.b.location(),self.room)
         self.assertEquals(self.c.location(),self.room)
         self.assertEquals(self.d.location(),self.room)
+
+    def testLoop(self):
+        self.mob.doCommand("""\
+loop {
+say hi
+}
+""")
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
+        self.assertEquals(len(self.messages),4)
+
+    def testRandom(self):
+        self.mob.doCommand("""\
+random {
+say hi
+say ho
+say he
+}
+""")
+        self.mob.run(0)
+        self.mob.run(0)
+        self.mob.run(0)
+        self.assertEquals(len(self.messages),1)
+        self.assert_(self.messages[0].dict['message'] in ['hi','ho','he'])
+
+
 
 if __name__ == "__main__":
     unittest.main()
