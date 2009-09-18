@@ -50,6 +50,15 @@ class LoopStatement(object):
     def __repr__(self):
         return "loop: %s" % (self.script)
 
+class RandomStatement(object):
+
+    def __init__(self,tokens):
+        self.script = tokens[0]
+        self.value = None
+
+    def __repr__(self):
+        return "random: %s" % (self.script)
+
 class HelpStatement(object):
 
     def __init__(self,tokens):
@@ -118,6 +127,8 @@ ifStatement = Literal("if").suppress() + empty + word + script + White("\n").sup
 ifStatement.setParseAction(IfStatement)
 loopStatement = Literal("loop").suppress() + empty + script + White("\n").suppress()
 loopStatement.setParseAction(LoopStatement)
+randomStatement = Literal("random").suppress() + empty + script + White("\n").suppress()
+randomStatement.setParseAction(RandomStatement)
 helpStatement = Literal("?").suppress() + empty + Optional(word) + White("\n").suppress()
 helpStatement.setParseAction(HelpStatement)
 helpEndStatement = OneOrMore(variable | word) + Suppress("?") + White("\n").suppress()
@@ -128,6 +139,7 @@ block << OneOrMore(empty + (helpStatement |\
                             helpEndStatement |\
                             sayStatement |\
                             loopStatement |\
+                            randomStatement |\
                             ifStatement |\
                             assign |\
                             expressionStatement))
@@ -235,6 +247,22 @@ print hi
         print block.parseString("""'hi
 """)
         print block.parseString("""'hi there
+""")
+
+    def testRandomStatement(self):
+        print randomStatement.parseString("""random {
+
+print hi
+}
+""")
+        print block.parseString("""random {
+
+print hi
+}
+print done
+""")
+        print block.parseString("""a = 5
+print hi
 """)
 
 if __name__ == '__main__':

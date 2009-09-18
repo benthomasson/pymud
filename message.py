@@ -52,7 +52,7 @@ class ContainerChannel(Channel,Container):
         for listener in self.contains.copy().values():
             if listener() and listener() not in _exclude:
                 listener().receiveMessage(message)
-            elif not listener():
+            elif not listener() and listener.id in self.contains:
                 del self.contains[listener.id]
 
 class RepeaterMixin(object):

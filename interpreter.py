@@ -5,6 +5,7 @@ import unittest
 from types import GeneratorType
 from pymud.coroutine import coroutine, step, finish
 from pymud.exceptions import *
+import random
 
 def classname(obj):
     return obj.__class__.__name__
@@ -21,16 +22,22 @@ class InterpreterVisitor(object):
         call = self.visit(ast)
         while step(call): yield
 
-    def visit(self,node,*args):
+    def visit(self,node,*args,**kwargs):
         fn = getattr(self, 'visit' + classname(node))
-        call = fn(node, *args)
+        call = fn(node, *args,**kwargs)
         while step(call): yield
 
-    def visitBlock(self,block,*args):
-        for statement in block.statements:
+    def visitBlock(self,block,randomBlock=False):
+        if randomBlock:
+            statement = random.choice(block.statements)
             call = self.visit(statement)
             while step(call): yield
-        block.value = block.statements[-1].value
+            block.value = statement.value
+        else:
+            for statement in block.statements:
+                call = self.visit(statement)
+                while step(call): yield
+            block.value = block.statements[-1].value
 
     def visitExpressionStatement(self,node,*args):
         """Handles the command statement case and the print statement case"""
@@ -76,6 +83,11 @@ class InterpreterVisitor(object):
                 while step(call): yield
         except BreakException,e:
             pass
+
+    def visitRandomStatement(self,node,*args):
+        yield
+        call = self.visit(node.script,randomBlock=True)
+        while step(call): yield
 
     def visitHelpStatement(self,node,*args):
         yield
