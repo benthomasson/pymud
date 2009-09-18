@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import unittest
-from pymud.testfixture import RoomTestFixture
+from pymud.testfixture import RoomTestFixture, ZoneTestFixture
 from pymud.persist import P
+from pymud import builder 
 
 class TestCommands(RoomTestFixture):
 
@@ -131,6 +132,33 @@ loop {
         for x in xrange(10):
             self.mob.run(x)
         self.assertEquals(len(self.messages),2)
+
+class TestCommands2(ZoneTestFixture):
+
+    def setUp(self):
+        ZoneTestFixture.setUp(self)
+        from pymud.mob import Mob
+        self.mob = builder.create(Mob,'mob',self.room)
+        self.mob.addListener(self)
+
+    def testCreate(self):
+        self.assert_(self.mob)
+        self.assertEquals(self.mob.id,'mob')
+        self.assertEquals(self.mob.name,'mob')
+        self.assertEquals(self.mob.location(),self.room)
+        self.assertEquals(self.room.location(),self.zone)
+
+    def testMap(self):
+        self.mob.doCommand("map")
+        self.assertEquals(len(self.messages),1)
+
+    def testGo(self):
+        self.assertEquals(self.mob.location(),self.room)
+        self.mob.doCommand("go east")
+        self.assertEquals(self.mob.location(),self.zone.rooms[2,1,0]())
+        self.mob.doCommand("go west")
+        self.assertEquals(self.mob.location(),self.room)
+
 
 if __name__ == "__main__":
     unittest.main()
