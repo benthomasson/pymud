@@ -71,6 +71,8 @@ class Scriptable(Updatable):
 %s
 --------------------------------------------------------------------------------
 """ % (self.name,message))
+            if not self.runTrigger("error"):
+                self.runTrigger("failure")
 
     def doCommand(self,command):
         self.commandQueue.append(command+"\n")
