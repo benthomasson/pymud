@@ -80,7 +80,11 @@ class TextFormatter(object):
     def formatinventory(self,message):
         items = message.dict['inventory']
         buf = "{GREEN}You are holding:{CLEAR}\n"
-        buf += "\n".join(map(lambda x:x().description,items.values()))
+        lines = []
+        for x in items.values():
+            if x:
+                lines.append(x().description)
+        buf += "\n".join(lines)
         return buf.format(**message.dict)
 
     def formatequipment(self,message):

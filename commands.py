@@ -99,7 +99,9 @@ def look(self,target=None):
         except GameException,e:
             pass
         try:
-            self.get(attribute=target)().seen(self)
+            for target in self.get(attribute=target):
+                if target:
+                    target().seen(self)
             return
         except GameException,e:
             pass
@@ -167,10 +169,13 @@ def get(self,target=None):
     yield
     if not self.location():
         raise GameException("You are in the void.  There is nothing here.")
-    target = self.location().get(attribute=target)()
-    target.checkGet(self)
-    self.add(target)
-    self.sendMessage("notice",notice="You get %s"  % target.name)
+    for target in self.location().get(attribute=target):
+        if target:
+            target = target()
+            if target == self: continue
+            target.checkGet(self)
+            self.add(target)
+            self.sendMessage("notice",notice="You get %s"  % target.name)
 
 def drop(self,target=None):
     """\
@@ -181,16 +186,19 @@ def drop(self,target=None):
     """
     yield
     try:
-        target = self.getFromSlots(attribute=target)()
+        targets = [ self.getFromSlots(attribute=target) ]
     except GameException, e:
-        target = self.get(attribute=target)()
-    target.checkDrop(self)
-    if self.location():
-        self.location().checkHold(target)
-        self.location().add(target)
-    else:
-        self.remove(target)
-    self.sendMessage("notice",notice="You drop %s"  % target.name)
+        targets = self.get(attribute=target)
+    for target in targets:
+        if target:
+            target = target()
+            target.checkDrop(self)
+            if self.location():
+                self.location().checkHold(target)
+                self.location().add(target)
+            else:
+                self.remove(target)
+            self.sendMessage("notice",notice="You drop %s"  % target.name)
 
 def use(self,target=None):
     """\
@@ -201,14 +209,17 @@ def use(self,target=None):
     """
     yield
     try:
-        target = self.getFromSlots(attribute=target)()
+        targets = [ self.getFromSlots(attribute=target) ]
     except GameException, e:
         try:
-            target = self.get(attribute=target)()
+            targets = self.get(attribute=target)
         except GameException, e:
-            target = self.location().get(attribute=target)()
-    target.checkUse(self)
-    target(self)
+            targets = self.location().get(attribute=target)
+    for target in targets:
+        if target:
+            target = target()
+            target.checkUse(self)
+            target(self)
 
 def inventory(self):
     """\
@@ -235,19 +246,25 @@ def wear(self,target=None,slot=None):
     """
     yield
     try:
-        target = self.get(attribute=target)()
+        targets = self.get(attribute=target)
     except GameException, e:
-        target = self.location().get(attribute=target)()
+        targets = self.location().get(attribute=target)
     if slot:
-        self.add(target,slot)
-        self.sendMessage("notice",notice="You put %s on %s" % (target.name,slot))
-        return
-    else:
-        for slot in target.fitsInSlots:
-            if slot in self.slotNames:
+        for target in targets:
+            if target:
+                target = target()
                 self.add(target,slot)
-                self.sendMessage("notice",notice="You put %s on %s"  % (target.name,slot))
+                self.sendMessage("notice",notice="You put %s on %s" % (target.name,slot))
                 return
+    else:
+        for target in targets:
+            if target:
+                target = target()
+                for slot in target.fitsInSlots:
+                    if slot in self.slotNames:
+                        self.add(target,slot)
+                        self.sendMessage("notice",notice="You put %s on %s"  % (target.name,slot))
+                        return
         raise GameException("You cannot wear that")
 
 def remove(self,target=None):

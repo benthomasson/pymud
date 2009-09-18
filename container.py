@@ -32,12 +32,26 @@ class Container(object):
             else:
                 return o
         elif attribute:
+            if attribute == 'all':
+                return self.contains.values()
+            if attribute.startswith('all.'):
+                attribute = attribute[4:]
+                matches = []
+                for o in self.contains.values():
+                    if o():
+                        if attribute == o().name:
+                            matches.append(o)
+                        elif attribute in o().attributes:
+                            matches.append(o)
+                if not matches:
+                    raise GameException("Cannot find anything like %s" % attribute)
+                return matches
             for o in self.contains.values():
                 if o():
                     if attribute == o().name:
-                        return o
+                        return [o]
                     elif attribute in o().attributes:
-                        return o
+                        return [o]
             raise GameException("Cannot find anything like %s" % attribute)
         else:
             raise GameException("Cannot find anything like %s" % attribute)
