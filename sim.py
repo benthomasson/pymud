@@ -50,3 +50,6 @@ class Sim(Persistent):
         if self.location():
             self.location().sendMessage(*args,**kwargs)
 
+    def sendMessage(self,*args,**kwargs):
+        pass
+        
