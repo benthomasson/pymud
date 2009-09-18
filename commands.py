@@ -299,6 +299,7 @@ def wander(self):
     exit = random.choice(self.location().exits.keys())
     self.location().exits[exit]().enter(self)
     self.sendMessage("notice",notice="You leave %s" % exit)
+    self.runTrigger('enter')
 
 def do(self,script=None):
     """\

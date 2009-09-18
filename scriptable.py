@@ -41,7 +41,7 @@ class Scriptable(Updatable):
                 self.variables["t:" + name] = value
             script = self.triggers[event]
             if script.strip():
-                self.scriptsQueue.append(interpret(script + "\n",self))
+                self.commandQueue.append(script + "\n")
                 return True
         return False
 
@@ -57,8 +57,11 @@ class Scriptable(Updatable):
             if self.commandScript:
                 if not step(self.commandScript):
                     self.commandScript = None
+        except BreakException:
+            pass
         except GameException, e:
             self.sendMessage("exception",error=str(e))
+            self.runTrigger("failure")
         except Exception, e:
             self.sendMessage("error",error=str(e))
             message = " ".join(traceback.format_exception(*sys.exc_info()))
