@@ -61,7 +61,7 @@ def addexit(self,name,to):
     addexit <name> <to-id>
     """
     to = P.persist.get(to)
-    self.location().exits[name] = P(to)
+    self.location().addExit(name,to)
 
 def add2dzone(self,width,breadth,klass):
     width = int(width)

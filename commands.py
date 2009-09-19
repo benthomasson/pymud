@@ -294,8 +294,8 @@ def go(self,exit):
     if not self.location():
         self.sendMessage("notice",notice="You cannot leave the void that way.")
         return
-    if exit in self.location().exits:
-        self.location().exits[exit]().enter(self)
+    if exit in self.location().exitNames():
+        self.location().getExit(exit).enter(self)
         self.sendMessage("notice",notice="You leave %s" % exit)
         self.runTrigger('enter')
     else:

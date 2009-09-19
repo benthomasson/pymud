@@ -56,7 +56,7 @@ class TestCommands(RoomTestFixture):
     def testGo(self):
         from pymud.room import Room
         self.create('home',Room)
-        self.room.exits['home'] = P(self.home)
+        self.room.addExit('home',self.home)
         self.assertEquals(self.mob.location(),self.room)
         self.mob.doCommand("go home")
         self.assertEquals(self.mob.location(),self.home)

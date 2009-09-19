@@ -24,9 +24,6 @@ def getOrCreate(klass,id=None,location=None):
         location.add(o)
     return o
 
-def addExit(room,exit,to):
-    room.exits[exit] = P(to)
-
 def add2dZone(width,breadth,klass):
     zone = create(Zone)
     rooms = {}
@@ -45,13 +42,13 @@ def connectRooms(zone,width,breadth,depth=0):
             if (x,y,depth) in rooms:
                 room = rooms[(x,y,depth)]()
                 if (x-1,y,depth) in rooms:
-                    addExit(room,'west',rooms[(x-1,y,depth)])
+                    room.addExit('west',rooms[(x-1,y,depth)])
                 if (x+1,y,depth) in rooms:
-                    addExit(room,'east',rooms[(x+1,y,depth)])
+                    room.addExit('east',rooms[(x+1,y,depth)])
                 if (x,y-1,depth) in rooms:
-                    addExit(room,'north',rooms[(x,y-1,depth)])
+                    room.addExit('north',rooms[(x,y-1,depth)])
                 if (x,y+1,depth) in rooms:
-                    addExit(room,'south',rooms[(x,y+1,depth)])
+                    room.addExit('south',rooms[(x,y+1,depth)])
 
 def addZoneFromMap(zoneMap,klasses):
     zone = create(Zone)
