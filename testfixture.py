@@ -22,6 +22,7 @@ class TestFixture(ColorTextFormatter,unittest.TestCase):
         if os.path.exists("test.db"): os.remove("test.db")
         if os.path.exists("test.db.db"): os.remove("test.db.db")
         P.persist = Persistence("test.db")
+        P.instances = {}
         Scheduler.scheduler = P.persist.getOrCreate('scheduler',Scheduler)
         MobMarket.market = MobMarket()
         P.persist.syncAll()

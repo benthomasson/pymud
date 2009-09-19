@@ -10,7 +10,7 @@ import pymud.interpreter as interpreter
 import threading
 from pymud.mob import Mob
 from pymud.formatter import ColorTextFormatter
-from pymud.persist import P, Persistence
+from pymud.persist import P, Persistence, getP
 from pymud.colors import *
 
 class Cli(cmd.Cmd, ColorTextFormatter):
@@ -133,9 +133,9 @@ def startCli(m):
 if __name__ == '__main__':
     P.persist = Persistence("cli_test.db")
     if P.persist.exists("mob"):
-        m = P(P.persist.get("mob"))
+        m = getP(P.persist.get("mob"))
     else:
-        m = P(P.persist.persist(Mob(id="mob")))
+        m = getP(P.persist.persist(Mob(id="mob")))
 
     cli = startCli(m)
 

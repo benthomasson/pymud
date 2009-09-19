@@ -1,7 +1,7 @@
 
 from pymud.message import ContainerChannel, Container
 from pymud.sim import Sim
-from pymud.persist import P
+from pymud.persist import P,getP
 
 class Room(Sim, ContainerChannel):
 
@@ -20,7 +20,7 @@ class Room(Sim, ContainerChannel):
         self.exits = {}
 
     def addExit(self,to,room):
-        self.exits[to] = P(room)
+        self.exits[to] = getP(room)
 
     def exitNames(self):
         return self.exits.keys()
@@ -74,8 +74,8 @@ class Zone(Sim):
 
     def add(self,o,x,y,z=0):
         self.coordinates[o.id] = (x,y,z)
-        self.rooms[(x,y,z)] = P(o)
-        o.zone = P(self)
+        self.rooms[(x,y,z)] = getP(o)
+        o.zone = getP(self)
 
     def remove(self,o):
         if o.id in self.coordinates:

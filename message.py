@@ -2,7 +2,7 @@
 
 import unittest
 
-from pymud.persist import P
+from pymud.persist import P,getP
 from pymud.container import Container
 
 class Message(object):
@@ -18,7 +18,7 @@ class Channel(object):
         self.listeners = {}
 
     def addListener(self,listener):
-        self.listeners[listener.id] = P(listener)
+        self.listeners[listener.id] = getP(listener)
 
     def removeListener(self,listener):
         if listener.id in self.listeners:

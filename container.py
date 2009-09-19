@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from pymud.persist import P
+from pymud.persist import P,getP
 from pymud.exceptions import *
 
 class Container(object):
@@ -21,8 +21,8 @@ class Container(object):
         self.checkHold(o)
         if o.location():
             o.location().remove(o)
-        o.location = P(self)
-        p = P(o)
+        o.location = getP(self)
+        p = getP(o)
         if o not in self.contains:
             self.contains.append(p)
 
@@ -89,8 +89,8 @@ class SlottedContainer(Container):
             self.add(other)
         if o.location:
             o.location().remove(o)
-        self.slots[slot] = P(o)
-        o.location = P(self)
+        self.slots[slot] = getP(o)
+        o.location = getP(self)
         o.locationSlot = slot
 
     def remove(self,o):
@@ -132,6 +132,9 @@ class SlottedContainer(Container):
 
 class Test(unittest.TestCase):
 
+    def setUp(self):
+        P.instances = {}
+
     def testSingle(self):
         from mob import Mob
         c = Container()
@@ -169,6 +172,9 @@ class Test(unittest.TestCase):
         self.assertRaises(GameException,c.get,attribute='mob')
 
 class TestSlotted(unittest.TestCase):
+
+    def setUp(self):
+        P.instances = {}
     
     def testNonSlotted(self):
         from item import Item

@@ -2,7 +2,7 @@
 
 import unittest
 from pymud.coroutine import coroutine,step,finish
-from pymud.persist import P
+from pymud.persist import P, getP
 import time
 
 def gettime():
@@ -31,7 +31,7 @@ class Scheduler(object):
         if queue:
             if queue not in self.itemQueues:
                 self.itemQueues[queue] = {}
-            self.itemQueues[queue][o.id] = P(o)
+            self.itemQueues[queue][o.id] = getP(o)
 
     def run(self,n=1):
         self.tick += n

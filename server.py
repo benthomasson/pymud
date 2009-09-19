@@ -6,7 +6,7 @@ from pymud.chat import ChatRoom
 from pymud.scheduler import Scheduler
 from pymud import cli
 from pymud import telnetserver
-from pymud.persist import P, Persistence
+from pymud.persist import P, Persistence, getP
 from pymud.exceptions import *
 from pymud.mobmarket import MobMarket
 import sys
@@ -39,7 +39,7 @@ class Server(object):
 
         P.persist.syncAll()
 
-        self.theCli = cli.startCli(P(creator))
+        self.theCli = cli.startCli(getP(creator))
         self.server = telnetserver.startServer()
 
     def run(self):

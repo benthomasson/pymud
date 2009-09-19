@@ -12,7 +12,7 @@ from pymud.formatter import ColorTextFormatter
 from pymud.container import SlottedContainer
 from pymud.sim import Sim
 from pymud.scriptable import Scriptable
-from pymud.persist import P
+from pymud.persist import P,getP
 from pymud.exceptions import *
 from commands import *
 

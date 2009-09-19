@@ -1,5 +1,5 @@
 
-from pymud.persist import P,Persistent
+from pymud.persist import P,Persistent,getP
 
 class MobMarket(Persistent):
 
@@ -11,7 +11,7 @@ class MobMarket(Persistent):
         self.id = id
 
     def add(self,mob):
-        self.mobs[mob.id] = P(mob)
+        self.mobs[mob.id] = getP(mob)
         
     def remove(self,mob):
         if mob.id in self.mobs:

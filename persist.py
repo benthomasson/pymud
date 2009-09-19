@@ -8,6 +8,14 @@ import os
 from pymud.coroutine import coroutine,step,finish
 from pymud.formatter import ColorTextFormatter
 
+def getP(o):
+    if o.id in P.instances:
+        return P.instances[o.id]
+    else:
+        p = P(o)
+        P.instances[o.id] = p
+        return p
+
 class P(object):
     """P is a persistent reference to a persistent object.
     To create a new persistent reference use:
@@ -20,6 +28,7 @@ class P(object):
     """
 
     persist = None
+    instances = {}
 
     __slots__ = ['id','ref']
 
@@ -33,6 +42,7 @@ class P(object):
         else:
             self.id = o.id
             self.ref = o
+        P.instances[self.id] = self
 
     def __call__(self):
         if self.ref and not hasattr(self.ref,'deleted'):
@@ -55,6 +65,7 @@ class P(object):
         return self() != None
 
     def delete(self):
+        del P.instances[self.id]
         P.persist.delete(self)
         self.id = None
         self.ref = None
@@ -381,6 +392,16 @@ class TestP(unittest.TestCase):
         self.assert_(self.p2 in l)
         l.remove(self.p1)
         self.assertFalse(l)
+
+    def testSame(self):
+        import mob
+        import sys
+        P.persist = Persistence("test.db")
+        m = P.persist.persist(mob.Mob())
+        p1 = getP(m)
+        p2 = getP(m)
+        self.assertEquals(p1,p2)
+        self.assert_(p1 is p2)
 
 
 if __name__ == "__main__":
