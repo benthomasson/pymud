@@ -59,7 +59,7 @@ class TextFormatter(object):
 
     def formatexits(self,message):
         lines = []
-        for name,exit in message.dict['exits']:
+        for name,exit in message.dict['exits'].iteritems():
             if exit:
                 lines.append("%s - %s" % (name,exit().name))
         buf = "{BLUE}Exits\n"

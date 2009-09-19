@@ -17,18 +17,17 @@ class Room(Sim, ContainerChannel):
         Sim.__init__(self)
         ContainerChannel.__init__(self)
         self.id = id
-        self.exits = []
+        self.exits = {}
 
     def addExit(self,to,room):
-        self.exits.append((to,P(room)))
+        self.exits[to] = P(room)
 
     def exitNames(self):
-        return map(lambda x:x[0],self.exits)
+        return self.exits.keys()
 
     def getExit(self,to):
-        for name,exit in self.exits:
-            if name == to and exit:
-                return exit()
+        if to in self.exits:
+           return self.exits[to]() 
 
     def checkEnter(self,o):
         pass
