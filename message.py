@@ -53,7 +53,7 @@ class ContainerChannel(Channel,Container):
             if listener() and listener() not in _exclude:
                 listener().receiveMessage(message)
             elif not listener() and listener in self.contains:
-                self.contains.remove(listener.id)
+                self.contains.remove(listener)
 
 class RepeaterMixin(object):
 
