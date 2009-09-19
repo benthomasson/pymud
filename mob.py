@@ -49,7 +49,7 @@ class Mob(RepeaterMixin,Channel,SlottedContainer,Scriptable,Sim):
     location = P.null
     description = "an ugly son of a mob"
     detail = "a really ugly son of a mob"
-    attributes = []
+    attributes = ['mob']
     name = 'mob'
     interface = None
     ticksPerTurn = 5

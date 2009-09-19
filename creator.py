@@ -23,7 +23,7 @@ class Creator(Mob):
 
     description = "something strange, like a bunch of green glowing letters"
     detail = "what appears to be an infinite string of numbers"
-    attributes = []
+    attributes = ['creator','Creator']
     name = 'Creator'
     slotNames = ['head','hand']
 
