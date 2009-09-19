@@ -65,7 +65,7 @@ class ZoneTestFixture(TestFixture,Sim):
         from pymud.room import Zone
         TestFixture.setUp(self)
         self.location = P.null
-        self.zone = builder.add2dZone(3,3,Room).location()
+        self.zone = builder.add2dZone(3,3,Room).zone()
         for x in self.zone.rooms.values():
             x().addListener(self)
         self.room = self.zone.rooms[1,1,0]()

@@ -147,7 +147,7 @@ class TestCommands2(ZoneTestFixture):
         self.assertEquals(self.mob.id,'mob')
         self.assertEquals(self.mob.name,'mob')
         self.assertEquals(self.mob.location(),self.room)
-        self.assertEquals(self.room.location(),self.zone)
+        self.assertEquals(self.room.zone(),self.zone)
 
     def testMap(self):
         self.mob.doCommand("map")

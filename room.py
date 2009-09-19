@@ -47,7 +47,7 @@ class Room(Sim, ContainerChannel):
     def seen(self,o):
         o.sendMessage("room",room=self,contains=self.contains,exits=self.exits)
 
-class Zone(Sim,ContainerChannel):
+class Zone(Sim):
 
     description = "a plain zone"
     detail = "a very plain zone"
@@ -57,7 +57,6 @@ class Zone(Sim,ContainerChannel):
 
     def __init__(self,id=None):
         Sim.__init__(self)
-        ContainerChannel.__init__(self)
         self.id = id
         self.rooms = {}
         self.coordinates = {}
@@ -66,7 +65,6 @@ class Zone(Sim,ContainerChannel):
     def add(self,o,x,y,z=0):
         self.coordinates[o.id] = (x,y,z)
         self.rooms[(x,y,z)] = P(o)
-        self.addListener(o)
         o.zone = P(self)
 
     def remove(self,o):
@@ -75,7 +73,6 @@ class Zone(Sim,ContainerChannel):
             del self.coordinates[o.id]
             if (x,y,z) in self.rooms:
                 del self.rooms[(x,y,z)]
-        self.removeListener(o)
         o.zone = self
 
     def showMap(self,observer,location):
