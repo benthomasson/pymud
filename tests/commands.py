@@ -4,6 +4,7 @@ import unittest
 from pymud.testfixture import RoomTestFixture, ZoneTestFixture
 from pymud.persist import P
 from pymud import builder 
+import logging
 
 class TestCommands(RoomTestFixture):
 
@@ -232,4 +233,5 @@ say he
 
 
 if __name__ == "__main__":
+    
     unittest.main()

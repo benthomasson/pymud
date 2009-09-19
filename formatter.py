@@ -50,7 +50,7 @@ class TextFormatter(object):
         items = message.dict['contains']
         buf = "{GREEN}"
         lines = []
-        for x in items.values():
+        for x in items:
             if x:
                 lines.append(x().description.capitalize())
         buf += "{CLEAR}\n{GREEN}".join(lines)
@@ -81,7 +81,7 @@ class TextFormatter(object):
         items = message.dict['inventory']
         buf = "{GREEN}You are holding:{CLEAR}\n"
         lines = []
-        for x in items.values():
+        for x in items:
             if x:
                 lines.append(x().description)
         buf += "\n".join(lines)

@@ -114,7 +114,10 @@ def look(self,target=None):
     if target == "around":
         lookMap(self,)
         return
-    self.location().get(attribute=target)().seen(self)
+    for target in self.location().get(attribute=target):
+        if target:
+            target.seen(self)
+
 
 def lookMap(self):
     """

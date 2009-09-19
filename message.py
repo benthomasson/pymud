@@ -49,11 +49,11 @@ class ContainerChannel(Channel,Container):
 
     def _sendMessage(self,message):
         _exclude = message.dict['_exclude']
-        for listener in self.contains.copy().values():
+        for listener in self.contains:
             if listener() and listener() not in _exclude:
                 listener().receiveMessage(message)
-            elif not listener() and listener.id in self.contains:
-                del self.contains[listener.id]
+            elif not listener() and listener in self.contains:
+                self.contains.remove(listener.id)
 
 class RepeaterMixin(object):
 

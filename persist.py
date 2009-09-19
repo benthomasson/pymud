@@ -48,6 +48,9 @@ class P(object):
         except KeyError,e:
             return None
 
+    def __eq__(self,other):
+        return self.id == other.id
+
     def __nonzero__(self):
         return self() != None
 
@@ -360,6 +363,25 @@ class TestP(unittest.TestCase):
         m = P(P.persist.persist(mob.Mob()))
         m2 = P(m)
         self.assert_(m.ref is m2.ref)
+
+    def testEquality(self):
+        self.p1 = P()
+        self.p1.id = 5
+        self.p1.ref = 9908
+        self.p2 = P()
+        self.p2.id = 5
+        self.p1.ref = 4353
+        self.assertEqual(self.p1,self.p2)
+        self.assertFalse(self.p1 is self.p2)
+
+    def testList(self):
+        self.testEquality()
+        l = [self.p2]
+        self.assert_(self.p1 in l)
+        self.assert_(self.p2 in l)
+        l.remove(self.p1)
+        self.assertFalse(l)
+
 
 if __name__ == "__main__":
     unittest.main()

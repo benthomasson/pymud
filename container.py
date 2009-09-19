@@ -7,12 +7,14 @@ from pymud.exceptions import *
 class Container(object):
 
     def __init__(self):
-        self.contains = {}
+        self.contains = []
 
     def remove(self,o):
         self.checkRemove(o)
-        if o.id in self.contains:
-            del self.contains[o.id]
+        try:
+            self.contains.remove(o)
+        except ValueError:
+            pass
         o.location = P.null
 
     def add(self,o):
@@ -21,23 +23,25 @@ class Container(object):
             o.location().remove(o)
         o.location = P(self)
         p = P(o)
-        self.contains[o.id] = p
+        if o not in self.contains:
+            self.contains.append(p)
+
+    def getById(self,id):
+        for o in self.contains:
+            if o and o.id == id:
+                return o()
+        raise GameException("Cannot find id %s" % id)
 
     def get(self,id=None,attribute=None,index=0):
-        if id and id in self.contains:
-            o = self.contains[id]
-            if not o():
-                del self.contains[id]
-                raise GameException("Cannot find anything like %s" % attribute)
-            else:
-                return o()
+        if id:
+            return self.getById(id)
         elif attribute:
             if attribute == 'all':
-                return map(lambda x:x(),self.contains.values())
+                return map(lambda x:x(),self.contains)
             if attribute.startswith('all.'):
                 attribute = attribute[4:]
                 matches = []
-                for o in self.contains.values():
+                for o in self.contains:
                     if o:
                         o = o()
                         if attribute == o.name:
@@ -47,7 +51,7 @@ class Container(object):
                 if not matches:
                     raise GameException("Cannot find anything like %s" % attribute)
                 return matches
-            for o in self.contains.values():
+            for o in self.contains:
                 if o:
                     o = o()
                     if attribute == o.name:
@@ -134,7 +138,7 @@ class Test(unittest.TestCase):
         c.id = "container"
         m = Mob(id='mob')
         c.add(m)
-        self.assertEquals(c.contains['mob'](), m)
+        self.assert_( m in c.contains)
         self.assertEquals(c.get(id='mob'),m)
         self.assertEquals(c.get(attribute='mob'),[m])
         self.assert_(m.location)
@@ -151,16 +155,16 @@ class Test(unittest.TestCase):
         m2 = Mob(id='mob2')
         c.add(m1)
         c.add(m2)
-        self.assertEquals(c.contains['mob1'](), m1)
+        self.assert_(m1 in c.contains)
         self.assertEquals(c.get(id='mob1'),m1)
         self.assertEquals(c.get(id='mob2'),m2)
-        self.assertEquals(c.get(attribute='mob'),[m2])
+        self.assertEquals(c.get(attribute='mob'),[m1])
         c.remove(m1)
-        self.assertFalse('mob1' in c.contains)
+        self.assert_(m2 in c.contains)
         self.assertEquals(c.get(id='mob2'),m2)
         self.assertEquals(c.get(attribute='mob'),[m2])
         c.remove(m2)
-        self.assertFalse('mob2' in c.contains)
+        self.assertFalse(m2 in c.contains)
         self.assertRaises(GameException,c.get,attribute='xcvc')
         self.assertRaises(GameException,c.get,attribute='mob')
 
@@ -173,7 +177,7 @@ class TestSlotted(unittest.TestCase):
         thing = Item(id='thing')
         c.add(thing)
         self.assertEquals(thing.location(),c)
-        self.assert_('thing' in c.contains)
+        self.assert_(thing in c.contains)
         c.remove(thing)
         self.assertFalse(thing.location)
         self.assertFalse('thing' in c.contains)
