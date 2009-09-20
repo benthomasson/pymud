@@ -6,6 +6,7 @@ from pymud.chat import ChatRoom
 from pymud.scheduler import Scheduler
 from pymud import cli
 from pymud import telnetserver
+from pymud import apiserver
 from pymud.persist import P, Persistence, getP
 from pymud.exceptions import *
 from pymud.mobmarket import MobMarket
@@ -40,7 +41,8 @@ class Server(object):
         P.persist.syncAll()
 
         self.theCli = cli.startCli(getP(creator))
-        self.server = telnetserver.startServer()
+        self.telnetserver = telnetserver.startServer()
+        self.apiserver = apiserver.startServer()
 
     def run(self):
         try:
@@ -60,7 +62,7 @@ class Server(object):
         print "Saving state"
         for instance in telnetserver.TelnetInterface.instances.copy():
             instance.finish()
-        self.server.shutdown()
+        self.telnetserver.shutdown()
         P.persist.close()
 
 if __name__ == "__main__":
