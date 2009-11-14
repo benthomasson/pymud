@@ -50,6 +50,10 @@ def connectRooms(zone,width,breadth,depth=0):
                 if (x,y+1,depth) in rooms:
                     room.addExit('south',rooms[(x,y+1,depth)])
 
+def addZoneFromMapFile(mapFile,klasses):
+    with open(mapFile) as f:
+        return addZoneFromMap(f.read(),klasses)
+
 def addZoneFromMap(zoneMap,klasses):
     zone = create(Zone)
     lines = zoneMap.splitlines()
