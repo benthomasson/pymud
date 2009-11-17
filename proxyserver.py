@@ -36,6 +36,11 @@ class Test(RoomTestFixture):
         s = client.get_sim("mob")
         self.assertEquals(s.description,'an ugly son of a mob')
         print mob,repr(mob),s,repr(s)
+        loc = s.location
+        self.assertFalse(loc.ref)
+        self.assertEquals(loc.id,'world')
+        print repr(s.location)
+        print repr(s.location())
         
 
 if __name__ == "__main__":
