@@ -4,11 +4,13 @@ import unittest
 from multiprocessing.managers import BaseManager
 from threading import Thread
 from sim import Sim
+from pymud.persist import P, Persistence, getP
 
 from proxy import SimProxy
+from testfixture import RoomTestFixture
 
 def get_sim(id):
-    return Sim()
+    return P.persist.get(id)
 
 class ProxyManager(BaseManager): pass
 
@@ -20,15 +22,20 @@ def startServer(address=("",6000)):
     thread = Thread(target=server.serve_forever)
     thread.start()
 
-class Test(unittest.TestCase):
+class Test(RoomTestFixture):
 
     def test(self):
+        from pymud.mob import Mob
+        mob = self.createHere("mob",Mob)
+        m2 = P.persist.get("mob")
+        self.assert_(mob is m2)
         import proxyclient
         startServer()
         client = proxyclient.ProxyManager(address=("localhost",6000),authkey="abc")
         client.connect()
-        s = client.get_sim(0)
-        self.assertEquals(s.description,'something')
+        s = client.get_sim("mob")
+        self.assertEquals(s.description,'an ugly son of a mob')
+        print mob,repr(mob),s,repr(s)
         
 
 if __name__ == "__main__":
