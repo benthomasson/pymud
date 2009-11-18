@@ -21,8 +21,7 @@ def startServer(address=("",6000),ThreadOrProcess=Thread):
     server = manager.get_server()
     if ThreadOrProcess:
         thread = ThreadOrProcess(target=server.serve_forever)
-        if ThreadOrProcess is Process:
-            thread.daemon = True
+        thread.daemon = True
         thread.start()
         return thread
     else:
