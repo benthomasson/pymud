@@ -79,6 +79,9 @@ class P(object):
         state['id'] = self.id
         return state
 
+    def __str__(self):
+        return "P" + str(self())
+
     def __repr__(self):
         return "P" + repr(self())
 
