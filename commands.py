@@ -301,6 +301,13 @@ def go(self,exit):
     else:
         raise GameException("You cannot leave that way.")
 
+def gocomplete(self,current,full):
+    if self.location():
+        return filter(lambda x:x.startswith(current),self.location().exits.keys())
+
+
+go.tabcomplete = gocomplete
+
 def wander(self):
     """\
     Wander about.
