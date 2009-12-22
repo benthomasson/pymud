@@ -112,7 +112,9 @@ def spy(self,target=None):
     elif target == "here":
         target = self.location()
     elif self.location():
-        target = self.location().get(attribute=target)()
+        target = self.location().get(attribute=target)
+        if target:
+            target = target[0]
     print target.__class__
     for name,value in target.__dict__.iteritems():
         print name,value
@@ -138,8 +140,10 @@ def kill(self,target=None):
     if not self.location():
         return
     target = self.location().get(attribute=target)
+    if target:
+        target = target[0]
     id = target.id
-    target().sendMessage("notice",notice="You have been killed by the cruel hand of fate")
+    target.sendMessage("notice",notice="You have been killed by the cruel hand of fate")
     target.delete()
     self.sendMessage("notice",notice="You killed %s" % id)
 
