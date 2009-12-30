@@ -70,6 +70,7 @@ class Zone(Sim):
         self.id = id
         self.rooms = {}
         self.coordinates = {}
+        self.home = None
 
 
     def add(self,o,x,y,z=0):
