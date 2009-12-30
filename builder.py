@@ -73,9 +73,32 @@ def addZoneFromMap(id,zoneMap,klasses):
                 zone.add(room,x,y)
                 rooms.append(room)
     connectRooms(zone,width+1,breadth+1)
+    zone.home = zone.rooms[(0,0,0)]
     return zone
 
 
+
+def buildRoomMapFile(fileName):
+    with open(fileName) as f:
+        roomMap = buildRoomMap(f.read())
+    return roomMap
+
+def buildRoomMap(string):
+    roomMap = {}
+    for line in string.splitlines():
+        char,space,className = line.strip().partition(" ")
+        moduleName = '.'.join(className.split('.')[:-1])
+        if moduleName:
+            print moduleName
+            klass = __import__(moduleName)
+            print klass
+            for part in className.split('.')[1:]:
+                klass = getattr(klass, part)
+        else:
+            klass = eval(className)
+        print char,className,klass
+        roomMap[char] = klass
+    return roomMap
 
     
 
