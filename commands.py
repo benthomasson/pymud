@@ -94,7 +94,7 @@ def look(self,target=None):
     """
     if target:
         try:
-            self.getFromSlots(attribute=target)().seen(self)
+            self.getFromSlots(attribute=target).seen(self)
             return
         except GameException,e:
             pass
@@ -118,6 +118,14 @@ def look(self,target=None):
         if target:
             target.seen(self)
 
+def room_complete(self,current,full):
+    if self.location():
+        names = map(lambda x:x().name,self.location().contains)
+        return filter(lambda x:x.startswith(current),names)
+    else:
+        return []
+
+look.tabcomplete = room_complete
 
 def lookMap(self):
     """
@@ -179,6 +187,8 @@ def get(self,target=None):
             self.add(target)
             self.sendMessage("notice",notice="You get %s"  % target.name)
 
+get.tabcomplete = room_complete
+
 def drop(self,target=None):
     """\
     Drop something from your inventory into the room.
@@ -197,6 +207,12 @@ def drop(self,target=None):
             else:
                 self.remove(target)
             self.sendMessage("notice",notice="You drop %s"  % target.name)
+
+def item_complete(self,current,full):
+    names = map(lambda x:x().name,self.contains)
+    return filter(lambda x:x.startswith(current),names)
+
+drop.tabcomplete = item_complete
 
 def use(self,target=None):
     """\
@@ -301,12 +317,14 @@ def go(self,exit):
     else:
         raise GameException("You cannot leave that way.")
 
-def gocomplete(self,current,full):
+def exit_complete(self,current,full):
     if self.location():
         return filter(lambda x:x.startswith(current),self.location().exits.keys())
+    else:
+        return []
 
 
-go.tabcomplete = gocomplete
+go.tabcomplete = exit_complete
 
 def wander(self):
     """\
