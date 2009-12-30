@@ -56,7 +56,7 @@ def addZoneFromMapFile(id,mapFile,klasses):
 
 def addZoneFromMap(id,zoneMap,klasses):
     if P.persist.exists(id):
-        return P.persist.get(id).home
+        return P.persist.get(id)
     zone = create(Zone,id)
     lines = zoneMap.splitlines()
     rooms = []
@@ -73,11 +73,7 @@ def addZoneFromMap(id,zoneMap,klasses):
                 zone.add(room,x,y)
                 rooms.append(room)
     connectRooms(zone,width+1,breadth+1)
-    if rooms:
-        zone.home = rooms[0]
-        return rooms[0]
-    else:
-        return None
+    return zone
 
 
 
