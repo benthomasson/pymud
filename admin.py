@@ -153,7 +153,9 @@ def mutate(self,target,klass):
     if target == "here":
         target = self.location()
     else:
-        target = self.location().get(attribute=target)()
+        target = self.location().get(attribute=target)
+        if target:
+            target = target[0]
     klasses = dict(map(lambda x:(x.__name__,x),getAllSubclasses(Sim)))
     oldname = target.name
     target.__class__ = klasses[klass]
