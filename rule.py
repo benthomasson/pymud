@@ -22,16 +22,16 @@ class Struct(object): pass
 
 class StopException(Exception): pass
 
-def runRules(o,ruleMap):
-    def ncmp(x,y):
-        xN,ignore,xLabel = x.partition('_')
-        yN,ignore,yLabel = y.partition('_')
-        v = cmp(xN,yN)
-        if v: return v
-        return cmp(xLabel,yLabel)
+def rcmp(x,y):
+    xN,ignore,xLabel = x.partition('_')
+    yN,ignore,yLabel = y.partition('_')
+    v = cmp(xN,yN)
+    if v: return v
+    return cmp(xLabel,yLabel)
 
+def runRules(o,ruleMap):
     try:
-        for key in sorted(ruleMap.keys(),cmp=ncmp):
+        for key in sorted(ruleMap.keys(),cmp=rcmp):
             ruleMap[key](o)
     except StopException, e:
         pass
