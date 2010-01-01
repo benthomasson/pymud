@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
+from pymud.chainedmap import ChainedMap
 
 def Fail(self,o):
     return False
@@ -36,7 +37,14 @@ def runRules(o,ruleMap):
     except StopException, e:
         pass
 
-class Test(unittest.TestCase):
+class Action(object):
+
+    rules = ChainedMap(map={})
+
+    def __call__(self):
+        runRules(self,self.rules)
+
+class _TestRules(unittest.TestCase):
 
     def testNull(self):
         x = Rule()
@@ -57,7 +65,6 @@ class Test(unittest.TestCase):
         self.assertEquals(o.a, 5)
 
     def testRules(self):
-        from pymud.chainedmap import ChainedMap
         x1, x2, x3 = Rule(), Rule(), Rule()
         def c(self,o):
             return True
@@ -87,6 +94,29 @@ class Test(unittest.TestCase):
         runRules(o,m)
         self.assertEquals(o.a, 4)
     
+class _TestAction(unittest.TestCase):
+
+    def testBase(self):
+        a = Action()
+        a()
+
+    def testSimple(self):
+        x1, x2, x3 = Rule(), Rule(), Rule()
+        def c(self,o):
+            return True
+        def a(self,o):
+            o.a = 5
+        def b(self,o):
+            o.a = 4
+        def s(self,o):
+            raise StopException()
+        x1.condition,x1.action = c,a
+        x2.condition,x2.action = c,b
+        x3.condition,x3.action = c,s
+        a = Action()
+        a.rules = ChainedMap(map={'1_a':x2,'1_b':x3,'1_c':x1})
+        a()
+        self.assertEquals(a.a, 4)
 
 if __name__ == "__main__":
     unittest.main()
