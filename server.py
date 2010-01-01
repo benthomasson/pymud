@@ -33,14 +33,14 @@ class Server(object):
         P.persist = Persistence("server.db")
         Scheduler.scheduler = P.persist.getOrCreate('scheduler',Scheduler)
         MobMarket.market = P.persist.getOrCreate('market',MobMarket)
-        creator = P.persist.getOrCreate("creator",Creator)
+        self.creator = P.persist.getOrCreate("creator",Creator)
         chat = P.persist.getOrCreate("globalchat",ChatRoom,name="global")
-        chat.addListener(creator)
-        Scheduler.scheduler.schedule(creator)
+        chat.addListener(self.creator)
+        Scheduler.scheduler.schedule(self.creator)
 
         P.persist.syncAll()
 
-        self.theCli = cli.startCli(getP(creator))
+        self.theCli = cli.startCli(getP(self.creator))
         self.telnetserver = telnetserver.startServer()
         self.proxyserver = proxyserver.startServer()
 

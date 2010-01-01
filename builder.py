@@ -89,14 +89,11 @@ def buildRoomMap(string):
         char,space,className = line.strip().partition(" ")
         moduleName = '.'.join(className.split('.')[:-1])
         if moduleName:
-            print moduleName
             klass = __import__(moduleName)
-            print klass
             for part in className.split('.')[1:]:
                 klass = getattr(klass, part)
         else:
             klass = eval(className)
-        print char,className,klass
         roomMap[char] = klass
     return roomMap
 
