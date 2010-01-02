@@ -15,9 +15,7 @@ def checkVoid(self,message):
         raise GameException("You are in the void. %s" % message)
 
 def getFirstTarget(self,target,exception):
-    print target
     target = self.location().get(attribute=target)
-    print target
     if target:
         return target[0]
     raise GameException(exception)
