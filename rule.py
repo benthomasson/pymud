@@ -33,10 +33,10 @@ def rcmp(x,y):
     if v: return v
     return cmp(xLabel,yLabel)
 
-def runRules(o,ruleMap):
+def runRules(o,rules):
     try:
-        for key in sorted(ruleMap.keys(),cmp=rcmp):
-            ruleMap[key](o)
+        for rule in rules:
+            rule(o)
     except StopException, e:
         pass
 
@@ -78,20 +78,16 @@ class _TestRules(unittest.TestCase):
         x2 = Rule(c,b)
         x3 = Rule(c,s)
         o = Struct()
-        m = ChainedMap(map={'10':x2,'1':x1})
-        runRules(o,m)
+        runRules(o,[x1,x2])
         self.assertEquals(o.a, 4)
         o = Struct()
-        m = ChainedMap(map={'10_b':x2,'1_a':x1})
-        runRules(o,m)
+        runRules(o,[x1,x2])
         self.assertEquals(o.a, 4)
         o = Struct()
-        m = ChainedMap(map={'1_a':x2,'1_b':x1})
-        runRules(o,m)
+        runRules(o,[x2,x1])
         self.assertEquals(o.a, 5)
         o = Struct()
-        m = ChainedMap(map={'1_a':x2,'1_b':x3,'1_c':x1})
-        runRules(o,m)
+        runRules(o,[x2,x3,x1])
         self.assertEquals(o.a, 4)
     
 class _TestAction(unittest.TestCase):
@@ -113,7 +109,7 @@ class _TestAction(unittest.TestCase):
         x2 = Rule(c,b)
         x3 = Rule(c,s)
         a = Action()
-        a.rules = ChainedMap(map={'1_a':x2,'1_b':x3,'1_c':x1})
+        a.rules = [x2,x3,x1]
         a()
         self.assertEquals(a.a, 4)
 
