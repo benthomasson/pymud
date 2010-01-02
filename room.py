@@ -3,7 +3,7 @@ from pymud.message import ContainerChannel, Container
 from pymud.sim import Sim
 from pymud.persist import P,getP
 
-class Room(Sim, ContainerChannel):
+class Room(ContainerChannel,Sim):
 
     description = "a plain room"
     detail = "a very plain room"
