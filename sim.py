@@ -16,9 +16,8 @@ class Sim(Persistent):
     location = P.null
     locationSlot = None
     fitsInSlots = []
-    lifetime = 1
     commands = {}
-    rules = {}
+    rules = []
 
     def __init__(self):
         Persistent.__init__(self)
@@ -47,7 +46,8 @@ class Sim(Persistent):
 
     def mutate(self):
         Scheduler.scheduler.schedule(self)
-        self.lifetime = self.__class__.lifetime
+        if hasattr(self,'lifetime'):
+            self.lifetime = self.__class__.lifetime
 
     def delete(self):
         P.persist.delete(self)
