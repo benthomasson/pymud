@@ -3,6 +3,7 @@ from pymud.persist import Persistent, P
 from pymud.exceptions import *
 from pymud.chainedmap import ChainedMap
 from pymud.scheduler import Scheduler
+from pymud.rule import runRules
 
 class Sim(Persistent):
 
@@ -17,6 +18,7 @@ class Sim(Persistent):
     fitsInSlots = []
     lifetime = 1
     commands = {}
+    rules = {}
 
     def __init__(self):
         Persistent.__init__(self)
@@ -38,6 +40,10 @@ class Sim(Persistent):
 
     def update(self,tick):
         self.lastUpdate = tick
+        self.runRules()
+
+    def runRules(self):
+        runRules(self,self.rules)
 
     def mutate(self):
         Scheduler.scheduler.schedule(self)
