@@ -65,7 +65,7 @@ class Server(object):
         self.telnetserver.shutdown()
         P.persist.close()
 
-class TestServer(Server):
+class TestServer():
 
     def start(self):
         P.persist = MockPersistence()
@@ -79,6 +79,20 @@ class TestServer(Server):
         P.persist.syncAll()
 
         self.theCli = cli.startCli(getP(self.creator))
+
+    def run(self,ticks):
+        try:
+            tick = time.time()
+            for i in xrange(ticks):
+                Scheduler.scheduler.run()
+                tick = time.time()
+                time.sleep(0.01)
+                self.theCli.receiveMessages()
+        except ShutdownSignal, e:
+            print "Shutting down server"
+        except BaseException, e:
+            print e
+            traceback.print_exception(*sys.exc_info())
 
     def close(self):
         P.persist.close()
