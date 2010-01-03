@@ -162,6 +162,28 @@ class Persistence(object):
     def close(self):
         self.db.close()
 
+class MockPersistence(Persistence):
+
+    def __init__(self):
+        self.db = {}
+        if '0' in self.db:
+            self.id = self.db['0']
+        else:
+            self.id = 0
+        self.db['0'] = self.id
+
+    def sync(self,n=1):
+        pass
+
+    def syncAll(self):
+        pass
+
+    @coroutine
+    def partialSync(self):
+        yield
+
+    def close(self):
+        pass
 
 class Persistent(object):
 
@@ -406,6 +428,20 @@ class TestP(unittest.TestCase):
         self.assertEquals(p1,p2)
         self.assert_(p1 is p2)
 
+class TestMockPersistence(unittest.TestCase):
+
+    def setUp(self):
+        P.persist = None
+
+    def testSame(self):
+        import mob
+        import sys
+        P.persist = MockPersistence()
+        m = P.persist.persist(mob.Mob())
+        p1 = getP(m)
+        p2 = getP(m)
+        self.assertEquals(p1,p2)
+        self.assert_(p1 is p2)
 
 if __name__ == "__main__":
     unittest.main()
