@@ -7,7 +7,7 @@ from pymud.scheduler import Scheduler
 from pymud import cli
 from pymud import telnetserver
 from pymud import proxyserver
-from pymud.persist import P, Persistence, getP
+from pymud.persist import P, Persistence, getP, MockPersistence
 from pymud.exceptions import *
 from pymud.mobmarket import MobMarket
 import sys
@@ -64,6 +64,25 @@ class Server(object):
             instance.finish()
         self.telnetserver.shutdown()
         P.persist.close()
+
+class TestServer(Server):
+
+    def start(self):
+        P.persist = MockPersistence()
+        Scheduler.scheduler = P.persist.getOrCreate('scheduler',Scheduler)
+        MobMarket.market = P.persist.getOrCreate('market',MobMarket)
+        self.creator = P.persist.getOrCreate("creator",Creator)
+        chat = P.persist.getOrCreate("globalchat",ChatRoom,name="global")
+        chat.addListener(self.creator)
+        Scheduler.scheduler.schedule(self.creator)
+
+        P.persist.syncAll()
+
+        self.theCli = cli.startCli(getP(self.creator))
+
+    def close(self):
+        P.persist.close()
+        P.persist = None
 
 if __name__ == "__main__":
 
