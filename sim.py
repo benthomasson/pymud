@@ -46,7 +46,9 @@ class Sim(Persistent):
 
     def mutate(self):
         Scheduler.scheduler.schedule(self)
-        if hasattr(self,'lifetime'):
+        if self.__dict__.has_key('lifetime'):
+            del self.lifetime
+        if hasattr(self.__class__,'lifetime'):
             self.lifetime = self.__class__.lifetime
 
     def delete(self):
