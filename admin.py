@@ -159,7 +159,7 @@ def mutate(self,target,klass):
     klasses = dict(map(lambda x:(x.__name__,x),getAllSubclasses(Sim)))
     oldname = target.name
     target.__class__ = klasses[klass]
-    target.mutate()
+    target.reschedule()
     self.sendMessage("notice",notice="%s mutated into a %s" % (oldname,target.name))
     
 

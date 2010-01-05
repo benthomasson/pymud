@@ -44,12 +44,8 @@ class Sim(Persistent):
     def runRules(self):
         runRules(self,self.rules)
 
-    def mutate(self):
+    def reschedule(self):
         Scheduler.scheduler.schedule(self)
-        if self.__dict__.has_key('lifetime'):
-            del self.lifetime
-        if hasattr(self.__class__,'lifetime'):
-            self.lifetime = self.__class__.lifetime
 
     def delete(self):
         P.persist.delete(self)
