@@ -1,5 +1,8 @@
 from pymud.exceptions import *
 
+from pymud.persist import P
+from pymud.scheduler import Scheduler
+
 def classname(obj):
     return obj.__class__.__name__
 
@@ -19,4 +22,12 @@ def getFirstTarget(self,target,exception):
     if target:
         return target[0]
     raise GameException(exception)
+
+def createInstance(klass):
+    i = klass()
+    P.persist.persist(i)
+    Scheduler.scheduler.schedule(i)
+    return i
+
+
 
