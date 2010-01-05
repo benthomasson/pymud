@@ -3,13 +3,13 @@
 import unittest
 from pymud.chainedmap import ChainedMap
 
-def Pass(self,o):
+def Pass(rule,o):
     return True
 
-def Fail(self,o):
+def Fail(rule,o):
     return False
 
-def NullAction(self,o):
+def NullAction(rule,o):
     pass
 
 class Rule(object):
@@ -55,9 +55,9 @@ class _TestRules(unittest.TestCase):
         x(o)
 
     def testSimple(self):
-        def c(self,o):
+        def c(rule,o):
             return True
-        def a(self,o):
+        def a(rule,o):
             o.a = 5
         x = Rule(c,a)
         o = Struct()
@@ -66,13 +66,13 @@ class _TestRules(unittest.TestCase):
         self.assertEquals(o.a, 5)
 
     def testRules(self):
-        def c(self,o):
+        def c(rule,o):
             return True
-        def a(self,o):
+        def a(rule,o):
             o.a = 5
-        def b(self,o):
+        def b(rule,o):
             o.a = 4
-        def s(self,o):
+        def s(rule,o):
             raise StopException()
         x1 = Rule(c,a)
         x2 = Rule(c,b)
@@ -97,13 +97,13 @@ class _TestAction(unittest.TestCase):
         a()
 
     def testSimple(self):
-        def c(self,o):
+        def c(rule,o):
             return True
-        def a(self,o):
+        def a(rule,o):
             o.a = 5
-        def b(self,o):
+        def b(rule,o):
             o.a = 4
-        def s(self,o):
+        def s(rule,o):
             raise StopException()
         x1 = Rule(c,a)
         x2 = Rule(c,b)
