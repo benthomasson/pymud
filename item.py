@@ -14,7 +14,6 @@ class Item(Sim):
         Sim.__init__(self)
         self.id = id
 
-
     def seen(self,o):
         o.sendMessage("look",description=self.detail)
 
@@ -32,4 +31,16 @@ class Item(Sim):
 
     def __call__(self,*ignore,**ignorekw):
         raise GameException("%s is not usable" % self.name)
+
+
+class FixedItem(Item):
+
+    def checkMove(self,getter):
+        raise GameException("%s cannot be moved" % self.name)
+
+    def checkGet(self,getter):
+        self.checkMove(getter)
+
+    def checkDrop(self,getter):
+        self.checkMove(getter)
 
