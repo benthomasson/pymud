@@ -18,6 +18,7 @@ class Sim(Persistent):
     fitsInSlots = []
     commands = {}
     rules = []
+    checks = []
 
     def __init__(self):
         Persistent.__init__(self)
@@ -39,7 +40,11 @@ class Sim(Persistent):
 
     def update(self,tick):
         self.lastUpdate = tick
+        self.runChecks()
         self.runRules()
+
+    def runChecks(self):
+        runRules(self,self.checks)
 
     def runRules(self):
         runRules(self,self.rules)
