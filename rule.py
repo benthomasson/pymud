@@ -16,13 +16,16 @@ def NullAction(rule,o):
 
 class Rule(object):
 
-    def __init__(self,condition=Fail,action=NullAction):
+    def __init__(self,condition=Fail,action=NullAction,failAction=NullAction):
         self.condition = condition
         self.action = action
+        self.failAction = failAction
 
     def __call__(self,o):
         if self.condition(self,o):
             self.action(self,o)
+        else:
+            self.failAction(self,o)
 
 class SteppableRule(Rule):
 
@@ -31,6 +34,8 @@ class SteppableRule(Rule):
             call = self.action(self,o)
             if isinstance(call,GeneratorType):
                 while step(call): yield
+        else:
+            self.failAction(self,o)
 
 class Struct(object): pass
 
