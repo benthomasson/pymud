@@ -8,7 +8,6 @@ class Item(Sim):
     location = P.null
     description = "a thing"
     detail = "it's nondescript"
-    article = "an"
     
     def __init__(self,id=None):
         Sim.__init__(self)

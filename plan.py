@@ -9,10 +9,11 @@ class Plan(Item):
 
     rule = SteppableRule(Pass,NullAction)
     user = None
+    name = 'plan'
 
     def __call__(self,user):
         self.user = user
-        call = rule(self)
+        call = self.rule(self)
         if isinstance(call,GeneratorType):
             while step(call): yield
 
