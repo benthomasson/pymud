@@ -3,6 +3,7 @@
 import unittest
 from pymud.chainedmap import ChainedMap
 from pymud.coroutine import step, finish
+from types import GeneratorType
 
 def Pass(rule,o):
     return True
@@ -28,7 +29,8 @@ class SteppableRule(Rule):
     def __call__(self,o):
         if self.condition(self,o):
             call = self.action(self,o)
-            while step(call): yield
+            if isinstance(call,GeneratorType):
+                while step(call): yield
 
 class Struct(object): pass
 

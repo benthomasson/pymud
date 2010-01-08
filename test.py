@@ -55,6 +55,7 @@ map(suite.addTestsFromTestCase,[mob.Test,
                                 testfixture.TestTestFixture,
                                 rule._TestRules,
                                 rule._TestAction,
+                                rule._TestSteppableRule,
                                 ])
 
 map(suite.addTestsFromModule,[ 'pymud.tests.chat',
