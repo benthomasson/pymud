@@ -15,6 +15,7 @@ import container
 import testfixture
 import null
 import rule
+import choices
 
 class SimpleSuite(unittest.TestSuite):
 
@@ -56,6 +57,7 @@ map(suite.addTestsFromTestCase,[mob.Test,
                                 rule._TestRules,
                                 rule._TestAction,
                                 rule._TestSteppableRule,
+                                choices._Test,
                                 ])
 
 map(suite.addTestsFromModule,[ 'pymud.tests.chat',
