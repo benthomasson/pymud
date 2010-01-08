@@ -2,6 +2,7 @@
 
 import unittest
 from pymud.chainedmap import ChainedMap
+from pymud.coroutine import step, finish
 
 def Pass(rule,o):
     return True
@@ -21,6 +22,13 @@ class Rule(object):
     def __call__(self,o):
         if self.condition(self,o):
             self.action(self,o)
+
+class SteppableRule(Rule):
+
+    def __call__(self,o):
+        if self.condition(self,o):
+            call = self.action(self,o)
+            while step(call): yield
 
 class Struct(object): pass
 
@@ -112,6 +120,37 @@ class _TestAction(unittest.TestCase):
         a.rules = [x2,x3,x1]
         a()
         self.assertEquals(a.a, 4)
+
+class _TestSteppableRule(unittest.TestCase):
+
+    def test(self):
+        def a(rule,o):
+            return iter(xrange(5))
+        o = Struct()
+        call = SteppableRule(Pass,a)(o)
+        finish(call)
+
+    def test2(self):
+        def a(rule,o):
+            o.x = 0
+            call = iter(xrange(5))
+            while step(call):
+                o.x += 1
+                yield
+        o = Struct()
+        call = SteppableRule(Pass,a)(o)
+        self.assert_(step(call))
+        self.assertEquals(o.x,1)
+        self.assert_(step(call))
+        self.assertEquals(o.x,2)
+        self.assert_(step(call))
+        self.assertEquals(o.x,3)
+        self.assert_(step(call))
+        self.assertEquals(o.x,4)
+        self.assert_(step(call))
+        self.assertEquals(o.x,5)
+        self.assertFalse(step(call))
+        self.assertEquals(o.x,5)
 
 if __name__ == "__main__":
     unittest.main()
