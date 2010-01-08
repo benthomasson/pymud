@@ -164,6 +164,7 @@ class TestCommands2(ZoneTestFixture):
         self.mob.doCommand("trigger enter map")
         self.assertEquals(self.mob.triggers['enter'],"map")
         self.mob.doCommand("go east")
+        self.mob.run(0)
         self.assertEquals(len(self.messages),3)
 
     def testTriggerClear(self):

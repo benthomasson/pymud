@@ -5,6 +5,9 @@ from pymud.exceptions import *
 from pymud.container import Container,SlottedContainer
 from pymud.interpreter import interpret
 from pymud.persist import P
+from pymud.util import *
+from coroutine import step
+from types import GeneratorType
 
 import random
 
@@ -232,7 +235,9 @@ def use(self,target=None):
     for target in targets:
         if target:
             target.checkUse(self)
-            target(self)
+            call = target(self)
+            if isinstance(call,GeneratorType):
+                while step(call): yield
 
 def inventory(self):
     """\
@@ -307,6 +312,7 @@ def go(self,exit):
 
     go east
     """
+    yield
     if not self.location():
         self.sendMessage("notice",notice="You cannot leave the void that way.")
         return
@@ -332,6 +338,7 @@ def wander(self):
 
     wander
     """
+    yield
     if not self.location(): return
     exit = random.choice(self.location().exits.keys())
     self.location().exits[exit]().enter(self)
