@@ -55,7 +55,6 @@ map(suite.addTestsFromTestCase,[mob.Test,
                                 null.Test,
                                 testfixture.TestTestFixture,
                                 rule._TestRules,
-                                rule._TestAction,
                                 rule._TestSteppableRule,
                                 choices._Test,
                                 ])
