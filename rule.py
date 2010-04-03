@@ -5,27 +5,42 @@ from pymud.chainedmap import ChainedMap
 from pymud.coroutine import step, finish
 from types import GeneratorType
 
-def Pass(rule,o):
-    return True
+class Condition(object): pass
+class Action(object): pass
 
-def Fail(rule,o):
-    return False
+class Pass(Condition):
+    "Pass"
 
-def NullAction(rule,o):
-    pass
+    def __call__(self,rule,o):
+        return True
+
+class Fail(Condition):
+    "Fail"
+
+    def __call__(self,rule,o):
+        return False
+
+class NullAction(Action):
+    "Do nothing"
+
+    def __call__(self,rule,o,result):
+        pass
 
 class Rule(object):
 
-    def __init__(self,condition=Fail,action=NullAction,failAction=NullAction):
+    def __init__(self,condition=Fail(),
+                      action=NullAction(),
+                      failAction=NullAction()):
         self.condition = condition
         self.action = action
         self.failAction = failAction
 
     def __call__(self,o):
-        if self.condition(self,o):
-            self.action(self,o)
+        result = self.condition(self,o)
+        if result:
+            self.action(self,o,result)
         else:
-            self.failAction(self,o)
+            self.failAction(self,o,result)
 
 class SteppableRule(Rule):
 
@@ -55,12 +70,44 @@ def runRules(o,rules):
     except StopException, e:
         pass
 
-class Action(object):
+#Actions
 
-    rules = ChainedMap(map={})
+class progn(Action):
+    "Do multiple actions"
 
-    def __call__(self):
-        runRules(self,self.rules)
+    def __init__(self,*fns):
+        self.fns = fns
+
+    def __call__(self,rule,o,result):
+        "Do multiple actions"
+        last = None
+        for fn in self.fns:
+            last = fn(rule,o,result)
+        return last
+
+class StopAction(Action):
+    "Stop running rules"
+
+    def __call__(self,rule,o,result):
+        raise StopException()
+
+class CallRuleAction(Action):
+    "Call another rule"
+
+    def __init__(self,callRule):
+        self.callRule = callRule
+
+    def __call__(self,rule,o,result):
+        self.callRule(o)
+
+class CallRuleListAction(Action):
+    "Call another rule set"
+
+    def __init__(self,rules):
+        self.rules = rules
+
+    def __call__(self,rule,o,result):
+        runRules(o,self.rules)
 
 class _TestRules(unittest.TestCase):
 
@@ -72,7 +119,7 @@ class _TestRules(unittest.TestCase):
     def testSimple(self):
         def c(rule,o):
             return True
-        def a(rule,o):
+        def a(rule,o,result):
             o.a = 5
         x = Rule(c,a)
         o = Struct()
@@ -83,11 +130,11 @@ class _TestRules(unittest.TestCase):
     def testRules(self):
         def c(rule,o):
             return True
-        def a(rule,o):
+        def a(rule,o,result):
             o.a = 5
-        def b(rule,o):
+        def b(rule,o,result):
             o.a = 4
-        def s(rule,o):
+        def s(rule,o,result):
             raise StopException()
         x1 = Rule(c,a)
         x2 = Rule(c,b)
@@ -105,36 +152,13 @@ class _TestRules(unittest.TestCase):
         runRules(o,[x2,x3,x1])
         self.assertEquals(o.a, 4)
     
-class _TestAction(unittest.TestCase):
-
-    def testBase(self):
-        a = Action()
-        a()
-
-    def testSimple(self):
-        def c(rule,o):
-            return True
-        def a(rule,o):
-            o.a = 5
-        def b(rule,o):
-            o.a = 4
-        def s(rule,o):
-            raise StopException()
-        x1 = Rule(c,a)
-        x2 = Rule(c,b)
-        x3 = Rule(c,s)
-        a = Action()
-        a.rules = [x2,x3,x1]
-        a()
-        self.assertEquals(a.a, 4)
-
 class _TestSteppableRule(unittest.TestCase):
 
     def test(self):
         def a(rule,o):
             return iter(xrange(5))
         o = Struct()
-        call = SteppableRule(Pass,a)(o)
+        call = SteppableRule(Pass(),a)(o)
         finish(call)
 
     def test2(self):
@@ -145,7 +169,7 @@ class _TestSteppableRule(unittest.TestCase):
                 o.x += 1
                 yield
         o = Struct()
-        call = SteppableRule(Pass,a)(o)
+        call = SteppableRule(Pass(),a)(o)
         self.assert_(step(call))
         self.assertEquals(o.x,1)
         self.assert_(step(call))
