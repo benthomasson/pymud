@@ -8,29 +8,35 @@ from types import GeneratorType
 class Condition(object): pass
 class Action(object): pass
 
-class Pass(Condition):
+class _Pass(Condition):
     "Pass"
 
     def __call__(self,rule,o):
         return True
 
-class Fail(Condition):
+Pass = _Pass()
+
+class _Fail(Condition):
     "Fail"
 
     def __call__(self,rule,o):
         return False
 
-class NullAction(Action):
+Fail = _Fail()
+
+class _NullAction(Action):
     "Do nothing"
 
     def __call__(self,rule,o,result):
         pass
 
+NullAction = _NullAction()
+
 class Rule(object):
 
-    def __init__(self,condition=Fail(),
-                      action=NullAction(),
-                      failAction=NullAction()):
+    def __init__(self,condition=Fail,
+                      action=NullAction,
+                      failAction=NullAction):
         self.condition = condition
         self.action = action
         self.failAction = failAction
@@ -70,9 +76,45 @@ def runRules(o,rules):
     except StopException, e:
         pass
 
+#Conditions
+
+class Not(Condition):
+    "Not"
+
+    def __init__(self,fn):
+        self.fn = fn
+
+    def __call__(self,rule,o):
+        return not self.fn(rule,o)
+
+class And(Condition):
+    "And"
+
+    def __init__(self,*fns):
+        self.fns = fns
+
+    def __call__(self,rule,o):
+        for fn in self.fns:
+            if not fn(rule,o):
+                return False
+        return True
+
+class Or(Condition):
+    "Or"
+
+    def __init__(self,*fns):
+        self.fns = fns
+
+    def __call__(self,rule,o):
+        for fn in self.fns:
+            if fn(rule,o):
+                return True
+        return False
+
+
 #Actions
 
-class progn(Action):
+class ProgN(Action):
     "Do multiple actions"
 
     def __init__(self,*fns):
@@ -158,7 +200,7 @@ class _TestSteppableRule(unittest.TestCase):
         def a(rule,o):
             return iter(xrange(5))
         o = Struct()
-        call = SteppableRule(Pass(),a)(o)
+        call = SteppableRule(Pass,a)(o)
         finish(call)
 
     def test2(self):
@@ -169,7 +211,7 @@ class _TestSteppableRule(unittest.TestCase):
                 o.x += 1
                 yield
         o = Struct()
-        call = SteppableRule(Pass(),a)(o)
+        call = SteppableRule(Pass,a)(o)
         self.assert_(step(call))
         self.assertEquals(o.x,1)
         self.assert_(step(call))
