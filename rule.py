@@ -51,8 +51,9 @@ class Rule(object):
 class SteppableRule(Rule):
 
     def __call__(self,o):
-        if self.condition(self,o):
-            call = self.action(self,o)
+        result = self.condition(self,o)
+        if result:
+            call = self.action(self,o,result)
             if isinstance(call,GeneratorType):
                 while step(call): yield
         else:
@@ -197,14 +198,14 @@ class _TestRules(unittest.TestCase):
 class _TestSteppableRule(unittest.TestCase):
 
     def test(self):
-        def a(rule,o):
+        def a(rule,o,result):
             return iter(xrange(5))
         o = Struct()
         call = SteppableRule(Pass,a)(o)
         finish(call)
 
     def test2(self):
-        def a(rule,o):
+        def a(rule,o,result):
             o.x = 0
             call = iter(xrange(5))
             while step(call):
