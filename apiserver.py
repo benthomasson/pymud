@@ -28,7 +28,7 @@ class ApiHandler(ColorTextFormatter,object):
                         self.mobs[id] = P.persist.get(id)
                         self.mobs[id].addListener(self)
                     if command:
-                        self.mobs[id].commandQueue.append(command + "\n")
+                        self.mobs[id].appendCommand(command + "\n")
                 self.receiveMessages()
                 time.sleep(0.01)
         except Exception,e:

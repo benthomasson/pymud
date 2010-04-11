@@ -128,7 +128,7 @@ class TelnetInterface(SocketServer.BaseRequestHandler, ColorTextFormatter):
         self.logger.info("%s%s" % (self.prompt(),str(line)))
         try:
             if line:
-                self.mob().commandQueue.append(line + "\n")
+                self.mob().appendCommand(line + "\n")
             self.socketFile.write("\n\r")
             self.socketFile.write(self.prompt())
             self.socketFile.flush()

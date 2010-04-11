@@ -62,7 +62,7 @@ class Cli(cmd.Cmd, ColorTextFormatter):
     def commandMode(self,line):
         try:
             if line:
-                self.mob().commandQueue.append(line + "\n")
+                self.mob().appendCommand(line)
             self.updatePrompt()
         except Exception,e:
             print str(e)

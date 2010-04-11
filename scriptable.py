@@ -74,7 +74,11 @@ class Scriptable(Updatable):
             if not self.runTrigger("error"):
                 self.runTrigger("failure")
 
-    def doCommand(self,command):
+    def appendCommand(self,command):
         self.commandQueue.append(command+"\n")
+
+    def doCommand(self,command):
+        self.appendCommand(command)
         self.run(0)
+
 

@@ -191,9 +191,9 @@ class Test(unittest.TestCase, ColorTextFormatter):
         from pymud.persist import P
         amob = Mob()
         amob.addListener(P(self))
-        amob.commandQueue.append("say hi\n")
-        amob.commandQueue.append("say hi\n")
-        amob.commandQueue.append("say hi\n")
+        amob.appendCommand("say hi")
+        amob.appendCommand("say hi")
+        amob.appendCommand("say hi")
         self.assertFalse(amob.commandScript)
         self.assertEquals(len(amob.commandQueue),3)
         amob.run(0)
