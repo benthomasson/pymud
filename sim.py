@@ -24,7 +24,9 @@ class Sim(Persistent):
         Persistent.__init__(self)
 
     def __repr__(self):
-        return "<" + self.__class__.__name__ +  ":" + self.id + ">"
+        if self.id:
+            return "<" + self.__class__.__name__ +  ":" + self.id + ">"
+        return "<" + self.__class__.__name__ +  ":" + "NO ID" + ">"
 
     def checkGet(self,getter):
         raise GameException("You cannot lift it.")
@@ -54,6 +56,7 @@ class Sim(Persistent):
 
     def delete(self):
         P.persist.delete(self)
+        self.__class__ = Deleted
 
     def sendLocationMessage(self,*args,**kwargs):
         if self.location():
@@ -62,4 +65,6 @@ class Sim(Persistent):
     def sendMessage(self,*ignore,**kwignore):
         pass
 
+
+class Deleted(Sim): pass
 

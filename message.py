@@ -12,6 +12,12 @@ class Message(object):
         self.dict = {'_exclude':[]}
         self.dict.update(kwargs)
 
+    def __str__(self):
+        return "message: %s" % self.type
+
+    def __repr__(self):
+        return self.__str__()
+
 class Channel(object):
     
     def __init__(self):

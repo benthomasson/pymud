@@ -10,13 +10,29 @@ import os
 import sys
 from pymud import builder
 
+class TestInterface(ColorTextFormatter):
 
-class TestFixture(ColorTextFormatter,unittest.TestCase):
+    def start(self):
+        self.id = 'test'
+        self.messages = []
+        self.listeningTo = []
+
+    def listenTo(self,o):
+        if hasattr(o,'addListener'):
+            self.listeningTo.append(o)
+            o.addListener(self)
 
     def receiveMessage(self,message):
         sys.stdout.write(self.formatMessage(message))
         sys.stdout.write("\n")
+        sys.stdout.flush()
         self.messages.append(message)
+    
+    def close(self):
+        for o in self.listeningTo:
+            o.removeListener(self)
+
+class TestFixture(TestInterface,unittest.TestCase):
 
     def setUp(self):
         if os.path.exists("test.db"): os.remove("test.db")

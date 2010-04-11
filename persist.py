@@ -22,7 +22,7 @@ class P(object):
     
     >>> x = persist.P(o).
 
-    To retrieve the object from the peristent reference above use:
+    To retrieve the object from the persistent reference above use:
 
     >>> x()
     """
@@ -117,6 +117,7 @@ class Persistence(object):
             return self.get(id)
         else:
             instance = klass(id=id,*args,**kwargs)
+            instance.id = id
             self.persist(instance)
             return instance
 
@@ -183,7 +184,8 @@ class MockPersistence(Persistence):
         yield
 
     def close(self):
-        pass
+        self.db = None
+        self.id = None
 
 class Persistent(object):
 

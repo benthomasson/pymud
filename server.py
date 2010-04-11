@@ -68,6 +68,10 @@ class Server(object):
 class TestServer():
 
     def start(self):
+        P.persist = None
+        P.instances = {}
+        Scheduler.scheduler = None
+        MobMarket.market = None
         P.persist = MockPersistence()
         Scheduler.scheduler = P.persist.getOrCreate('scheduler',Scheduler)
         MobMarket.market = P.persist.getOrCreate('market',MobMarket)
@@ -78,16 +82,14 @@ class TestServer():
 
         P.persist.syncAll()
 
-        self.theCli = cli.startCli(getP(self.creator))
+        #self.theCli = cli.startCli(getP(self.creator))
 
     def run(self,ticks):
         try:
-            tick = time.time()
             for i in xrange(ticks):
                 Scheduler.scheduler.run()
-                tick = time.time()
-                time.sleep(0.01)
-                self.theCli.receiveMessages()
+                #time.sleep(0.01)
+                #self.theCli.receiveMessages()
         except ShutdownSignal, e:
             print "Shutting down server"
         except BaseException, e:
@@ -97,6 +99,9 @@ class TestServer():
     def close(self):
         P.persist.close()
         P.persist = None
+        P.instances = {}
+        Scheduler.scheduler = None
+        MobMarket.market = None
 
 if __name__ == "__main__":
 
