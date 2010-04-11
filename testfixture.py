@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from pymud.sim import Sim
-from pymud.persist import P, Persistence
+from pymud.persist import P, Persistence, MockPersistence
 from pymud.scheduler import Scheduler
 from pymud.mobmarket import MobMarket
 from pymud.formatter import ColorTextFormatter
@@ -21,7 +21,7 @@ class TestFixture(ColorTextFormatter,unittest.TestCase):
     def setUp(self):
         if os.path.exists("test.db"): os.remove("test.db")
         if os.path.exists("test.db.db"): os.remove("test.db.db")
-        P.persist = Persistence("test.db")
+        P.persist = MockPersistence()
         P.instances = {}
         Scheduler.scheduler = P.persist.getOrCreate('scheduler',Scheduler)
         MobMarket.market = MobMarket()
